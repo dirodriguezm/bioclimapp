@@ -1,5 +1,6 @@
 # bioclimapp
 Ejecutar estos comandos para montar laravel
+ - `composer install`
  - `cp .env.example .env`
  - `php artisan key:generate`
 
