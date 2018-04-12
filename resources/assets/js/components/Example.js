@@ -1,24 +1,74 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps"
 
 export default class Example extends Component {
-    render() {
-        return (
-            <div className="container">
-                <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <div className="card">
-                            <div className="card-header">REACT inside Laravel</div>
-
-                            <div className="card-body">
-                                I'm an example component!
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
+  constructor() {
+    super();
+    //Initialize the state in the constructor
+    this.state = {
+        materiales: [],
     }
+  }
+
+  /*componentDidMount() is a lifecycle method
+   * that gets called after the component is rendered
+   */
+  componentDidMount() {
+    /* fetch API in action */
+    fetch('/api/materiales')
+        .then(response => {
+            return response.json();
+        })
+        .then(materiales => {
+            //Fetched product is stored in the state
+            this.setState({ materiales });
+        });
+  }
+
+  renderProducts() {
+    return this.state.materiales.map(material => {
+        return (
+            /* When using list you need to specify a key
+             * attribute that is unique for each list item
+            */
+            <li key={material.id} >
+                { material.nombre }
+            </li>
+        );
+    })
+  }
+
+
+
+  render() {
+    const MyMapComponent = withScriptjs(withGoogleMap((props) =>
+      <GoogleMap
+        defaultZoom={15}
+        defaultCenter={{ lat: -36.82013519999999, lng: -73.0443904 }}
+      >
+        {props.isMarkerShown && <Marker position={{ lat: -36.82013519999999, lng: -73.0443904 }} />}
+      </GoogleMap>
+    ))
+      return (
+          <div className="container">
+              <div className="row justify-content-center">
+                  <div className="col-md-8">
+                      <div className="card">
+                          <div className="card-header">Lista de materiales</div>
+                      </div>
+                      <MyMapComponent
+                        isMarkerShown
+                        googleMapURL="https://maps.googleapis.com/maps/api/js?v=3.exp&libraries=geometry,drawing,places"
+                        loadingElement={<div style={{ height: `100%` }} />}
+                        containerElement={<div style={{ height: `400px` }} />}
+                        mapElement={<div style={{ height: `100%` }} />}
+                      />
+                  </div>
+              </div>
+          </div>
+      );
+  }
 }
 
 if (document.getElementById('example')) {
