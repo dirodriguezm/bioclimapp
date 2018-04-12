@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { withScriptjs, withGoogleMap, GoogleMap, Marker } from "react-google-maps"
 
 export default class Example extends Component {
+<<<<<<< HEAD
   constructor() {
     super();
     //Initialize the state in the constructor
@@ -10,6 +11,15 @@ export default class Example extends Component {
         materiales: [],
     }
   }
+=======
+    render() {
+        return (
+            <div className="container">
+                <div className="row justify-content-center">
+                    <div className="col-md-8">
+                        <div className="card">
+                            <div className="card-header">Example Component</div>
+>>>>>>> cb5305db21eb9df4abceeb95a571828eef627ad0
 
   /*componentDidMount() is a lifecycle method
    * that gets called after the component is rendered
