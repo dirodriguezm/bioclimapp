@@ -20,11 +20,12 @@
         "lodash": "^4.17.4",
         "popper.js": "^1.12",
         "react": "^16.2.0",
-        "react-dom": "^16.3.2"
+        "react-dom": "^16.2.0"
     },
     "dependencies": {
         "google-maps-react": "^2.0.0",
         "orbit-controls-es6": "^1.0.12",
+        "react-dom": "^16.3.2",
         "react-google-maps": "^9.4.5",
         "react-three": "^0.9.7",
         "three": "^0.91.0"

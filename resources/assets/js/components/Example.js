@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import Scene from './World';
+import Scene from './World'
 
 export default class Example extends Component {
     render() {

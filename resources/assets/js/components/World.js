@@ -16,76 +16,83 @@ class Scene extends Component {
     const width = this.mount.clientWidth
     const height = this.mount.clientHeight
 
-    const scene = new THREE.Scene()
-    var camera = new THREE.PerspectiveCamera( 40, width / height, 1, 10000 );
-	camera.position.set( 5, 8, 13 );
-	camera.lookAt( new THREE.Vector3() );
+    //Hay que cargar camara, escena y renderer,
 
-
+    //Escena
+    const escena = new THREE.Scene()
+    //Camara
+    var camara = new THREE.PerspectiveCamera( 40, width / height, 1, 10000 );
+	  camara.position.set( 5, 8, 13 );
+	  camara.lookAt( new THREE.Vector3() );
+    //Renderer
     const renderer = new THREE.WebGLRenderer({ antialias: true })
-    const controls = new OrbitControls( camera, renderer.domElement )
+
+    //Controles para la camara
+    const controls = new OrbitControls( camara, renderer.domElement )
     controls.enabled = true;
     controls.maxDistance = 500;
     /*controls.minDistance = 10;*/
+
     const geometry = new THREE.BoxGeometry(1, 1, 1)
     const material = new THREE.MeshBasicMaterial({ color: '#433F81' })
     const cube = new THREE.Mesh(geometry, material)
     //const pared = new Pared()
 
     var gridHelper = new THREE.GridHelper( 100, 20 );
-	scene.add( gridHelper );
+    escena.add( cube )
+	  escena.add( gridHelper );
 
     // Lights
     /*var ambientLight = new THREE.AmbientLight( 0x606060 );
-    scene.add( ambientLight );*/
+    escena.add( ambientLight );*/
     var directionalLight = new THREE.DirectionalLight( 0xffffff,1 );
     directionalLight.position.set( 50, 50, 50 );
-    scene.add( directionalLight );
+    escena.add( directionalLight );
 
 
     // We will use 2D canvas element to render our HUD.
     //this.getElementsByName('name')
     console.log(this.myRef)
-    var hudCanvas = this.myRef.createElement('canvas')
+    //var hudCanvas = this.myRef.createElement('canvas')
     //var hudCanvas = React.createElement('canvas')
 
     //var hudCanvas = ReactDOM.createElement('canvas')
 
     //var hudCanvas = this.createElement('canvas')
-    hudCanvas.width = width;
-    hudCanvas.height = height;
+    //hudCanvas.width = width;
+    //hudCanvas.height = height;
 
     // Get 2D context and draw something supercool.
-    var hudBitmap = hudCanvas.getContext('2d');
-	hudBitmap.font = "Normal 40px Arial";
-    hudBitmap.textAlign = 'center';
-    hudBitmap.fillStyle = "rgba(245,245,245,0.75)";
-    hudBitmap.fillText('Initializing...', width / 2, height / 2);
+    //var hudBitmap = hudCanvas.getContext('2d');
+	//hudBitmap.font = "Normal 40px Arial";
+    //hudBitmap.textAlign = 'center';
+    //hudBitmap.fillStyle = "rgba(245,245,245,0.75)";
+    //hudBitmap.fillText('Initializing...', width / 2, height / 2);
 
-    // Create the camera and set the viewport to match the screen dimensions.
-    var cameraHUD = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2, 0, 30 );
+    // Create the camara and set the viewport to match the screen dimensions.
+    //var camaraHUD = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2, 0, 30 );
 
-    // Create also a custom scene for HUD.
-    sceneHUD = new THREE.Scene();
+    // Create also a custom escena for HUD.
+    //escenaHUD = new THREE.Scene();
     // Create texture from rendered graphics.
-	var hudTexture = new THREE.Texture(hudCanvas)
-	hudTexture.needsUpdate = true;
+	//var hudTexture = new THREE.Texture(hudCanvas)
+	//hudTexture.needsUpdate = true;
 
     // Create HUD material.
-    var material_text = new THREE.MeshBasicMaterial( {map: hudTexture} );
-    material.transparent = true;
+    //var material_text = new THREE.MeshBasicMaterial( {map: hudTexture} );
+    //material.transparent = true;
 
     // Create plane to render the HUD. This plane fill the whole screen.
-    var planeGeometry = new THREE.PlaneGeometry( width, height );
-    var plane = new THREE.Mesh( planeGeometry, material_text );
-    sceneHUD.add( plane );
+    //var planeGeometry = new THREE.PlaneGeometry( width, height );
+    //var plane = new THREE.Mesh( planeGeometry, material_text );
+    //escenaHUD.add( plane );
 
-    //scene.add(pared)
+    //escena.add(pared)
     renderer.setClearColor('#F0F0F0')
     renderer.setSize(width, height)
 
-    this.scene = scene
-    this.camera = camera
+    this.escena = escena
+    this.camara = camara
     this.renderer = renderer
     this.material = material
     this.cube = cube
@@ -117,7 +124,7 @@ class Scene extends Component {
   }
 
   renderScene() {
-    this.renderer.render(this.scene, this.camera)
+    this.renderer.render(this.escena, this.camara)
   }
 
 
