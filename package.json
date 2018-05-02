@@ -25,6 +25,7 @@
     "dependencies": {
         "google-map-react": "^0.34.0",
         "google-maps-react": "^2.0.0",
+        "orbit-controls-es6": "^1.0.12",
         "react-google-maps": "^9.4.5",
         "suncalc": "^1.8.0"
     }
