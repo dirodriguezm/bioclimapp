@@ -10,7 +10,7 @@
         "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --no-progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
     },
     "devDependencies": {
-        "axios": "^0.18",
+        "axios": "^0.18.0",
         "babel-plugin-transform-es2015-destructuring": "^6.23.0",
         "babel-preset-react": "^6.23.0",
         "bootstrap": "^4.0.0",
@@ -23,6 +23,9 @@
         "react-dom": "^16.2.0"
     },
     "dependencies": {
-        "react-google-maps": "^9.4.5"
+        "google-map-react": "^0.34.0",
+        "google-maps-react": "^2.0.0",
+        "react-google-maps": "^9.4.5",
+        "suncalc": "^1.8.0"
     }
 }
