@@ -145,13 +145,16 @@ class Scene extends Component {
       event.preventDefault()
       var rect = this.renderer.domElement.getBoundingClientRect();
       this.mouse.x = ( ( event.clientX - rect.left ) / ( rect.width ) ) * 2 - 1;
-      this.mouse.y = - ( ( event.clientY - rect.top ) / ( rect.height - rect.top) ) * 2 + 1;
+      this.mouse.y = - ( ( event.clientY - rect.top ) / ( rect.height ) ) * 2 + 1;
       this.raycaster.setFromCamera( this.mouse, this.camara );
 
       var intersects = this.raycaster.intersectObjects(this.objetos);
 
+      console.log("x: "+this.mouse.x+"\ny: "+this.mouse.y);
+
       if(intersects.length > 0){
           var intersect = intersects[0]
+          console.log(intersect.point);
           this.indicadorPared.position.copy( intersect.point ).add( intersect.face.normal );
 		  this.indicadorPared.position.floor()
       }
