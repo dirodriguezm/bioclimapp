@@ -32,7 +32,7 @@
         <div class="title">
             Bioclimapp
         </div>
-        <div id="example"></div>
+        <div id="main"></div>
         <script src="{{mix('js/app.js')}}" ></script>
     </body>
 </html>
