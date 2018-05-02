@@ -33,6 +33,6 @@ export default class Main extends Component {
   }
 }
 
-if (document.getElementById('main')) {
-    ReactDOM.render(<Main />, document.getElementById('main'));
+if (document.getElementById('root')) {
+    ReactDOM.render(<Main />, document.getElementById('root'));
 }
