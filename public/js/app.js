@@ -55104,7 +55104,7 @@ var MapContainer = function (_React$Component) {
           currentLocation: {
             lat: clickEvent.latLng.lat(),
             lng: clickEvent.latLng.lng(),
-            elevation: result.elevation
+            elevation: result.elevationgi
           }
         });
       });
