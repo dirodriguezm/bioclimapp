@@ -54934,155 +54934,198 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 var Scene = function (_Component) {
-  _inherits(Scene, _Component);
+    _inherits(Scene, _Component);
 
-  function Scene(props) {
-    _classCallCheck(this, Scene);
+    //Aqui se nomban objetos y se asocian a un metodo
+    function Scene(props) {
+        _classCallCheck(this, Scene);
 
-    var _this = _possibleConstructorReturn(this, (Scene.__proto__ || Object.getPrototypeOf(Scene)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (Scene.__proto__ || Object.getPrototypeOf(Scene)).call(this, props));
 
-    _this.start = _this.start.bind(_this);
-    _this.stop = _this.stop.bind(_this);
-    _this.animate = _this.animate.bind(_this);
-    _this.myRef = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createRef();
-    return _this;
-  }
-
-  _createClass(Scene, [{
-    key: 'componentDidMount',
-    value: function componentDidMount() {
-      var width = this.mount.clientWidth;
-      var height = this.mount.clientHeight;
-
-      //Hay que cargar camara, escena y renderer,
-
-      //Escena
-      var escena = new __WEBPACK_IMPORTED_MODULE_2_three__["g" /* Scene */]();
-      //Camara
-      var camara = new __WEBPACK_IMPORTED_MODULE_2_three__["f" /* PerspectiveCamera */](40, width / height, 1, 10000);
-      camara.position.set(5, 8, 13);
-      camara.lookAt(new __WEBPACK_IMPORTED_MODULE_2_three__["h" /* Vector3 */]());
-      //Renderer
-      var renderer = new __WEBPACK_IMPORTED_MODULE_2_three__["i" /* WebGLRenderer */]({ antialias: true });
-
-      //Controles para la camara
-      var controls = new __WEBPACK_IMPORTED_MODULE_3_orbit_controls_es6__["a" /* default */](camara, renderer.domElement);
-      controls.enabled = true;
-      controls.maxDistance = 500;
-      /*controls.minDistance = 10;*/
-
-      var geometry = new __WEBPACK_IMPORTED_MODULE_2_three__["a" /* BoxGeometry */](1, 1, 1);
-      var material = new __WEBPACK_IMPORTED_MODULE_2_three__["e" /* MeshBasicMaterial */]({ color: '#433F81' });
-      var cube = new __WEBPACK_IMPORTED_MODULE_2_three__["d" /* Mesh */](geometry, material);
-      //const pared = new Pared()
-
-      var gridHelper = new __WEBPACK_IMPORTED_MODULE_2_three__["c" /* GridHelper */](100, 20);
-      escena.add(cube);
-      escena.add(gridHelper);
-
-      // Lights
-      /*var ambientLight = new THREE.AmbientLight( 0x606060 );
-      escena.add( ambientLight );*/
-      var directionalLight = new __WEBPACK_IMPORTED_MODULE_2_three__["b" /* DirectionalLight */](0xffffff, 1);
-      directionalLight.position.set(50, 50, 50);
-      escena.add(directionalLight);
-
-      // We will use 2D canvas element to render our HUD.
-      //this.getElementsByName('name')
-      console.log(this.myRef);
-      //var hudCanvas = this.myRef.createElement('canvas')
-      //var hudCanvas = React.createElement('canvas')
-
-      //var hudCanvas = ReactDOM.createElement('canvas')
-
-      //var hudCanvas = this.createElement('canvas')
-      //hudCanvas.width = width;
-      //hudCanvas.height = height;
-
-      // Get 2D context and draw something supercool.
-      //var hudBitmap = hudCanvas.getContext('2d');
-      //hudBitmap.font = "Normal 40px Arial";
-      //hudBitmap.textAlign = 'center';
-      //hudBitmap.fillStyle = "rgba(245,245,245,0.75)";
-      //hudBitmap.fillText('Initializing...', width / 2, height / 2);
-
-      // Create the camara and set the viewport to match the screen dimensions.
-      //var camaraHUD = new THREE.OrthographicCamera(-width/2, width/2, height/2, -height/2, 0, 30 );
-
-      // Create also a custom escena for HUD.
-      //escenaHUD = new THREE.Scene();
-      // Create texture from rendered graphics.
-      //var hudTexture = new THREE.Texture(hudCanvas)
-      //hudTexture.needsUpdate = true;
-
-      // Create HUD material.
-      //var material_text = new THREE.MeshBasicMaterial( {map: hudTexture} );
-      //material.transparent = true;
-
-      // Create plane to render the HUD. This plane fill the whole screen.
-      //var planeGeometry = new THREE.PlaneGeometry( width, height );
-      //var plane = new THREE.Mesh( planeGeometry, material_text );
-      //escenaHUD.add( plane );
-
-      //escena.add(pared)
-      renderer.setClearColor('#F0F0F0');
-      renderer.setSize(width, height);
-
-      this.escena = escena;
-      this.camara = camara;
-      this.renderer = renderer;
-      this.material = material;
-      this.cube = cube;
-      //this.control = control
-
-      this.mount.appendChild(this.renderer.domElement);
-      this.start();
+        _this.start = _this.start.bind(_this);
+        _this.stop = _this.stop.bind(_this);
+        _this.animate = _this.animate.bind(_this);
+        _this.onMouseMove = _this.onMouseMove.bind(_this);
+        _this.onClick = _this.onClick.bind(_this);
+        _this.agregarPared = _this.agregarPared.bind(_this);
+        return _this;
     }
-  }, {
-    key: 'componentWillUnmount',
-    value: function componentWillUnmount() {
-      this.stop();
-      this.mount.removeChild(this.renderer.domElement);
-    }
-  }, {
-    key: 'start',
-    value: function start() {
-      if (!this.frameId) {
-        this.frameId = requestAnimationFrame(this.animate);
-      }
-    }
-  }, {
-    key: 'stop',
-    value: function stop() {
-      cancelAnimationFrame(this.frameId);
-    }
-  }, {
-    key: 'animate',
-    value: function animate() {
-      this.cube.rotation.y += 0.01;
-      this.renderScene();
-      this.frameId = window.requestAnimationFrame(this.animate);
-    }
-  }, {
-    key: 'renderScene',
-    value: function renderScene() {
-      this.renderer.render(this.escena, this.camara);
-    }
-  }, {
-    key: 'render',
-    value: function render() {
-      var _this2 = this;
 
-      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', {
-        style: { width: '1080px', height: '800px' },
-        ref: function ref(mount) {
-          _this2.mount = mount;
+    _createClass(Scene, [{
+        key: 'componentDidMount',
+        value: function componentDidMount() {
+            //configuracion pantalla
+            var width = this.mount.clientWidth;
+            var height = this.mount.clientHeight;
+
+            //posicion de mouse en la pantalla
+            var mouse = new __WEBPACK_IMPORTED_MODULE_2_three__["k" /* Vector2 */]();
+            this.mouse = mouse;
+            //arreglo de objetos visibles que podrían interactuar
+            var objetos = [];
+            var paredes = [];
+            var ventanas = [];
+            this.objetos = objetos;
+            this.paredes = paredes;
+            this.ventanas = ventanas;
+
+            //Hay que cargar escena, camara, y renderer,
+            //Escena
+            var escena = new __WEBPACK_IMPORTED_MODULE_2_three__["j" /* Scene */]();
+            this.escena = escena;
+            //Camara
+            var camara = new __WEBPACK_IMPORTED_MODULE_2_three__["g" /* PerspectiveCamera */](40, width / height, 1, 10000);
+            camara.position.set(5, 8, 13);
+            camara.lookAt(new __WEBPACK_IMPORTED_MODULE_2_three__["l" /* Vector3 */]());
+            this.camara = camara;
+            //Renderer
+            var renderer = new __WEBPACK_IMPORTED_MODULE_2_three__["m" /* WebGLRenderer */]({ antialias: true });
+            renderer.setClearColor('#F0F0F0');
+            renderer.setSize(width, height);
+            this.renderer = renderer;
+            //Controles para la camara
+            var control = new __WEBPACK_IMPORTED_MODULE_3_orbit_controls_es6__["a" /* default */](camara, renderer.domElement);
+            control.enabled = true;
+            control.maxDistance = 500;
+            this.control = control;
+            /*controls.minDistance = 10;*/
+
+            //Plano se agrega a objetos //
+            var planoGeometria = new __WEBPACK_IMPORTED_MODULE_2_three__["h" /* PlaneBufferGeometry */](100, 100);
+            planoGeometria.rotateX(-Math.PI / 2);
+            var plano = new __WEBPACK_IMPORTED_MODULE_2_three__["e" /* Mesh */](planoGeometria, new __WEBPACK_IMPORTED_MODULE_2_three__["f" /* MeshBasicMaterial */]({ visible: false }));
+            escena.add(plano);
+            objetos.push(plano);
+
+            //Grid del plano
+            var gridHelper = new __WEBPACK_IMPORTED_MODULE_2_three__["d" /* GridHelper */](100, 100);
+            plano.add(gridHelper);
+
+            //Indicador de la pared
+            var geomeIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["b" /* CylinderBufferGeometry */](0.05, 0.05, 2, 32);
+            var materialIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["f" /* MeshBasicMaterial */]({ color: 0xff0000, opacity: 0.5, transparent: true });
+            var indicadorPared = new __WEBPACK_IMPORTED_MODULE_2_three__["e" /* Mesh */](geomeIndPared, materialIndPared);
+            escena.add(indicadorPared);
+            this.indicadorPared = indicadorPared;
+
+            //pared que dibuja nuevas paredes
+            var geoParedFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["a" /* BoxBufferGeometry */](1, 1, 0.05);
+            var materialParedFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["f" /* MeshBasicMaterial */]({ color: '#433F81', opacity: 0.5, transparent: true });
+            var paredFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["e" /* Mesh */](geoParedFantasma, materialParedFantasma);
+            paredFantasma.visible = false;
+            escena.add(paredFantasma);
+            this.paredFantasma = paredFantasma;
+
+            // Luces, es el sol, todavía no se si funcionan
+            var sol = new __WEBPACK_IMPORTED_MODULE_2_three__["c" /* DirectionalLight */](0xffffff, 1);
+            sol.position.set(50, 50, 50);
+            sol.lookAt(new __WEBPACK_IMPORTED_MODULE_2_three__["l" /* Vector3 */]());
+            escena.add(sol);
+            this.sol = sol;
+
+            //raycaster, usado para apuntar objetos
+            var raycaster = new __WEBPACK_IMPORTED_MODULE_2_three__["i" /* Raycaster */]();
+            raycaster.linePrecision = 1;
+            this.raycaster = raycaster;
+
+            var dibujando = false;
+            this.dibujando = dibujando;
+            //controles, ahora con teclas para probar
+
+            this.mount.appendChild(this.renderer.domElement);
+            this.start();
         }
-      });
-    }
-  }]);
+    }, {
+        key: 'componentWillUnmount',
+        value: function componentWillUnmount() {
+            this.stop();
+            this.mount.removeChild(this.renderer.domElement);
+        }
+    }, {
+        key: 'start',
+        value: function start() {
+            if (!this.frameId) {
+                this.frameId = requestAnimationFrame(this.animate);
+            }
+        }
+    }, {
+        key: 'stop',
+        value: function stop() {
+            cancelAnimationFrame(this.frameId);
+        }
+    }, {
+        key: 'animate',
+        value: function animate() {
+            this.renderScene();
+            this.frameId = window.requestAnimationFrame(this.animate);
+        }
+    }, {
+        key: 'renderScene',
+        value: function renderScene() {
 
-  return Scene;
+            this.renderer.render(this.escena, this.camara);
+        }
+    }, {
+        key: 'agregarPared',
+        value: function agregarPared() {
+            if (this.dibujando) {
+                this.dibujando = false;
+                var endPosition = this.indicadorPared.position;
+                var widthPared = endPosition.distanceTo(this.paredFantasma.position);
+                //this.paredFantasma.width = widthPared;
+                this.paredFantasma.scale.x = widthPared;
+                //this.paredFantasma.rotateX( - Math.PI / 2 );
+                //this.paredFantasma.position.copy(this.indicadorPared.position);
+            } else {
+                this.dibujando = true;
+                this.paredFantasma.position.copy(this.indicadorPared.position);
+                this.paredFantasma.visible = true;
+                console.log(this.indicadorPared.position);
+            }
+        }
+    }, {
+        key: 'onMouseMove',
+        value: function onMouseMove(event) {
+            event.preventDefault();
+            var rect = this.renderer.domElement.getBoundingClientRect();
+            this.mouse.x = (event.clientX - rect.left) / rect.width * 2 - 1;
+            this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+            this.raycaster.setFromCamera(this.mouse, this.camara);
+
+            var intersects = this.raycaster.intersectObjects(this.objetos);
+
+            console.log("x: " + this.mouse.x + "\ny: " + this.mouse.y);
+
+            if (intersects.length > 0) {
+                var intersect = intersects[0];
+                console.log(intersect.point);
+                this.indicadorPared.position.copy(intersect.point).add(intersect.face.normal);
+                this.indicadorPared.position.floor();
+            }
+        }
+    }, {
+        key: 'onClick',
+        value: function onClick(event) {
+            event.preventDefault();
+            this.agregarPared();
+        }
+    }, {
+        key: 'render',
+        value: function render() {
+            var _this2 = this;
+
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', {
+                onMouseMove: this.onMouseMove,
+                onClick: this.onClick,
+                style: { width: '1080px', height: '800px' },
+                ref: function ref(mount) {
+                    _this2.mount = mount;
+                }
+            });
+        }
+    }]);
+
+    return Scene;
 }(__WEBPACK_IMPORTED_MODULE_0_react__["Component"]);
 
 /* harmony default export */ __webpack_exports__["a"] = (Scene);
@@ -55094,20 +55137,20 @@ var Scene = function (_Component) {
 "use strict";
 /* unused harmony export WebGLRenderTargetCube */
 /* unused harmony export WebGLRenderTarget */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return WebGLRenderer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return WebGLRenderer; });
 /* unused harmony export ShaderLib */
 /* unused harmony export UniformsLib */
 /* unused harmony export UniformsUtils */
 /* unused harmony export ShaderChunk */
 /* unused harmony export FogExp2 */
 /* unused harmony export Fog */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return Scene; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return Scene; });
 /* unused harmony export Sprite */
 /* unused harmony export LOD */
 /* unused harmony export SkinnedMesh */
 /* unused harmony export Skeleton */
 /* unused harmony export Bone */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return Mesh; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return Mesh; });
 /* unused harmony export LineSegments */
 /* unused harmony export LineLoop */
 /* unused harmony export Line */
@@ -55144,12 +55187,12 @@ var Scene = function (_Component) {
 /* unused harmony export RectAreaLight */
 /* unused harmony export HemisphereLight */
 /* unused harmony export DirectionalLightShadow */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return DirectionalLight; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return DirectionalLight; });
 /* unused harmony export AmbientLight */
 /* unused harmony export LightShadow */
 /* unused harmony export Light */
 /* unused harmony export StereoCamera */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return PerspectiveCamera; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return PerspectiveCamera; });
 /* unused harmony export OrthographicCamera */
 /* unused harmony export CubeCamera */
 /* unused harmony export ArrayCamera */
@@ -55182,7 +55225,7 @@ var Scene = function (_Component) {
 /* unused harmony export InstancedBufferAttribute */
 /* unused harmony export Face3 */
 /* unused harmony export Object3D */
-/* unused harmony export Raycaster */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Raycaster; });
 /* unused harmony export Layers */
 /* unused harmony export EventDispatcher */
 /* unused harmony export Clock */
@@ -55206,8 +55249,8 @@ var Scene = function (_Component) {
 /* unused harmony export Line3 */
 /* unused harmony export Euler */
 /* unused harmony export Vector4 */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return Vector3; });
-/* unused harmony export Vector2 */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return Vector3; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return Vector2; });
 /* unused harmony export Quaternion */
 /* unused harmony export Color */
 /* unused harmony export ImmediateRenderObject */
@@ -55217,7 +55260,7 @@ var Scene = function (_Component) {
 /* unused harmony export PointLightHelper */
 /* unused harmony export RectAreaLightHelper */
 /* unused harmony export HemisphereLightHelper */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return GridHelper; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return GridHelper; });
 /* unused harmony export PolarGridHelper */
 /* unused harmony export FaceNormalsHelper */
 /* unused harmony export DirectionalLightHelper */
@@ -55261,7 +55304,7 @@ var Scene = function (_Component) {
 /* unused harmony export RingGeometry */
 /* unused harmony export RingBufferGeometry */
 /* unused harmony export PlaneGeometry */
-/* unused harmony export PlaneBufferGeometry */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return PlaneBufferGeometry; });
 /* unused harmony export LatheGeometry */
 /* unused harmony export LatheBufferGeometry */
 /* unused harmony export ShapeGeometry */
@@ -55272,11 +55315,11 @@ var Scene = function (_Component) {
 /* unused harmony export ConeGeometry */
 /* unused harmony export ConeBufferGeometry */
 /* unused harmony export CylinderGeometry */
-/* unused harmony export CylinderBufferGeometry */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CylinderBufferGeometry; });
 /* unused harmony export CircleGeometry */
 /* unused harmony export CircleBufferGeometry */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BoxGeometry; });
-/* unused harmony export BoxBufferGeometry */
+/* unused harmony export BoxGeometry */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BoxBufferGeometry; });
 /* unused harmony export ShadowMaterial */
 /* unused harmony export SpriteMaterial */
 /* unused harmony export RawShaderMaterial */
@@ -55290,7 +55333,7 @@ var Scene = function (_Component) {
 /* unused harmony export MeshLambertMaterial */
 /* unused harmony export MeshDepthMaterial */
 /* unused harmony export MeshDistanceMaterial */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return MeshBasicMaterial; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return MeshBasicMaterial; });
 /* unused harmony export LineDashedMaterial */
 /* unused harmony export LineBasicMaterial */
 /* unused harmony export Material */
