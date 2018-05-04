@@ -57659,7 +57659,7 @@ function CanvasRenderer() {
 /***/ (function(module, exports, __webpack_require__) {
 
 __webpack_require__(26);
-module.exports = __webpack_require__(81);
+module.exports = __webpack_require__(82);
 
 
 /***/ }),
@@ -79898,6 +79898,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__MapContainer__ = __webpack_require__(62);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__World__ = __webpack_require__(79);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__SearchBar__ = __webpack_require__(81);
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -79911,13 +79912,20 @@ function _inherits(subClass, superClass) { if (typeof superClass !== "function" 
 
 
 
+
 var Main = function (_Component) {
     _inherits(Main, _Component);
 
     function Main(props) {
         _classCallCheck(this, Main);
 
-        return _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
+        var _this = _possibleConstructorReturn(this, (Main.__proto__ || Object.getPrototypeOf(Main)).call(this, props));
+
+        _this.state = {
+            map: null,
+            apiKey: 'AIzaSyAA_ayr9aMRSAPIugacjp_CL6S5ux_N4is'
+        };
+        return _this;
     }
 
     /*componentDidMount() is a lifecycle method
@@ -79937,9 +79945,11 @@ var Main = function (_Component) {
                 { className: 'container' },
                 __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
                     'div',
-                    { className: 'row justify-content-center' },
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__World__["a" /* default */], null),
-                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_2__MapContainer__["a" /* default */], { apiKey: 'AIzaSyAA_ayr9aMRSAPIugacjp_CL6S5ux_N4is' })
+                    null,
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_4__SearchBar__["a" /* default */], {
+                        apiKey: this.state.apiKey
+                    }),
+                    __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__World__["a" /* default */], null)
                 )
             );
         }
@@ -98336,8 +98346,6 @@ module.exports = camelize;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_google_maps_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_google_maps_react__);
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
@@ -98357,15 +98365,10 @@ var MapContainer = function (_React$Component) {
     var _this = _possibleConstructorReturn(this, (MapContainer.__proto__ || Object.getPrototypeOf(MapContainer)).call(this, props));
 
     _this.state = {
-      currentLocation: {
-        lat: '-36.82013519999999',
-        lng: '-73.0443904',
-        elevation: -1
-      }
+      currentLocation: _this.props.currentLocation
     };
     _this.mapClicked = _this.mapClicked.bind(_this);
     _this.onDragend = _this.onDragend.bind(_this);
-    _this.onMapReady = _this.onMapReady.bind(_this);
     return _this;
   }
 
@@ -98373,7 +98376,6 @@ var MapContainer = function (_React$Component) {
     key: 'getGeocode',
     value: function getGeocode(latLng, _callback) {
       var geocoder = new google.maps.Geocoder();
-      var res = "hola";
       geocoder.geocode({ 'location': latLng }, function (results, status) {
         if (status === 'OK') {
           if (results[1]) {
@@ -98432,7 +98434,7 @@ var MapContainer = function (_React$Component) {
           currentLocation: {
             lat: clickEvent.latLng.lat(),
             lng: clickEvent.latLng.lng(),
-            elevation: result.elevationgi
+            elevation: result.elevation
           }
         });
       });
@@ -98454,76 +98456,24 @@ var MapContainer = function (_React$Component) {
       });
     }
   }, {
-    key: 'onMapReady',
-    value: function onMapReady(mapProps, map) {
-      var _this3 = this;
-
-      var google = this.props.google;
-
-      if (!google || !map) return;
-
-      var autocomplete = new google.maps.places.Autocomplete(this.autocomplete);
-      autocomplete.bindTo('bounds', map);
-
-      autocomplete.addListener('place_changed', function () {
-        var place = autocomplete.getPlace();
-
-        if (!place.geometry) return;
-
-        if (place.geometry.viewport) map.fitBounds(place.geometry.viewport);else {
-          map.setCenter(place.geometry.location);
-          map.setZoom(17);
-        }
-
-        _this3.setState({ currentLocation: place.geometry.location });
-      });
-    }
-  }, {
-    key: 'onSubmit',
-    value: function onSubmit(e) {
-      e.preventDefault();
-    }
-  }, {
     key: 'render',
     value: function render() {
-      var _this4 = this;
-
       var style = {
-        width: '100vw',
+        width: '100px',
         height: '50vh'
       };
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
         'div',
-        null,
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'div',
-          null,
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-            'form',
-            { onSubmit: this.onSubmit },
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
-              placeholder: 'Ingrese localidad',
-              ref: function ref(_ref) {
-                return _this4.autocomplete = _ref;
-              },
-              type: 'text'
-            }),
-            __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', _defineProperty({ className: 'button', type: 'submit', value: 'Go' }, 'type', 'hidden'))
-          )
-        ),
-        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
-          'div',
-          { style: style },
-          __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_google_maps_react__["Map"], { className: 'map',
-            google: this.props.google,
-            onClick: this.mapClicked,
-            onDragend: this.onDragend,
-            onReady: this.onMapReady,
-            initialCenter: this.state.currentLocation,
-            center: this.state.currentLocation
-          })
-        )
+        { style: style },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_1_google_maps_react__["Map"], { className: 'map',
+          google: this.props.google,
+          onClick: this.mapClicked,
+          onDragend: this.onDragend,
+          onReady: this.props.onReady,
+          initialCenter: this.state.currentLocation,
+          center: this.state.currentLocation
+        })
       );
     }
   }]);
@@ -104560,7 +104510,7 @@ var Scene = function (_Component) {
                 this.dibujando = true;
                 this.paredFantasma.position.copy(this.indicadorPared.position);
                 this.paredFantasma.visible = true;
-                console.log(this.indicadorPared.position);
+                //console.log(this.indicadorPared.position);
             }
         }
     }, {
@@ -104574,11 +104524,11 @@ var Scene = function (_Component) {
 
             var intersects = this.raycaster.intersectObjects(this.objetos);
 
-            console.log("x: " + this.mouse.x + "\ny: " + this.mouse.y);
+            //console.log("x: "+this.mouse.x+"\ny: "+this.mouse.y);
 
             if (intersects.length > 0) {
                 var intersect = intersects[0];
-                console.log(intersect.point);
+                //console.log(intersect.point);
                 this.indicadorPared.position.copy(intersect.point).add(intersect.face.normal);
                 this.indicadorPared.position.floor();
             }
@@ -104594,14 +104544,18 @@ var Scene = function (_Component) {
         value: function render() {
             var _this2 = this;
 
-            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', {
-                onMouseMove: this.onMouseMove,
-                onClick: this.onClick,
-                style: { width: '1080px', height: '800px' },
-                ref: function ref(mount) {
-                    _this2.mount = mount;
-                }
-            });
+            return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+                'div',
+                null,
+                __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', {
+                    onMouseMove: this.onMouseMove,
+                    onClick: this.onClick,
+                    style: { width: '100%', height: '600px' },
+                    ref: function ref(mount) {
+                        _this2.mount = mount;
+                    }
+                })
+            );
         }
     }]);
 
@@ -105614,9 +105568,752 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
 
 /***/ }),
 /* 81 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_google_maps_react__ = __webpack_require__(63);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_google_maps_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_google_maps_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_reactjs_popup__ = __webpack_require__(87);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__MapContainer__ = __webpack_require__(62);
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+
+
+
+
+
+var SearchBar = function (_React$Component) {
+  _inherits(SearchBar, _React$Component);
+
+  function SearchBar(props) {
+    _classCallCheck(this, SearchBar);
+
+    var _this = _possibleConstructorReturn(this, (SearchBar.__proto__ || Object.getPrototypeOf(SearchBar)).call(this, props));
+
+    _this.state = {
+      currentLocation: {
+        lat: '-36.82013519999999',
+        lng: '-73.0443904'
+      }
+    };
+    _this.onMapReady = _this.onMapReady.bind(_this);
+    return _this;
+  }
+
+  _createClass(SearchBar, [{
+    key: 'onSubmit',
+    value: function onSubmit(e) {
+      e.preventDefault();
+    }
+  }, {
+    key: 'onMapReady',
+    value: function onMapReady(mapProps, map) {
+      var _this2 = this;
+
+      var google = mapProps.google;
+
+      if (!google || !map) return;
+
+      var autocomplete = new google.maps.places.Autocomplete(this.autocomplete);
+      autocomplete.bindTo('bounds', map);
+
+      autocomplete.addListener('place_changed', function () {
+        var place = autocomplete.getPlace();
+
+        if (!place.geometry) return;
+
+        if (place.geometry.viewport) map.fitBounds(place.geometry.viewport);else {
+          map.setCenter(place.geometry.location);
+          map.setZoom(20);
+        }
+
+        _this2.setState({ currentLocation: place.geometry.location });
+      });
+    }
+  }, {
+    key: 'render',
+    value: function render() {
+      var _this3 = this;
+
+      var mapa = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3__MapContainer__["a" /* default */], {
+        apiKey: this.props.apiKey,
+        onReady: this.onMapReady,
+        currentLocation: this.state.currentLocation
+      });
+      var form = __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        'form',
+        { onSubmit: this.onSubmit },
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', {
+          style: { width: '100%' },
+          placeholder: 'Ingrese localidad',
+          ref: function ref(_ref) {
+            return _this3.autocomplete = _ref;
+          },
+          type: 'text'
+        }),
+        __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('input', _defineProperty({ className: 'button', type: 'submit', value: 'Go' }, 'type', 'hidden'))
+      );
+
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
+        __WEBPACK_IMPORTED_MODULE_2_reactjs_popup__["a" /* default */],
+        {
+          trigger: form,
+          on: 'click',
+          position: 'bottom center',
+          closeOnDocumentClick: true,
+          contentStyle: { width: '100%' },
+          overlayStyle: { width: '80%' }
+        },
+        mapa
+      );
+    }
+  }]);
+
+  return SearchBar;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.Component);
+
+/* harmony default export */ __webpack_exports__["a"] = (SearchBar);
+
+/***/ }),
+/* 82 */
 /***/ (function(module, exports) {
 
 // removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 83 */,
+/* 84 */,
+/* 85 */,
+/* 86 */,
+/* 87 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_react_dom___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_react_dom__);
+/*!
+ * reactjs-popup v1.1.1
+ * (c) 2018-present Youssouf EL AZIZI <youssoufelazizi@gmail.com>
+ * Released under the MIT License.
+ */
+
+
+
+function _classCallCheck(instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+}
+
+function _defineProperties(target, props) {
+  for (var i = 0; i < props.length; i++) {
+    var descriptor = props[i];
+    descriptor.enumerable = descriptor.enumerable || false;
+    descriptor.configurable = true;
+    if ("value" in descriptor) descriptor.writable = true;
+    Object.defineProperty(target, descriptor.key, descriptor);
+  }
+}
+
+function _createClass(Constructor, protoProps, staticProps) {
+  if (protoProps) _defineProperties(Constructor.prototype, protoProps);
+  if (staticProps) _defineProperties(Constructor, staticProps);
+  return Constructor;
+}
+
+function _extends() {
+  _extends = Object.assign || function (target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+
+      for (var key in source) {
+        if (Object.prototype.hasOwnProperty.call(source, key)) {
+          target[key] = source[key];
+        }
+      }
+    }
+
+    return target;
+  };
+
+  return _extends.apply(this, arguments);
+}
+
+function _inherits(subClass, superClass) {
+  if (typeof superClass !== "function" && superClass !== null) {
+    throw new TypeError("Super expression must either be null or a function");
+  }
+
+  subClass.prototype = Object.create(superClass && superClass.prototype, {
+    constructor: {
+      value: subClass,
+      enumerable: false,
+      writable: true,
+      configurable: true
+    }
+  });
+  if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass;
+}
+
+function _assertThisInitialized(self) {
+  if (self === void 0) {
+    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
+  }
+
+  return self;
+}
+
+function _possibleConstructorReturn(self, call) {
+  if (call && (typeof call === "object" || typeof call === "function")) {
+    return call;
+  }
+
+  return _assertThisInitialized(self);
+}
+
+/* Algo to calculate position 
+  1. center position for popup content : the center of the trigger will be the center of the content content
+      so the popup content position will be like this :
+      top => the y of the center for the trigger element : trigger.top + trigger.height/2
+      left => the x of the center for the trigger element : trigger.left + trigger.width/2
+
+  2. translate position according to the first  position attribute  passed  in the function argument 
+      for example :
+        position = 'left top'
+        we need to handle the first argument in the position: 'left' => that's mean we need to translate the popup content according to the X axis by - content.width/2
+      
+  3.translate position according to the first  position attribute  passed  in the function argument 
+    for example :
+      position = 'left top'
+      the second argument 'top' => translate popup content by + content.height*4/5
+
+*/
+function calculatePosition(triggerBounding, ContentBounding, position, arrow, offset) {
+  var margin = arrow ? 8 : 0;
+  var MarginX = margin + offset.offsetX;
+  var MarginY = margin + offset.offsetY;
+  var args = position.split(" "); // the step N 1 : center the popup content => ok
+
+  var CenterTop = triggerBounding.top + triggerBounding.height / 2;
+  var CenterLeft = triggerBounding.left + triggerBounding.width / 2;
+  var height = ContentBounding.height,
+      width = ContentBounding.width;
+  var top = CenterTop - height / 2;
+  var left = CenterLeft - width / 2;
+  var transform = "";
+  var arrowTop = "0%";
+  var arrowLeft = "0%"; // the  step N 2 : => ok
+
+  switch (args[0]) {
+    case "top":
+      top -= height / 2 + triggerBounding.height / 2 + MarginY;
+      transform = "rotate(45deg)";
+      arrowTop = "100%";
+      arrowLeft = "50%";
+      break;
+
+    case "bottom":
+      top += height / 2 + triggerBounding.height / 2 + MarginY;
+      transform = "rotate(225deg)";
+      arrowLeft = "50%";
+      break;
+
+    case "left":
+      left -= width / 2 + triggerBounding.width / 2 + MarginX;
+      transform = " rotate(-45deg)";
+      arrowLeft = "100%";
+      arrowTop = "50%";
+      break;
+
+    case "right":
+      left += width / 2 + triggerBounding.width / 2 + MarginX;
+      transform = "rotate(135deg)";
+      arrowTop = "50%";
+      break;
+  }
+
+  switch (args[1]) {
+    case "top":
+      top = triggerBounding.top;
+      arrowTop = triggerBounding.height / 2 + "px";
+      break;
+
+    case "bottom":
+      top = triggerBounding.top - height + triggerBounding.height;
+      arrowTop = height - triggerBounding.height / 2 + "px";
+      break;
+
+    case "left":
+      left = triggerBounding.left;
+      arrowLeft = triggerBounding.width / 2 + "px";
+      break;
+
+    case "right":
+      left = triggerBounding.left - width + triggerBounding.width;
+      arrowLeft = width - triggerBounding.width / 2 + "px";
+      break;
+  }
+
+  return {
+    top: top,
+    left: left,
+    transform: transform,
+    arrowLeft: arrowLeft,
+    arrowTop: arrowTop
+  };
+}
+
+var styles = {
+  popupContent: {
+    tooltip: {
+      position: "absolute",
+      zIndex: "2",
+      width: "200px",
+      background: "rgb(255, 255, 255)",
+      border: "1px solid rgb(187, 187, 187)",
+      boxShadow: "rgba(0, 0, 0, 0.2) 0px 1px 3px",
+      padding: "5px"
+    },
+    modal: {
+      position: "relative",
+      background: "rgb(255, 255, 255)",
+      width: "50%",
+      margin: "auto",
+      border: "1px solid rgb(187, 187, 187)",
+      padding: "5px"
+    }
+  },
+  popupArrow: {
+    height: "10px",
+    width: "10px",
+    position: "absolute",
+    background: "rgb(255, 255, 255)",
+    transform: "rotate(45deg)",
+    margin: "-5px",
+    zIndex: "-1",
+    boxShadow: "rgba(0, 0, 0, 0.2) 1px 1px 1px"
+  },
+  overlay: {
+    tooltip: {
+      position: "fixed",
+      top: "0",
+      bottom: "0",
+      left: "0",
+      right: "0"
+    },
+    modal: {
+      position: "fixed",
+      top: "0",
+      bottom: "0",
+      left: "0",
+      right: "0",
+      background: "rgba(0, 0, 0,0.5)",
+      display: "flex",
+      zIndex: "999"
+    }
+  }
+};
+
+var Popup =
+/*#__PURE__*/
+function (_React$PureComponent) {
+  _inherits(Popup, _React$PureComponent);
+
+  function Popup(props) {
+    var _this;
+
+    _classCallCheck(this, Popup);
+
+    _this = _possibleConstructorReturn(this, (Popup.__proto__ || Object.getPrototypeOf(Popup)).call(this, props));
+    Object.defineProperty(_assertThisInitialized(_this), "state", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: {
+        isOpen: _this.props.open || _this.props.defaultOpen,
+        modal: _this.props.modal ? true : !_this.props.trigger // we create this modal state because the popup can't be a tooltip if the trigger prop doesn't existe
+
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "lockScroll", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        if (_this.state.modal && _this.props.lockScroll) document.getElementsByTagName("body")[0].style.overflow = "hidden";
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "resetScroll", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        if (_this.state.modal && _this.props.lockScroll) document.getElementsByTagName("body")[0].style.overflow = "auto";
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "togglePopup", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        if (_this.state.isOpen) _this.closePopup();else _this.openPopup();
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "openPopup", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        if (_this.state.isOpen) return;
+
+        _this.setState({
+          isOpen: true
+        }, function () {
+          _this.setPosition();
+
+          _this.props.onOpen();
+
+          _this.lockScroll();
+        });
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "closePopup", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        if (!_this.state.isOpen) return;
+
+        _this.setState({
+          isOpen: false
+        }, function () {
+          _this.props.onClose();
+
+          _this.resetScroll();
+        });
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "onMouseEnter", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        clearTimeout(_this.timeOut);
+        var mouseEnterDelay = _this.props.mouseEnterDelay;
+        _this.timeOut = setTimeout(function () {
+          return _this.openPopup();
+        }, mouseEnterDelay);
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "onMouseLeave", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        clearTimeout(_this.timeOut);
+        var mouseLeaveDelay = _this.props.mouseLeaveDelay;
+        _this.timeOut = setTimeout(function () {
+          return _this.closePopup();
+        }, mouseLeaveDelay);
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "setPosition", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        var _this$props = _this.props,
+            arrow = _this$props.arrow,
+            position = _this$props.position,
+            offsetX = _this$props.offsetX,
+            offsetY = _this$props.offsetY;
+        var modal = _this.state.modal;
+        if (modal) return;
+
+        var helper = _this.HelperEl.getBoundingClientRect();
+
+        var trigger = _this.TriggerEl.getBoundingClientRect();
+
+        var content = _this.ContentEl.getBoundingClientRect();
+
+        var cords = calculatePosition(trigger, content, position, arrow, {
+          offsetX: offsetX,
+          offsetY: offsetY
+        });
+        _this.ContentEl.style.top = cords.top - helper.top + "px";
+        _this.ContentEl.style.left = cords.left - helper.left + "px";
+
+        if (arrow) {
+          _this.ArrowEl.style["transform"] = cords.transform;
+          _this.ArrowEl.style["-ms-transform"] = cords.transform;
+          _this.ArrowEl.style["-webkit-transform"] = cords.transform;
+          _this.ArrowEl.style.top = cords.arrowTop;
+          _this.ArrowEl.style.left = cords.arrowLeft;
+        }
+
+        if (window.getComputedStyle(_this.TriggerEl, null).getPropertyValue("position") == "static" || window.getComputedStyle(_this.TriggerEl, null).getPropertyValue("position") == "") _this.TriggerEl.style.position = "relative";
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "addWarperAction", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        var _this$props2 = _this.props,
+            contentStyle = _this$props2.contentStyle,
+            className = _this$props2.className,
+            on = _this$props2.on;
+        var modal = _this.state.modal;
+        var popupContentStyle = modal ? styles.popupContent.modal : styles.popupContent.tooltip;
+        var childrenElementProps = {
+          className: "popup-content ".concat(className),
+          style: Object.assign({}, popupContentStyle, contentStyle),
+          ref: _this.setContentRef,
+          onClick: function onClick(e) {
+            e.stopPropagation();
+          }
+        };
+
+        if (!modal && on.indexOf("hover") >= 0) {
+          childrenElementProps.onMouseEnter = _this.onMouseEnter;
+          childrenElementProps.onMouseLeave = _this.onMouseLeave;
+        }
+
+        return childrenElementProps;
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "renderTrigger", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        var triggerProps = {
+          key: "T"
+        };
+        var _this$props3 = _this.props,
+            on = _this$props3.on,
+            trigger = _this$props3.trigger;
+        var onAsArray = Array.isArray(on) ? on : [on];
+
+        for (var i = 0, len = onAsArray.length; i < len; i++) {
+          switch (onAsArray[i]) {
+            case "click":
+              triggerProps.onClick = _this.togglePopup;
+              break;
+
+            case "hover":
+              triggerProps.onMouseEnter = _this.onMouseEnter;
+              triggerProps.onMouseLeave = _this.onMouseLeave;
+
+            case "focus":
+              triggerProps.onFocus = _this.onMouseEnter;
+              break;
+          }
+        }
+
+        if (typeof trigger === "function") return __WEBPACK_IMPORTED_MODULE_0_react___default.a.cloneElement(trigger(_this.state.isOpen), triggerProps);
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.cloneElement(trigger, triggerProps);
+      }
+    });
+    Object.defineProperty(_assertThisInitialized(_this), "renderContent", {
+      configurable: true,
+      enumerable: true,
+      writable: true,
+      value: function value() {
+        var _this$props4 = _this.props,
+            arrow = _this$props4.arrow,
+            arrowStyle = _this$props4.arrowStyle;
+        var modal = _this.state.modal;
+        return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", _extends({}, _this.addWarperAction(), {
+          key: "C"
+        }), arrow && !modal && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+          ref: _this.setArrowRef,
+          style: Object.assign({}, styles.popupArrow, arrowStyle)
+        }), typeof _this.props.children === "function" ? _this.props.children(_this.closePopup, _this.state.isOpen) : _this.props.children);
+      }
+    });
+
+    _this.setTriggerRef = function (r) {
+      return _this.TriggerEl = r;
+    };
+
+    _this.setContentRef = function (r) {
+      return _this.ContentEl = r;
+    };
+
+    _this.setArrowRef = function (r) {
+      return _this.ArrowEl = r;
+    };
+
+    _this.setHelperRef = function (r) {
+      return _this.HelperEl = r;
+    };
+
+    _this.timeOut = 0;
+    return _this;
+  }
+
+  _createClass(Popup, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var _this2 = this;
+
+      var _props = this.props,
+          closeOnEscape = _props.closeOnEscape,
+          defaultOpen = _props.defaultOpen;
+      if (defaultOpen) this.setPosition();
+
+      if (closeOnEscape) {
+        window.addEventListener("keyup", function (e) {
+          if (e.key === "Escape") _this2.closePopup();
+        });
+      }
+    }
+  }, {
+    key: "componentWillReceiveProps",
+    value: function componentWillReceiveProps(nextProps) {
+      if (this.props.open === nextProps.open) return;
+      if (nextProps.open) this.openPopup();else this.closePopup();
+    }
+  }, {
+    key: "componentWillUnmount",
+    value: function componentWillUnmount() {
+      // kill any function to execute if the component is unmounted
+      clearTimeout(this.timeOut);
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var _props2 = this.props,
+          overlayStyle = _props2.overlayStyle,
+          closeOnDocumentClick = _props2.closeOnDocumentClick,
+          on = _props2.on;
+      var modal = this.state.modal;
+      var overlay = this.state.isOpen && !(on.indexOf("hover") >= 0);
+      var ovStyle = modal ? styles.overlay.modal : styles.overlay.tooltip;
+      return [this.state.isOpen && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+        key: "H",
+        style: {
+          position: "absolute",
+          top: "0px",
+          left: "0px"
+        },
+        ref: this.setHelperRef
+      }), overlay && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("div", {
+        key: "O",
+        className: "popup-overlay",
+        style: Object.assign({}, ovStyle, overlayStyle),
+        onClick: closeOnDocumentClick ? this.closePopup : undefined
+      }, modal && this.renderContent()), this.state.isOpen && !modal && this.renderContent(), !!this.props.trigger && __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(Ref, {
+        innerRef: this.setTriggerRef,
+        key: "R"
+      }, this.renderTrigger())];
+    }
+  }]);
+
+  return Popup;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent);
+
+Object.defineProperty(Popup, "defaultProps", {
+  configurable: true,
+  enumerable: true,
+  writable: true,
+  value: {
+    children: function children() {
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement("span", null, " Your Content Here !!");
+    },
+    trigger: null,
+    onOpen: function onOpen() {},
+    onClose: function onClose() {},
+    defaultOpen: false,
+    open: false,
+    closeOnDocumentClick: true,
+    closeOnEscape: true,
+    on: ["click"],
+    contentStyle: {},
+    arrowStyle: {},
+    overlayStyle: {},
+    className: "",
+    position: "bottom center",
+    modal: false,
+    lockScroll: false,
+    arrow: true,
+    offsetX: 0,
+    offsetY: 0,
+    mouseEnterDelay: 100,
+    mouseLeaveDelay: 100
+  }
+});
+
+if (true) {
+  var PropTypes = __webpack_require__(2);
+
+  Popup.propTypes = {
+    arrowStyle: PropTypes.object,
+    contentStyle: PropTypes.object,
+    overlayStyle: PropTypes.object,
+    className: PropTypes.string,
+    modal: PropTypes.bool,
+    closeOnDocumentClick: PropTypes.bool,
+    lockScroll: PropTypes.bool,
+    offsetX: PropTypes.number,
+    offsetY: PropTypes.number,
+    mouseEnterDelay: PropTypes.number,
+    mouseLeaveDelay: PropTypes.number,
+    onOpen: PropTypes.func,
+    onClose: PropTypes.func,
+    open: PropTypes.bool,
+    defaultOpen: PropTypes.bool,
+    trigger: PropTypes.oneOfType([PropTypes.func, PropTypes.element]),
+    // for uncontrolled component we don't need the trigger Element
+    on: PropTypes.oneOfType([PropTypes.oneOf(["hover", "click", "focus"]), PropTypes.arrayOf(PropTypes.oneOf(["hover", "click", "focus"]))]),
+    children: PropTypes.oneOfType([PropTypes.func, PropTypes.element, PropTypes.string]).isRequired,
+    position: PropTypes.oneOf(["top left", "top center", "top right", "bottom left", "bottom center", "bottom right", "right top", "right center", "right bottom", "left top", "left center", "left bottom"])
+  };
+}
+
+var Ref =
+/*#__PURE__*/
+function (_React$PureComponent2) {
+  _inherits(Ref, _React$PureComponent2);
+
+  function Ref(props) {
+    _classCallCheck(this, Ref);
+
+    return _possibleConstructorReturn(this, (Ref.__proto__ || Object.getPrototypeOf(Ref)).call(this, props));
+  }
+
+  _createClass(Ref, [{
+    key: "componentDidMount",
+    value: function componentDidMount() {
+      var innerRef = this.props.innerRef;
+      if (innerRef) innerRef(Object(__WEBPACK_IMPORTED_MODULE_1_react_dom__["findDOMNode"])(this));
+    }
+  }, {
+    key: "render",
+    value: function render() {
+      var children = this.props.children;
+      return __WEBPACK_IMPORTED_MODULE_0_react___default.a.Children.only(children);
+    }
+  }]);
+
+  return Ref;
+}(__WEBPACK_IMPORTED_MODULE_0_react___default.a.PureComponent);
+
+/* harmony default export */ __webpack_exports__["a"] = (Popup);
+
 
 /***/ })
 /******/ ]);

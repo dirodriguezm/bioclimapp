@@ -2,10 +2,15 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import MapContainer from './MapContainer';
 import Scene from './World';
+import SearchBar from './SearchBar';
 
 export default class Main extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      map: null,
+      apiKey: 'AIzaSyAA_ayr9aMRSAPIugacjp_CL6S5ux_N4is',
+    };
   }
 
   /*componentDidMount() is a lifecycle method
@@ -19,9 +24,11 @@ export default class Main extends Component {
 
       return (
           <div className="container">
-              <div className="row justify-content-center">
-                      <Scene/>
-                      <MapContainer apiKey='AIzaSyAA_ayr9aMRSAPIugacjp_CL6S5ux_N4is'/>
+              <div>
+                  <SearchBar
+                    apiKey={this.state.apiKey}
+                  />
+                  <Scene/>
               </div>
           </div>
       );

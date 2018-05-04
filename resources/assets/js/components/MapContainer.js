@@ -7,20 +7,14 @@ export class MapContainer extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      currentLocation: {
-        lat: '-36.82013519999999',
-        lng: '-73.0443904',
-        elevation: -1
-      }
+      currentLocation: this.props.currentLocation,
     }
     this.mapClicked = this.mapClicked.bind(this);
     this.onDragend = this.onDragend.bind(this);
-    this.onMapReady = this.onMapReady.bind(this);
   }
 
   getGeocode(latLng, _callback){
     var geocoder = new google.maps.Geocoder;
-    var res = "hola";
     geocoder.geocode({'location': latLng}, function(results, status){
       if (status === 'OK'){
         if (results[1]){
@@ -73,7 +67,7 @@ export class MapContainer extends React.Component {
         currentLocation: {
           lat: clickEvent.latLng.lat(),
           lng: clickEvent.latLng.lng(),
-          elevation: result.elevationgi
+          elevation: result.elevation
         }
       });
     });
@@ -94,62 +88,25 @@ export class MapContainer extends React.Component {
     });
   }
 
-  onMapReady(mapProps, map){
-    const google = this.props.google;
-
-    if (!google || !map) return;
-
-    const autocomplete = new google.maps.places.Autocomplete(this.autocomplete);
-    autocomplete.bindTo('bounds', map);
-
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-
-      if (!place.geometry) return;
-
-      if (place.geometry.viewport) map.fitBounds(place.geometry.viewport);
-      else {
-        map.setCenter(place.geometry.location);
-        map.setZoom(17);
-      }
-
-      this.setState({ currentLocation: place.geometry.location });
-    });
-  }
-
-  onSubmit(e) {
-    e.preventDefault();
-  }
 
   render() {
     const style = {
-      width: '100vw',
+      width: '100px',
       height: '50vh'
     }
 
     return (
-      <div>
-        <div>
-          <form onSubmit={this.onSubmit}>
-            <input
-              placeholder="Ingrese localidad"
-              ref={ref => (this.autocomplete = ref)}
-              type="text"
-            />
+      <div style={style}>
+       <Map className="map"
+          google={this.props.google}
+          onClick={this.mapClicked}
+          onDragend={this.onDragend}
+          onReady={this.props.onReady}
+          initialCenter={this.state.currentLocation}
+          center={this.state.currentLocation}
+       >
 
-            <input className='button' type="submit" value="Go" type='hidden'  />
-          </form>
-        </div>
-        <div style={style}>
-         <Map className="map"
-            google={this.props.google}
-            onClick={this.mapClicked}
-            onDragend={this.onDragend}
-            onReady={this.onMapReady}
-            initialCenter={this.state.currentLocation}
-            center={this.state.currentLocation}
-         />
-       </div>
+       </Map>
      </div>
     )
   }

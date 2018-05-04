@@ -137,7 +137,7 @@ class Scene extends Component {
           this.dibujando = true;
           this.paredFantasma.position.copy(this.indicadorPared.position);
           this.paredFantasma.visible = true;
-          console.log(this.indicadorPared.position);
+          //console.log(this.indicadorPared.position);
       }
   }
 
@@ -150,11 +150,11 @@ class Scene extends Component {
 
       var intersects = this.raycaster.intersectObjects(this.objetos);
 
-      console.log("x: "+this.mouse.x+"\ny: "+this.mouse.y);
+      //console.log("x: "+this.mouse.x+"\ny: "+this.mouse.y);
 
       if(intersects.length > 0){
           var intersect = intersects[0]
-          console.log(intersect.point);
+          //console.log(intersect.point);
           this.indicadorPared.position.copy( intersect.point ).add( intersect.face.normal );
 		  this.indicadorPared.position.floor()
       }
@@ -168,12 +168,15 @@ class Scene extends Component {
 
  render() {
   return (
-    <div
-      onMouseMove={this.onMouseMove}
-      onClick={this.onClick}
-      style={{ width: '1080px', height: '800px' }}
-      ref={(mount) => { this.mount = mount }}
-    />
+    <div>
+      <div
+        onMouseMove={this.onMouseMove}
+        onClick={this.onClick}
+        style={{ width: '100%', height: '600px' }}
+        ref={(mount) => { this.mount = mount }}
+      />
+    </div>
+
   )
  }
  }
