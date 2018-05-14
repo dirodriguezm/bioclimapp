@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+//use App\Http\Controllers;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,3 +21,5 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 Route::get('/materiales', function(){
   return response(DB::table('materiales')->get());
 });
+
+Route::get('/comuna/{lat}', 'ComunaController@getComunaByLat');

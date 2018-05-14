@@ -1,44 +1,29 @@
 import React, { Component } from 'react';
-import {Map, GoogleApiWrapper} from 'google-maps-react';
+import { Map, TileLayer, Marker, Popup } from 'react-leaflet';
+import SearchBar from './SearchBar';
 var SunCalc = require('suncalc');
+import axios from 'axios'
 
 
-export class MapContainer extends React.Component {
+export default class MapContainer extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      currentLocation: this.props.currentLocation,
+      lat: this.props.lat,
+      lng: this.props.lng,
+      zoom: this.props.zoom,
+      markers: this.props.markers,
     }
     this.mapClicked = this.mapClicked.bind(this);
-    this.onDragend = this.onDragend.bind(this);
   }
 
-  getGeocode(latLng, _callback){
-    var geocoder = new google.maps.Geocoder;
-    geocoder.geocode({'location': latLng}, function(results, status){
-      if (status === 'OK'){
-        if (results[1]){
-          _callback(results);
-        }
-      }
-    });
+  getElevationOfPoint(latlng, callback){
+    axios.get('https://api.open-elevation.com/api/v1/lookup\?locations\=' + latlng.lat + "," + latlng.lng)
+    .then(response => callback(response.data.results));
   }
 
-  getElevationOfPoint(latLng, _callback){
-    var elevator = new google.maps.ElevationService;
-    elevator.getElevationForLocations({
-      locations: [latLng]
-    }, function(results, status){
-      if (status === 'OK'){
-        if (results[0]){
-          _callback(results[0]);
-        }
-      }
-    });
-  }
-
-  getSunPosition(latLng){
-    let sun = SunCalc.getPosition(/*Date*/ new Date(), /*Number*/ latLng.lat(), /*Number*/ latLng.lng());
+  getSunPosition(latlng){
+    let sun = SunCalc.getPosition(/*Date*/ new Date(), /*Number*/ latlng.lat, /*Number*/ latlng.lng);
     let altitude = sun.altitude * 180 / Math.PI;
     let azimuth = sun.azimuth * 180 / Math.PI;
     return {
@@ -47,73 +32,69 @@ export class MapContainer extends React.Component {
     }
   }
 
-  createMarker(latLng, map, info_content){
-    return new google.maps.Marker({
-      position: latLng,
-      map: map
-    });
+  createMarker(lat,lng){
+    let markers = this.state.markers;
+    markers.push([lat,lng]);
+    this.setState({
+      markers: markers
+    })
   }
 
   createInfoWindow(map, marker, info_content){
-    var infowindow = new google.maps.InfoWindow;
-    infowindow.setContent(info_content);
-    infowindow.open(map, marker);
+
   }
 
 
-  mapClicked(mapProps, map, clickEvent){
-    this.getElevationOfPoint(clickEvent.latLng, (result) => {
+  mapClicked(e){
+    this.getElevationOfPoint(e.latlng, results => {
       this.setState({
-        currentLocation: {
-          lat: clickEvent.latLng.lat(),
-          lng: clickEvent.latLng.lng(),
-          elevation: result.elevation
-        }
+        // lat: e.latlng.lat,
+        // lng: e.latlng.lng,
+        elevation: results[0].elevation
       });
     });
 
-    let marker = this.createMarker(clickEvent.latLng,map);
-    this.getGeocode(clickEvent.latLng, (results) => {
-      this.createInfoWindow(map,marker,results[1].formatted_address);
-    });
-    //
-  }
-
-  onDragend(mapProps, map){
-    this.setState({
-      currentLocation: {
-        lat: map.getCenter().lat(),
-        lng: map.getCenter().lng()
+    axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + "&zoom=18&addressdetails=1")
+    .then(response => {
+        console.log(response.data.address.city);
+        console.log(e.latlng.lat)
       }
-    });
+    );
   }
 
 
   render() {
+    const position = [this.state.lat, this.state.lng];
     const style = {
-      width: '100px',
+      width: '100%',
       height: '50vh'
     }
-
     return (
-      <div style={style}>
-       <Map className="map"
-          google={this.props.google}
-          onClick={this.mapClicked}
-          onDragend={this.onDragend}
-          onReady={this.props.onReady}
-          initialCenter={this.state.currentLocation}
-          center={this.state.currentLocation}
-       >
+      <Map
+        center={position}
+        zoom={this.state.zoom}
+        style={style}
+        onDblclick={this.mapClicked}
+        onLocationFound={this.handleLocationFound}
+        ref="map"
+        doubleClickZoom={false}
+      >
+        <TileLayer
+          attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
 
-       </Map>
-     </div>
+        {this.state.markers.map((position) =>
+          <Marker position={position}>
+            <Popup>
+              <span>
+                A pretty CSS3 popup. <br /> Easily customizable.
+              </span>
+            </Popup>
+          </Marker>
+        )}
+        <SearchBar/>
+      </Map>
     )
   }
 }
-
-export default GoogleApiWrapper(
-  (props) => ({
-    apiKey: props.apiKey,
-  }
-))(MapContainer)
