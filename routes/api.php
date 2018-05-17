@@ -22,4 +22,4 @@ Route::get('/materiales', function(){
   return response(DB::table('materiales')->get());
 });
 
-Route::get('/comuna/{lat}', 'ComunaController@getComunaByLat');
+Route::get('/comuna/{lat}/{lng}', 'ComunaController@getComunaByPoint');

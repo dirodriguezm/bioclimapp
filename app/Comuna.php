@@ -3,9 +3,17 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Grimzy\LaravelMysqlSpatial\Eloquent\SpatialTrait;
 
 class Comuna extends Model
 {
+  use SpatialTrait;
+  protected $fillable = [
+        'nombre'
+    ];
+  protected $spatialFields = [
+        'centroide'
+  ];
   /**
    * The table associated with the model.
    *
@@ -24,7 +32,7 @@ class Comuna extends Model
     /**
       * Obtener las temperaturas de la comuna.
       */
-     public function radiaciones()
+     public function temperaturas()
      {
          return $this->hasMany('App\Temperatura', 'comuna', 'id');
      }

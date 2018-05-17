@@ -30566,9 +30566,9 @@ var MapContainer = function (_React$Component) {
         });
       });
 
-      __WEBPACK_IMPORTED_MODULE_3_axios___default.a.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + "&zoom=18&addressdetails=1").then(function (response) {
-        console.log(response.data.address.city);
-        console.log(e.latlng.lat);
+      __WEBPACK_IMPORTED_MODULE_3_axios___default.a.get("http://127.0.0.1:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng).then(function (response) {
+        console.log(response.data);
+        console.log(e.latlng);
       });
     }
   }, {

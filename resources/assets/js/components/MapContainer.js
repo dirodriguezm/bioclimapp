@@ -54,10 +54,10 @@ export default class MapContainer extends React.Component {
       });
     });
 
-    axios.get("https://nominatim.openstreetmap.org/reverse?format=json&lat=" + e.latlng.lat + "&lon=" + e.latlng.lng + "&zoom=18&addressdetails=1")
+    axios.get("http://127.0.0.1:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
     .then(response => {
-        console.log(response.data.address.city);
-        console.log(e.latlng.lat)
+        console.log(response.data);
+        console.log(e.latlng);
       }
     );
   }
