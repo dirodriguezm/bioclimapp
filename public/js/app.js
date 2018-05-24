@@ -14319,21 +14319,21 @@ module.exports = invariant;
 "use strict";
 /* unused harmony export WebGLRenderTargetCube */
 /* unused harmony export WebGLRenderTarget */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return WebGLRenderer; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "t", function() { return WebGLRenderer; });
 /* unused harmony export ShaderLib */
 /* unused harmony export UniformsLib */
 /* unused harmony export UniformsUtils */
 /* unused harmony export ShaderChunk */
 /* unused harmony export FogExp2 */
 /* unused harmony export Fog */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return Scene; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return Scene; });
 /* unused harmony export LensFlare */
 /* unused harmony export Sprite */
 /* unused harmony export LOD */
 /* unused harmony export SkinnedMesh */
 /* unused harmony export Skeleton */
 /* unused harmony export Bone */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return Mesh; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return Mesh; });
 /* unused harmony export LineSegments */
 /* unused harmony export Line */
 /* unused harmony export Points */
@@ -14368,12 +14368,12 @@ module.exports = invariant;
 /* unused harmony export RectAreaLight */
 /* unused harmony export HemisphereLight */
 /* unused harmony export DirectionalLightShadow */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return DirectionalLight; });
-/* unused harmony export AmbientLight */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return DirectionalLight; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return AmbientLight; });
 /* unused harmony export LightShadow */
 /* unused harmony export Light */
 /* unused harmony export StereoCamera */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "i", function() { return PerspectiveCamera; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return PerspectiveCamera; });
 /* unused harmony export OrthographicCamera */
 /* unused harmony export CubeCamera */
 /* unused harmony export Camera */
@@ -14406,9 +14406,9 @@ module.exports = invariant;
 /* unused harmony export InstancedBufferAttribute */
 /* unused harmony export Face3 */
 /* unused harmony export Object3D */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "l", function() { return Raycaster; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return Raycaster; });
 /* unused harmony export Layers */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return EventDispatcher; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return EventDispatcher; });
 /* unused harmony export Clock */
 /* unused harmony export QuaternionLinearInterpolant */
 /* unused harmony export LinearInterpolant */
@@ -14418,7 +14418,7 @@ module.exports = invariant;
 /* unused harmony export Triangle */
 /* unused harmony export Spline */
 /* unused harmony export Math */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return Spherical; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "q", function() { return Spherical; });
 /* unused harmony export Cylindrical */
 /* unused harmony export Plane */
 /* unused harmony export Frustum */
@@ -14431,10 +14431,10 @@ module.exports = invariant;
 /* unused harmony export Line3 */
 /* unused harmony export Euler */
 /* unused harmony export Vector4 */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "p", function() { return Vector3; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "o", function() { return Vector2; });
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return Quaternion; });
-/* unused harmony export Color */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "s", function() { return Vector3; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "r", function() { return Vector2; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "n", function() { return Quaternion; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return Color; });
 /* unused harmony export MorphBlendMesh */
 /* unused harmony export ImmediateRenderObject */
 /* unused harmony export VertexNormalsHelper */
@@ -14443,7 +14443,7 @@ module.exports = invariant;
 /* unused harmony export PointLightHelper */
 /* unused harmony export RectAreaLightHelper */
 /* unused harmony export HemisphereLightHelper */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "e", function() { return GridHelper; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "g", function() { return GridHelper; });
 /* unused harmony export PolarGridHelper */
 /* unused harmony export FaceNormalsHelper */
 /* unused harmony export DirectionalLightHelper */
@@ -14495,7 +14495,7 @@ module.exports = invariant;
 /* unused harmony export SphereGeometry */
 /* unused harmony export RingGeometry */
 /* unused harmony export RingBufferGeometry */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return PlaneBufferGeometry; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "m", function() { return PlaneBufferGeometry; });
 /* unused harmony export PlaneGeometry */
 /* unused harmony export LatheGeometry */
 /* unused harmony export LatheBufferGeometry */
@@ -14506,10 +14506,10 @@ module.exports = invariant;
 /* unused harmony export ConeGeometry */
 /* unused harmony export ConeBufferGeometry */
 /* unused harmony export CylinderGeometry */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return CylinderBufferGeometry; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "d", function() { return CylinderBufferGeometry; });
 /* unused harmony export CircleBufferGeometry */
 /* unused harmony export CircleGeometry */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return BoxBufferGeometry; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return BoxBufferGeometry; });
 /* unused harmony export BoxGeometry */
 /* unused harmony export ShadowMaterial */
 /* unused harmony export SpriteMaterial */
@@ -14522,9 +14522,9 @@ module.exports = invariant;
 /* unused harmony export MeshPhongMaterial */
 /* unused harmony export MeshToonMaterial */
 /* unused harmony export MeshNormalMaterial */
-/* unused harmony export MeshLambertMaterial */
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "k", function() { return MeshLambertMaterial; });
 /* unused harmony export MeshDepthMaterial */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return MeshBasicMaterial; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "j", function() { return MeshBasicMaterial; });
 /* unused harmony export LineDashedMaterial */
 /* unused harmony export LineBasicMaterial */
 /* unused harmony export Material */
@@ -14539,7 +14539,7 @@ module.exports = invariant;
 /* unused harmony export Int8BufferAttribute */
 /* unused harmony export BufferAttribute */
 /* unused harmony export REVISION */
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "f", function() { return MOUSE; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "h", function() { return MOUSE; });
 /* unused harmony export CullFaceNone */
 /* unused harmony export CullFaceBack */
 /* unused harmony export CullFaceFront */
@@ -104428,6 +104428,7 @@ var Scene = function (_Component) {
         _this.onMouseMove = _this.onMouseMove.bind(_this);
         _this.onClick = _this.onClick.bind(_this);
         _this.agregarPared = _this.agregarPared.bind(_this);
+        _this.onKeyDown = _this.onKeyDown.bind(_this);
         return _this;
     }
 
@@ -104439,7 +104440,7 @@ var Scene = function (_Component) {
             var height = this.mount.clientHeight;
 
             //posicion de mouse en la pantalla
-            var mouse = new __WEBPACK_IMPORTED_MODULE_2_three__["o" /* Vector2 */]();
+            var mouse = new __WEBPACK_IMPORTED_MODULE_2_three__["r" /* Vector2 */]();
             this.mouse = mouse;
             //arreglo de objetos visibles que podrían interactuar
             var objetos = [];
@@ -104451,17 +104452,21 @@ var Scene = function (_Component) {
 
             //Hay que cargar escena, camara, y renderer,
             //Escena
-            var escena = new __WEBPACK_IMPORTED_MODULE_2_three__["m" /* Scene */]();
+            var escena = new __WEBPACK_IMPORTED_MODULE_2_three__["p" /* Scene */]();
+            escena.background = new __WEBPACK_IMPORTED_MODULE_2_three__["c" /* Color */](0xf0f0f0);
             this.escena = escena;
+
             //Camara
-            var camara = new __WEBPACK_IMPORTED_MODULE_2_three__["i" /* PerspectiveCamera */](40, width / height, 1, 10000);
+            var camara = new __WEBPACK_IMPORTED_MODULE_2_three__["l" /* PerspectiveCamera */](45, width / height, 1, 10000);
             camara.position.set(5, 8, 13);
-            camara.lookAt(new __WEBPACK_IMPORTED_MODULE_2_three__["p" /* Vector3 */]());
+            camara.lookAt(new __WEBPACK_IMPORTED_MODULE_2_three__["s" /* Vector3 */]());
             this.camara = camara;
             //Renderer
-            var renderer = new __WEBPACK_IMPORTED_MODULE_2_three__["q" /* WebGLRenderer */]({ antialias: true });
+            var renderer = new __WEBPACK_IMPORTED_MODULE_2_three__["t" /* WebGLRenderer */]({ antialias: true });
+            renderer.shadowMap.enabled = true;
             renderer.setClearColor('#F0F0F0');
             renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
             this.renderer = renderer;
             //Controles para la camara
             var control = new __WEBPACK_IMPORTED_MODULE_3_orbit_controls_es6__["a" /* default */](camara, renderer.domElement);
@@ -104471,45 +104476,63 @@ var Scene = function (_Component) {
             /*controls.minDistance = 10;*/
 
             //Plano se agrega a objetos //
-            var planoGeometria = new __WEBPACK_IMPORTED_MODULE_2_three__["j" /* PlaneBufferGeometry */](100, 100);
+            var planoGeometria = new __WEBPACK_IMPORTED_MODULE_2_three__["m" /* PlaneBufferGeometry */](100, 100);
             planoGeometria.rotateX(-Math.PI / 2);
-            var plano = new __WEBPACK_IMPORTED_MODULE_2_three__["g" /* Mesh */](planoGeometria, new __WEBPACK_IMPORTED_MODULE_2_three__["h" /* MeshBasicMaterial */]({ visible: false }));
+
+            var plano = new __WEBPACK_IMPORTED_MODULE_2_three__["i" /* Mesh */](planoGeometria, new __WEBPACK_IMPORTED_MODULE_2_three__["j" /* MeshBasicMaterial */]({ visible: true }));
             escena.add(plano);
             objetos.push(plano);
 
             //Grid del plano
-            var gridHelper = new __WEBPACK_IMPORTED_MODULE_2_three__["e" /* GridHelper */](100, 100);
-            plano.add(gridHelper);
+            var gridHelper = new __WEBPACK_IMPORTED_MODULE_2_three__["g" /* GridHelper */](50, 100);
+            escena.add(gridHelper);
 
             //Indicador de la pared
-            var geomeIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["b" /* CylinderBufferGeometry */](0.05, 0.05, 2, 32);
-            var materialIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["h" /* MeshBasicMaterial */]({ color: 0xff0000, opacity: 0.5, transparent: true });
-            var indicadorPared = new __WEBPACK_IMPORTED_MODULE_2_three__["g" /* Mesh */](geomeIndPared, materialIndPared);
+            var geomeIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["d" /* CylinderBufferGeometry */](0.05, 0.05, 2, 32);
+            var geo = new __WEBPACK_IMPORTED_MODULE_2_three__["b" /* BoxBufferGeometry */](1, 1, 1);
+            var materialIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["j" /* MeshBasicMaterial */]({ color: 0xff0000, opacity: 0.5, transparent: true });
+            var indicadorPared = new __WEBPACK_IMPORTED_MODULE_2_three__["i" /* Mesh */](geomeIndPared, materialIndPared);
+            indicadorPared.visible = false;
             escena.add(indicadorPared);
             this.indicadorPared = indicadorPared;
 
             //pared que dibuja nuevas paredes
-            var geoParedFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["a" /* BoxBufferGeometry */](1, 1, 0.05);
-            var materialParedFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["h" /* MeshBasicMaterial */]({ color: '#433F81', opacity: 0.5, transparent: true });
-            var paredFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["g" /* Mesh */](geoParedFantasma, materialParedFantasma);
+            var geoParedFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["b" /* BoxBufferGeometry */](0.05, 2, 0.05);
+            var materialParedFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["j" /* MeshBasicMaterial */]({ color: '#433F81', opacity: 0.5, transparent: true });
+            var paredFantasma = new __WEBPACK_IMPORTED_MODULE_2_three__["i" /* Mesh */](geoParedFantasma, materialParedFantasma);
             paredFantasma.visible = false;
             escena.add(paredFantasma);
             this.paredFantasma = paredFantasma;
+            this.materialParedFantasma = materialParedFantasma;
 
             // Luces, es el sol, todavía no se si funcionan
-            var sol = new __WEBPACK_IMPORTED_MODULE_2_three__["c" /* DirectionalLight */](0xffffff, 1);
-            sol.position.set(50, 50, 50);
-            sol.lookAt(new __WEBPACK_IMPORTED_MODULE_2_three__["p" /* Vector3 */]());
-            escena.add(sol);
-            this.sol = sol;
+            var light = new __WEBPACK_IMPORTED_MODULE_2_three__["a" /* AmbientLight */](0x404040); // soft white light
+            escena.add(light);
+            var factor = 1;
+            var directionalLight = new __WEBPACK_IMPORTED_MODULE_2_three__["e" /* DirectionalLight */](0xffffff);
+            directionalLight.position.x = factor * (Math.random() - 0.5);
+            directionalLight.position.y = factor * (Math.random() - 0.5);
+            directionalLight.position.z = factor * (Math.random() - 0.5);
+            directionalLight.position.normalize();
+            escena.add(directionalLight);
+            var directionalLight = new __WEBPACK_IMPORTED_MODULE_2_three__["e" /* DirectionalLight */](0x808080);
+            directionalLight.position.x = factor * (Math.random() - 0.5);
+            directionalLight.position.y = factor * (Math.random() - 0.5);
+            directionalLight.position.z = factor * (Math.random() - 0.5);
+            directionalLight.position.normalize();
+            escena.add(directionalLight);
 
             //raycaster, usado para apuntar objetos
-            var raycaster = new __WEBPACK_IMPORTED_MODULE_2_three__["l" /* Raycaster */]();
-            raycaster.linePrecision = 1;
+            var raycaster = new __WEBPACK_IMPORTED_MODULE_2_three__["o" /* Raycaster */]();
+            raycaster.linePrecision = 3;
             this.raycaster = raycaster;
 
-            var dibujando = false;
-            this.dibujando = dibujando;
+            var construyendo = false;
+            this.construyendo = construyendo;
+            var construirPared = false;
+            this.construirPared = construirPared;
+            var construirVentana = false;
+            this.construirVentana = construirVentana;
             //controles, ahora con teclas para probar
 
             this.mount.appendChild(this.renderer.domElement);
@@ -104549,19 +104572,53 @@ var Scene = function (_Component) {
         key: 'agregarPared',
         value: function agregarPared() {
             if (this.dibujando) {
-                this.dibujando = false;
-                var endPosition = this.indicadorPared.position;
-                var widthPared = endPosition.distanceTo(this.paredFantasma.position);
-                //this.paredFantasma.width = widthPared;
-                this.paredFantasma.scale.x = widthPared;
-                //this.paredFantasma.rotateX( - Math.PI / 2 );
-                //this.paredFantasma.position.copy(this.indicadorPared.position);
+                var pared = this.paredFantasma.clone();
+                var material = new __WEBPACK_IMPORTED_MODULE_2_three__["k" /* MeshLambertMaterial */]({ color: '#433F81', transparent: false });
+                pared.material = material;
+                this.paredFantasma.visible = false;
+                pared.castShadow = true;
+                this.escena.add(pared);
+                this.paredes.push(pared);
+                this.dibujando = false; /*
+                                        var endPosition = this.indicadorPared.position;
+                                        var widthPared = endPosition.distanceTo( this.paredFantasma.position );
+                                        //this.paredFantasma.width = widthPared;
+                                        this.paredFantasma.scale.x = widthPared;
+                                        //this.paredFantasma.rotateX( - Math.PI / 2 );
+                                        //this.paredFantasma.position.copy(this.indicadorPared.position);*/
             } else {
-                this.dibujando = true;
-                this.paredFantasma.position.copy(this.indicadorPared.position);
+                var geomeIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["b" /* BoxBufferGeometry */](0.05, 2, 0.05);
+                this.paredFantasma.geometry = geomeIndPared;
                 this.paredFantasma.visible = true;
-                console.log(this.indicadorPared.position);
+                this.dibujando = true;
+                var startPosition = this.indicadorPared.position.clone();
+                this.startPosition = startPosition;
+                this.paredFantasma.position.copy(startPosition);
             }
+        }
+    }, {
+        key: 'onKeyDown',
+        value: function onKeyDown(event) {
+            event.preventDefault();
+            var code = event.keyCode;
+            if (code == 49) {
+                this.control.enabled = false;
+                this.construirPared = true;
+                this.construirVentana = false;
+                this.renderScene();
+                this.indicadorPared.visible = true;
+            } else if (code == 50) {
+                this.control.enabled = false;
+                this.construirPared = false;
+                this.construirVentana = true;
+                this.indicadorPared.visible = false;
+            } else if (code == 48) {
+                this.control.enabled = true;
+                this.construirPared = false;
+                this.construirVentana = false;
+                this.indicadorPared.visible = false;
+            }
+            console.log(code);
         }
     }, {
         key: 'onMouseMove',
@@ -104572,22 +104629,51 @@ var Scene = function (_Component) {
             this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
             this.raycaster.setFromCamera(this.mouse, this.camara);
 
-            var intersects = this.raycaster.intersectObjects(this.objetos);
+            var intersects = 0;
 
-            console.log("x: " + this.mouse.x + "\ny: " + this.mouse.y);
+            //console.log("x: "+this.mouse.x+"\ny: "+this.mouse.y);
+
+            if (this.construirPared) {
+                intersects = this.raycaster.intersectObjects(this.objetos);
+            } else if (this.construirVentana) {
+                intersects = this.raycaster.intersectObjects(this.paredes);
+            }
 
             if (intersects.length > 0) {
                 var intersect = intersects[0];
-                console.log(intersect.point);
-                this.indicadorPared.position.copy(intersect.point).add(intersect.face.normal);
-                this.indicadorPared.position.floor();
+                //console.log(intersect.point);
+                if (this.construirVentana) {
+                    console.log(intersect);
+                } else if (this.construirPared) {
+                    this.indicadorPared.position.copy(intersect.point).add(intersect.face.normal);
+                    this.indicadorPared.position.floor();
+                    if (this.indicadorPared.position.y < 1) {
+                        this.indicadorPared.position.y = 1;
+                    }
+                }
+
+                if (this.dibujando) {
+                    var nexPosition = this.indicadorPared.position.clone();
+                    var dir = nexPosition.clone().sub(this.startPosition);
+                    var widthPared = this.startPosition.distanceTo(nexPosition);
+                    var geomeIndPared = new __WEBPACK_IMPORTED_MODULE_2_three__["b" /* BoxBufferGeometry */](widthPared, 2, 0.05);
+                    this.paredFantasma.geometry = geomeIndPared;
+                    var len = dir.length();
+                    dir = dir.normalize().multiplyScalar(len * 0.5);
+                    var pos = this.startPosition.clone().add(dir);
+                    this.paredFantasma.position.copy(pos);
+                    var angleRadians = Math.atan2(nexPosition.z - this.startPosition.z, nexPosition.x - this.startPosition.x);
+                    this.paredFantasma.rotation.y = -angleRadians;
+                }
             }
         }
     }, {
         key: 'onClick',
         value: function onClick(event) {
             event.preventDefault();
-            this.agregarPared();
+            if (this.construirPared) {
+                this.agregarPared();
+            }
         }
     }, {
         key: 'render',
@@ -104595,6 +104681,8 @@ var Scene = function (_Component) {
             var _this2 = this;
 
             return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement('div', {
+                onKeyDown: this.onKeyDown,
+                tabIndex: '0',
                 onMouseMove: this.onMouseMove,
                 onClick: this.onClick,
                 style: { width: '1080px', height: '800px' },
@@ -104639,7 +104727,7 @@ var Scene = function (_Component) {
 
 
 
-class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDispatcher */] {
+class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["f" /* EventDispatcher */] {
   constructor(object, domElement) {
     super();
 
@@ -104651,7 +104739,7 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
     this.enabled = true;
 
     // "target" sets the location of focus, where the object orbits around
-    this.target = new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */]();
+    this.target = new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */]();
 
     // How far you can dolly in and out ( PerspectiveCamera only )
     this.minDistance = 0;
@@ -104707,9 +104795,9 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
 
     // Mouse buttons
     this.mouseButtons = {
-      ORBIT: __WEBPACK_IMPORTED_MODULE_0_three__["f" /* MOUSE */].LEFT,
-      ZOOM: __WEBPACK_IMPORTED_MODULE_0_three__["f" /* MOUSE */].MIDDLE,
-      PAN: __WEBPACK_IMPORTED_MODULE_0_three__["f" /* MOUSE */].RIGHT
+      ORBIT: __WEBPACK_IMPORTED_MODULE_0_three__["h" /* MOUSE */].LEFT,
+      ZOOM: __WEBPACK_IMPORTED_MODULE_0_three__["h" /* MOUSE */].MIDDLE,
+      PAN: __WEBPACK_IMPORTED_MODULE_0_three__["h" /* MOUSE */].RIGHT
     };
 
     // for reset
@@ -104751,14 +104839,14 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
     // this method is exposed, but perhaps it would be better if we can make it private...
     this.update = function() {
 
-      var offset = new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */]();
+      var offset = new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */]();
 
       // so camera.up is the orbit axis
-      var quat = new __WEBPACK_IMPORTED_MODULE_0_three__["k" /* Quaternion */]().setFromUnitVectors(object.up, new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */](0, 1, 0));
+      var quat = new __WEBPACK_IMPORTED_MODULE_0_three__["n" /* Quaternion */]().setFromUnitVectors(object.up, new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */](0, 1, 0));
       var quatInverse = quat.clone().inverse();
 
-      var lastPosition = new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */]();
-      var lastQuaternion = new __WEBPACK_IMPORTED_MODULE_0_three__["k" /* Quaternion */]();
+      var lastPosition = new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */]();
+      var lastQuaternion = new __WEBPACK_IMPORTED_MODULE_0_three__["n" /* Quaternion */]();
 
       return function update() {
 
@@ -104895,24 +104983,24 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
     var EPS = 0.000001;
 
     // current position in spherical coordinates
-    var spherical = new __WEBPACK_IMPORTED_MODULE_0_three__["n" /* Spherical */]();
-    var sphericalDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["n" /* Spherical */]();
+    var spherical = new __WEBPACK_IMPORTED_MODULE_0_three__["q" /* Spherical */]();
+    var sphericalDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["q" /* Spherical */]();
 
     var scale = 1;
-    var panOffset = new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */]();
+    var panOffset = new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */]();
     var zoomChanged = false;
 
-    var rotateStart = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
-    var rotateEnd = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
-    var rotateDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
+    var rotateStart = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
+    var rotateEnd = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
+    var rotateDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
 
-    var panStart = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
-    var panEnd = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
-    var panDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
+    var panStart = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
+    var panEnd = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
+    var panDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
 
-    var dollyStart = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
-    var dollyEnd = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
-    var dollyDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["o" /* Vector2 */]();
+    var dollyStart = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
+    var dollyEnd = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
+    var dollyDelta = new __WEBPACK_IMPORTED_MODULE_0_three__["r" /* Vector2 */]();
 
     function getAutoRotationAngle() {
 
@@ -104940,7 +105028,7 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
 
     var panLeft = function() {
 
-      var v = new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */]();
+      var v = new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */]();
 
       return function panLeft(distance, objectMatrix) {
 
@@ -104955,7 +105043,7 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
 
     var panUp = function() {
 
-      var v = new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */]();
+      var v = new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */]();
 
       return function panUp(distance, objectMatrix) {
 
@@ -104971,7 +105059,7 @@ class OrbitControls extends __WEBPACK_IMPORTED_MODULE_0_three__["d" /* EventDisp
     // deltaX and deltaY are in pixels; right and down are positive
     var pan = function() {
 
-      var offset = new __WEBPACK_IMPORTED_MODULE_0_three__["p" /* Vector3 */]();
+      var offset = new __WEBPACK_IMPORTED_MODULE_0_three__["s" /* Vector3 */]();
 
       return function pan(deltaX, deltaY) {
 
