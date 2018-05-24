@@ -12,7 +12,7 @@ class Comuna extends Model
         'nombre'
     ];
   protected $spatialFields = [
-        'centroide'
+        'geometria'
   ];
   /**
    * The table associated with the model.

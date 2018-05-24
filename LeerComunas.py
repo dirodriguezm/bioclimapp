@@ -1,7 +1,12 @@
 import csv
-
-with open('/home/diego/Documentos/Material Memoria/centroide_comunas.csv', 'rb') as csvfile:
+import sys
+csv.field_size_limit(sys.maxsize)
+with open('/home/diego/test.csv', 'rb') as csvfile:
     reader = csv.reader(csvfile, delimiter= ",")
     for row in reader:
-        print "DB::table('comunas')->insert([ 'nombre' =>  '" + row[0] + \
-        "', 'centroide' => DB::raw(\"GeomFromText('" + row[1] + "')\")]);"
+        if "MULTIPOLYGON" not in row[1]:
+            print "DB::table('comunas')->insert([ 'nombre' =>  '" + row[0] + \
+            "', 'geometria' => DB::raw(\"GeomFromText('" + row[1] + ")')\")]);"
+        else:
+            print "DB::table('comunas')->insert([ 'nombre' =>  '" + row[0] + \
+            "', 'geometria' => DB::raw(\"GeomFromText('" + row[1] + "')\")]);"
