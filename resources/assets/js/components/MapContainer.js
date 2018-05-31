@@ -46,18 +46,18 @@ export default class MapContainer extends React.Component {
 
 
   mapClicked(e){
-    this.getElevationOfPoint(e.latlng, results => {
-      this.setState({
-        // lat: e.latlng.lat,
-        // lng: e.latlng.lng,
-        elevation: results[0].elevation
-      });
-    });
+    // this.getElevationOfPoint(e.latlng, results => {
+    //
+    // });
 
     axios.get("http://127.0.0.1:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
     .then(response => {
-        console.log(response.data);
-        console.log(e.latlng);
+        this.setState({
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+          comuna: response.data[0].nombre
+          //elevation: results[0].elevation
+        });
       }
     );
   }
@@ -70,31 +70,40 @@ export default class MapContainer extends React.Component {
       height: '50vh'
     }
     return (
-      <Map
-        center={position}
-        zoom={this.state.zoom}
-        style={style}
-        onDblclick={this.mapClicked}
-        onLocationFound={this.handleLocationFound}
-        ref="map"
-        doubleClickZoom={false}
-      >
-        <TileLayer
-          attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
+      <div>
+        <Map
+          center={position}
+          zoom={this.state.zoom}
+          style={style}
+          onDblclick={this.mapClicked}
+          onLocationFound={this.handleLocationFound}
+          ref="map"
+          doubleClickZoom={false}
+        >
+          <TileLayer
+            attribution="&amp;copy <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMap</a> contributors"
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
 
-        {this.state.markers.map((position) =>
-          <Marker position={position}>
-            <Popup>
-              <span>
-                A pretty CSS3 popup. <br /> Easily customizable.
-              </span>
-            </Popup>
-          </Marker>
-        )}
-        <SearchBar/>
-      </Map>
+          {this.state.markers.map((position) =>
+            <Marker position={position}>
+              <Popup>
+                <span>
+                  A pretty CSS3 popup. <br /> Easily customizable.
+                </span>
+              </Popup>
+            </Marker>
+          )}
+          <SearchBar/>
+        </Map>
+
+        {
+          this.state.comuna?
+          <h1>Seleccionaste {this.state.comuna}</h1> :
+          <div></div>
+        }
+
+      </div>
     )
   }
 }

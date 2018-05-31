@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import MapContainer from './MapContainer';
-import Scene from './World';
-import SearchBar from './SearchBar';
-import Popup from "reactjs-popup";
+import TabPanel from "./TabPanel";
+import {Grid, Row, Col} from 'react-bootstrap';
 
 export default class Main extends Component {
   constructor(props) {
@@ -22,25 +20,27 @@ export default class Main extends Component {
   }
 
   render() {
-    const mapStyle = {
-      width: '100vh',
-      height: '50vh'
-    }
+
 
       return (
           <div className="container">
-              <div>
-                <Popup trigger={<button> Mapa</button>} position="right top" contentStyle={mapStyle}>
-                  <MapContainer
-                    lat={-36.82013519999999}
-                    lng={-73.0443904}
-                    zoom={15}
-                    markers={[]}
-                  />
-                </Popup>
+              <Grid>
+                <Row className="show-grid">
+                  <Col xs={12} md={8}>
+                    <div style={{height:"80vh", width:"50vw"}} ><TabPanel/></div>
 
-                  <Scene/>
-              </div>
+                  </Col>
+                  <Col xs={6} md={4}>
+                    <Row>ACA VA LA NOTA </Row>
+                    <Row>ACA VA LA INFO GEOGRAFICA</Row>
+                  </Col>
+                </Row>
+                <Row className="show-grid">
+                  <Col xs={12} md={8}>
+                    ACA VAN LOS BOTONES DE DIBUJO
+                  </Col>
+                </Row>
+              </Grid>
           </div>
       );
   }

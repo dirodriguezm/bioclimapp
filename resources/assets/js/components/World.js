@@ -7,19 +7,25 @@ class Scene extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
     constructor(props) {
         super(props)
-        this.start = this.start.bind(this)
-        this.stop = this.stop.bind(this)
-        this.animate = this.animate.bind(this)
-        this.onMouseMove = this.onMouseMove.bind(this)
-        this.onClick = this.onClick.bind(this)
-        this.agregarPared = this.agregarPared.bind(this)
-        this.onKeyDown = this.onKeyDown.bind(this)
+        this.start = this.start.bind(this);
+        this.stop = this.stop.bind(this);
+        this.animate = this.animate.bind(this);
+        this.onMouseMove = this.onMouseMove.bind(this);
+        this.onClick = this.onClick.bind(this);
+        this.agregarPared = this.agregarPared.bind(this);
+        this.onKeyDown = this.onKeyDown.bind(this);
+        this.state = {
+          height: props.height,
+          width: props.width
+        }
   }
 
   componentDidMount() {
         //configuracion pantalla
-        const width = this.mount.clientWidth;
-        const height = this.mount.clientHeight;
+
+        const width = this.state.width;
+        const height = this.state.height;
+        console.log("props width", width);
 
         //posicion de mouse en la pantalla
         var mouse = new THREE.Vector2();
@@ -47,7 +53,7 @@ class Scene extends Component {
         const renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.shadowMap.enabled = true;
         renderer.setClearColor('#F0F0F0');
-        renderer.setSize(width, height);
+        renderer.setSize(width,height);
         renderer.setPixelRatio( window.devicePixelRatio );
         this.renderer = renderer;
         //Controles para la camara
@@ -266,7 +272,6 @@ class Scene extends Component {
       tabIndex="0"
       onMouseMove={this.onMouseMove}
       onClick={this.onClick}
-      style={{ width: '1080px', height: '800px' }}
       ref={(mount) => { this.mount = mount }}
     />
   )
