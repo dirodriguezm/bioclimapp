@@ -13,14 +13,10 @@
           .title{
             font-family: 'Raleway', sans-serif;
             color: #636b6f;
-            font-size: 84px;
+            font-size: 64px;
             text-align: center;
           }
         </style>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-        integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-        crossorigin="anonymous"/>
         <!-- Leaflet CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
           integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
@@ -43,10 +39,10 @@
                 @endauth
             </div>
         @endif
-        <div class="title">
+        <!-- <div class="title">
             Bioclimapp
-        </div>
-        <div id="root"></div>
+        </div> -->
+        <div id="root" style="margin-top:20px"></div>
         <script src="{{mix('js/app.js')}}" ></script>
     </body>
 </html>

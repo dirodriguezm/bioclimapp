@@ -1,15 +1,18 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import TabPanel from "./TabPanel";
-import {Grid, Row, Col} from 'react-bootstrap';
+import GradePanel from "./GradePanel";
+import GeoInfoPanel from "./GeoInfoPanel";
+import { Container, Row, Col } from 'reactstrap';
 
 export default class Main extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      map: null,
-      apiKey: 'AIzaSyAA_ayr9aMRSAPIugacjp_CL6S5ux_N4is',
+      comuna: "",
+      grade: "",
     };
+    this.onComunaChanged = this.onComunaChanged.bind(this);
   }
 
   /*componentDidMount() is a lifecycle method
@@ -19,29 +22,42 @@ export default class Main extends Component {
 
   }
 
+  onComunaChanged(comuna){
+    this.setState({
+      comuna: comuna
+    });
+  }
+  onGradeChanged(grade){
+    this.setState({
+      grade: grade
+    });
+  }
+
   render() {
 
-
       return (
-          <div className="container">
-              <Grid>
-                <Row className="show-grid">
-                  <Col xs={12} md={8}>
-                    <div style={{height:"80vh", width:"50vw"}} ><TabPanel/></div>
-
-                  </Col>
-                  <Col xs={6} md={4}>
-                    <Row>ACA VA LA NOTA </Row>
-                    <Row>ACA VA LA INFO GEOGRAFICA</Row>
+          <Container fluid>
+            <Row >
+              <Col xs="8"><TabPanel onComunaChanged={this.onComunaChanged}/></Col>
+              <Col xs="4">
+                <Row>
+                  <Col xs="5">
+                    <GradePanel grade="NOTA"/>
                   </Col>
                 </Row>
-                <Row className="show-grid">
-                  <Col xs={12} md={8}>
-                    ACA VAN LOS BOTONES DE DIBUJO
+                <Row>
+                  <Col xs="10">
+                    <GeoInfoPanel comuna={this.state.comuna}/>
                   </Col>
                 </Row>
-              </Grid>
-          </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs="8">
+                PANEL HERRAMIENTAS
+              </Col>
+            </Row>
+          </Container>
       );
   }
 }

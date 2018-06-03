@@ -25,7 +25,6 @@ class Scene extends Component {
 
         const width = this.state.width;
         const height = this.state.height;
-        console.log("props width", width);
 
         //posicion de mouse en la pantalla
         var mouse = new THREE.Vector2();

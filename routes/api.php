@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use App\Mes;
 //use App\Http\Controllers;
 
 /*
@@ -23,3 +24,7 @@ Route::get('/materiales', function(){
 });
 
 Route::get('/comuna/{lat}/{lng}', 'ComunaController@getComunaByPoint');
+Route::get('/temperaturas/{id}', 'ComunaController@getTemperaturesById');
+Route::get('/meses', function(){
+  return( response(Mes::all()));
+});

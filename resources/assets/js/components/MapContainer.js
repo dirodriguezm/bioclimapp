@@ -53,11 +53,12 @@ export default class MapContainer extends React.Component {
     axios.get("http://127.0.0.1:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
     .then(response => {
         this.setState({
-          lat: e.latlng.lat,
-          lng: e.latlng.lng,
-          comuna: response.data[0].nombre
+          // lat: e.latlng.lat,
+          // lng: e.latlng.lng,
+          comuna: response.data[0]
           //elevation: results[0].elevation
         });
+        this.props.onComunaChanged(response.data[0]);
       }
     );
   }
@@ -97,11 +98,6 @@ export default class MapContainer extends React.Component {
           <SearchBar/>
         </Map>
 
-        {
-          this.state.comuna?
-          <h1>Seleccionaste {this.state.comuna}</h1> :
-          <div></div>
-        }
 
       </div>
     )

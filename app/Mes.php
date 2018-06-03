@@ -24,8 +24,8 @@ class Mes extends Model
     /**
       * Obtener las temperaturas del Mes.
       */
-     public function radiaciones()
+     public function temperaturas()
      {
-         return $this->hasMany('App\Radiacion', 'mes', 'id');
+         return $this->hasMany('App\Temperatura', 'mes', 'id');
      }
 }

@@ -1,34 +1,37 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Tabs, Tab } from 'react-bootstrap';
 import MapContainer from './MapContainer';
+import { TabContent, TabPane, Nav, NavItem, NavLink, Card, Button, CardTitle, CardText, Row, Col } from 'reactstrap';
+import classnames from 'classnames';
 import Scene from './World';
 
 export default class TabPanel extends Component {
   constructor(props, context) {
     super(props, context);
-
-    this.handleSelect = this.handleSelect.bind(this);
-
+    this.toggle = this.toggle.bind(this);
     this.state = {
-      key: 1
+      activeTab: '1'
     };
+    this.onComunaChanged = this.onComunaChanged.bind(this);
   }
 
   componentDidMount(){
     this.setState({
       height:this.tab.clientHeight,
       width: this.tab.clientWidth
-    })
+    });
   }
 
+  toggle(tab) {
+    if (this.state.activeTab !== tab) {
+      this.setState({
+        activeTab: tab
+      });
+    }
+  }
 
-
-
-
-  handleSelect(key) {
-    //alert(`selected ${key}`);
-    this.setState({ key });
+  onComunaChanged(comuna){
+    this.props.onComunaChanged(comuna);
   }
 
   render() {
@@ -39,36 +42,66 @@ export default class TabPanel extends Component {
 
     return (
       <div ref={(tab) => { this.tab = tab }}>
-        <Tabs
-          activeKey={this.state.key}
-          onSelect={this.handleSelect}
-          id="tabs"
-        >
-          <Tab eventKey={1} title="Localidad">
+        <Nav tabs>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: this.state.activeTab === '1' })}
+              onClick={() => { this.toggle('1'); }}
+            >
+              Localidad
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: this.state.activeTab === '2' })}
+              onClick={() => { this.toggle('2'); }}
+            >
+              Contexto
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: this.state.activeTab === '3' })}
+              onClick={() => { this.toggle('3'); }}
+            >
+              Morfología
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              className={classnames({ active: this.state.activeTab === '4' })}
+              onClick={() => { this.toggle('4'); }}
+            >
+              Sistemas de Energía Renovable
+            </NavLink>
+          </NavItem>
+        </Nav>
+        <TabContent activeTab={this.state.activeTab} ref={(tab) => { this.tab = tab }}>
+          <TabPane tabId="1">
             <MapContainer
               lat={-36.82013519999999}
               lng={-73.0443904}
               zoom={15}
               markers={[]}
+              onComunaChanged={this.onComunaChanged}
             />
-          </Tab>
-          <Tab eventKey={2} title="Contexto">
+          </TabPane>
+          <TabPane tabId="2">
             {this.state.width?
-            <Scene width={this.state.width} height={this.state.height} /> :
+            <Scene width={this.state.width} height={this.state.height}/> :
             <div></div>
             }
-          </Tab>
-          <Tab eventKey={3} title="Morfología">
+          </TabPane>
+          <TabPane tabId="3">
             {this.state.width?
-            <Scene width={this.state.width} height={this.state.height} /> :
-            <div></div>
+              <Scene width={this.state.width} height={this.state.height}/> :
+              <div></div>
             }
-
-          </Tab>
-          <Tab eventKey={4} title="Sistemas de Energía Renovable">
+          </TabPane>
+          <TabPane tabId="4">
             Por definir
-          </Tab>
-        </Tabs>
+          </TabPane>
+        </TabContent>
       </div>
     );
   }
