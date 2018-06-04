@@ -23,12 +23,14 @@
         "react-dom": "^16.2.0"
     },
     "dependencies": {
+        "chart.js": "^2.7.2",
         "fusioncharts": "^3.12.2",
         "leaflet": "^1.3.1",
         "leaflet-geosearch": "^2.6.0",
         "orbit-controls-es6": "^1.0.12",
         "places.js": "^1.6.0",
         "prop-types": "^15.6.1",
+        "react-chartjs-2": "^2.7.2",
         "react-fusioncharts": "^1.0.5",
         "react-leaflet": "^1.9.1",
         "reactjs-popup": "^1.1.1",

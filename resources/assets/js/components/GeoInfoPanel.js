@@ -4,89 +4,60 @@ import { Card, CardImg, CardText, CardBody,
   CardTitle, CardSubtitle, ListGroup, ListGroupItem } from 'reactstrap';
 import GradePanel from "./GradePanel";
 import axios from 'axios';
-import fusioncharts from 'fusioncharts';
-import charts from 'fusioncharts/fusioncharts.charts';
-import ReactFC from 'react-fusioncharts';
-import theme from 'fusioncharts/themes/fusioncharts.theme.carbon';
-charts(FusionCharts);
-theme(FusionCharts);
+import {Bar} from 'react-chartjs-2';
 
 export default class GeoInfoPanel extends Component{
 
   constructor(props){
     super(props);
     this.state = {
-      comuna: props.comuna,
-      meses: []
+      comuna: props.comuna
     }
-    this.getTemperatures = this.getTemperatures.bind(this);
-    this.getMonthsNames = this.getMonthsNames.bind(this);
   }
 
   componentWillReceiveProps(nextProps){
-    var temps = [];
-    const pointer = this;
-    axios.all([this.getTemperatures(nextProps.comuna), this.getMonthsNames()])
-    .then(axios.spread(function (temps, months) {
-      pointer.setState({
+    axios.get('http://127.0.0.1:8000/api/temperaturas/' + nextProps.comuna.id)
+    .then(response => {
+      this.setState({
         comuna: nextProps.comuna,
-        temps: temps.data,
-        meses: months.data
-      });
-    }));
+        temps: response.data
+      })
+    })
   }
-
-  getTemperatures(comuna){
-    return axios.get('http://127.0.0.1:8000/api/temperaturas/' + comuna.id);
-  }
-
-  getMonthsNames(){
-    return axios.get('http://127.0.0.1:8000/api/meses');
-  }
-
-
-
 
 
   render(){
-    var data = [];
-    if(this.state.temps != null){
-      let i = 0;
-      for (let temp of this.state.temps){
-        data.push({label: this.state.meses[i].nombre, value: temp.valor});
-        i++;
-      }
-      let mean_temp = data.pop();
-      var chartConfigs = {
-          type: "Column2D",
-          className: "fc-column2d", // ReactJS attribute-name for DOM classes
-          // "width": "500",
-          // "height": "300",
-          dataFormat: "JSON",
-          dataSource: {
-              chart:{
-                caption: "Temperatura promedio mensual",
-                xAxisName: "Mes",
-                yAxisName: "°C",
-                theme: 'carbon',
-                paletteColors: '#0075c2',
-              },
-              data: data,
-              trendlines: [
-                  {
-                      line: [
-                          {
-                              startvalue: mean_temp.value,
-                              //color: "#000",
-                              valueOnRight: "1",
-                              displayvalue: mean_temp.label
-                          }
-                      ]
-                  }
-              ]
-          }
-      };
+    let anual = null;
+    if( this.state.temps){
+      anual = this.state.temps.pop();
     }
+    const data = {
+      labels: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+      'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+      datasets: [
+        {
+          label: 'Temperatura promedio',
+          backgroundColor: 'rgba(255,99,132,0.2)',
+          borderColor: 'rgba(255,99,132,1)',
+          borderWidth: 1,
+          hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+          hoverBorderColor: 'rgba(255,99,132,1)',
+          data: this.state.temps? this.state.temps.map(function(temp){
+            return temp.valor;
+          }) : null
+        },
+        {
+          label: 'Anual',
+          type: 'line',
+          data: Array(12).fill(anual? anual.valor : null),
+          fill: false,
+          borderColor: '#EC932F',
+          borderWidth: 1,
+          pointRadius: 0,
+          pointHoverRadius: 0
+        }
+      ]
+    };
 
     return(
       <div>
@@ -97,7 +68,22 @@ export default class GeoInfoPanel extends Component{
             this.state.comuna.nombre?
             <div>
               <CardSubtitle>{"Comuna: " + this.state.comuna.nombre}</CardSubtitle>
-              <ReactFC {...chartConfigs} />
+              <Bar
+                data={data}
+                options={{
+                  maintainAspectRatio: true,
+                  responsive: true,
+                  scales:{
+                    yAxes: [{
+                      scaleLabel: {
+                        display: true,
+                        labelString: '°C'
+                      }
+                    }],
+                  }
+                }}
+              />
+
             </div>
             :
             <CardSubtitle>Selecciona una comuna</CardSubtitle>
