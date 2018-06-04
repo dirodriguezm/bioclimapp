@@ -23,7 +23,15 @@ En caso de error, hace falta preparar react en laravel:
   - `sudo npm install`   (en caso de error de escritura usar 
    `sudo npm install --unsafe-perm=true --allow-root`)
    
+   
 
 
-
-
+# Paquetes
+<ul>
+	<li>Three.js</li>
+	<li>Reactstrap</li>
+	<li>Chart.js</li>
+	<li>react-chartjs-2 https://github.com/jerairrest/react-chartjs-2</li>
+	<li>axios</li>
+</ul>
+	
