@@ -16,13 +16,16 @@ export default class GeoInfoPanel extends Component{
   }
 
   componentWillReceiveProps(nextProps){
-    axios.get('http://127.0.0.1:8000/api/temperaturas/' + nextProps.comuna.id)
-    .then(response => {
-      this.setState({
-        comuna: nextProps.comuna,
-        temps: response.data
+    if(nextProps.comuna.nombre != this.state.comuna.nombre){
+      axios.get('http://127.0.0.1:8000/api/temperaturas/' + nextProps.comuna.id)
+      .then(response => {
+        this.setState({
+          comuna: nextProps.comuna,
+          temps: response.data
+        })
       })
-    })
+    }
+
   }
 
 
