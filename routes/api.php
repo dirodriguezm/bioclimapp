@@ -25,6 +25,4 @@ Route::get('/materiales', function(){
 
 Route::get('/comuna/{lat}/{lng}', 'ComunaController@getComunaByPoint');
 Route::get('/temperaturas/{id}', 'ComunaController@getTemperaturesById');
-Route::get('/meses', function(){
-  return( response(Mes::all()));
-});
+Route::get('/radiaciones/{id}', 'ComunaController@getGlobalRadiationById');

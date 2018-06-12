@@ -15,6 +15,9 @@ export default class MapContainer extends React.Component {
       markers: this.props.markers,
     }
     this.mapClicked = this.mapClicked.bind(this);
+    this.getSunPosition = this.getSunPosition.bind(this);
+    this.getSolarTimes = this.getSolarTimes.bind(this);
+    this.handleLocationFound = this.handleLocationFound.bind(this);
   }
 
   getElevationOfPoint(latlng, callback){
@@ -32,35 +35,40 @@ export default class MapContainer extends React.Component {
     }
   }
 
+  getSolarTimes(lat,lng){
+    return SunCalc.getTimes(new Date(), lat,lng);
+  }
+
   createMarker(lat,lng){
-    let markers = this.state.markers;
+    let markers = [];
     markers.push([lat,lng]);
     this.setState({
       markers: markers
     })
   }
 
-  createInfoWindow(map, marker, info_content){
-
-  }
 
 
   mapClicked(e){
-    // this.getElevationOfPoint(e.latlng, results => {
-    //
-    // });
-
+    this.createMarker(e.latlng.lat,e.latlng.lng);
     axios.get("http://127.0.0.1:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
     .then(response => {
         this.setState({
-          // lat: e.latlng.lat,
-          // lng: e.latlng.lng,
-          comuna: response.data[0]
-          //elevation: results[0].elevation
+          lat: e.latlng.lat,
+          lng: e.latlng.lng,
+          comuna: response.data[0],
+          sunPosition: this.getSunPosition(e.latlng),
+          sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng),
+
         });
-        this.props.onComunaChanged(response.data[0]);
+        this.props.onComunaChanged(this.state);
       }
     );
+
+  }
+
+  handleLocationFound(e){
+    console.log("hola");
   }
 
 
@@ -77,7 +85,8 @@ export default class MapContainer extends React.Component {
           zoom={this.state.zoom}
           style={style}
           onDblclick={this.mapClicked}
-          onLocationFound={this.handleLocationFound}
+          onLocationfound={this.handleLocationFound}
+          onGeosearchShowlocation={this.handleLocationFound}
           ref="map"
           doubleClickZoom={false}
         >
@@ -87,15 +96,15 @@ export default class MapContainer extends React.Component {
           />
 
           {this.state.markers.map((position) =>
-            <Marker position={position}>
+            <Marker key={position} position={position}>
               <Popup>
                 <span>
-                  A pretty CSS3 popup. <br /> Easily customizable.
+                  {this.state.comuna ? this.state.comuna.nombre : ""}
                 </span>
               </Popup>
             </Marker>
           )}
-          <SearchBar/>
+          <SearchBar />
         </Map>
 
 

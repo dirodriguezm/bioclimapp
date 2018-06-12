@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Popup from "reactjs-popup";
-import MapContainer from './MapContainer';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import {MapControl} from 'react-leaflet';
 
@@ -9,6 +8,7 @@ export default class SearchBar extends MapControl{
   constructor(props){
     super(props);
   }
+
 
   createLeafletElement() {
     return GeoSearchControl({
@@ -20,8 +20,14 @@ export default class SearchBar extends MapControl{
       retainZoomLevel: false,
       searchLabel: 'Ingrese localidad',
       keepResult: true,
-      showMarker: false,
+      showMarker: true,
+      maxMarkers: 1,
       animateZoom: true,
+      marker: {                                           // optional: L.Marker    - default L.Icon.Default
+        icon: new L.Icon.Default(),
+        draggable: false,
+      },
+
     });
   }
 
