@@ -20,13 +20,8 @@ export default class SearchBar extends MapControl{
       retainZoomLevel: false,
       searchLabel: 'Ingrese localidad',
       keepResult: true,
-      showMarker: true,
-      maxMarkers: 1,
+      showMarker: false,
       animateZoom: true,
-      marker: {                                           // optional: L.Marker    - default L.Icon.Default
-        icon: new L.Icon.Default(),
-        draggable: false,
-      },
 
     });
   }

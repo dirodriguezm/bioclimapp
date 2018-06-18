@@ -13,6 +13,7 @@ export default class TabPanel extends Component {
       activeTab: '1'
     };
     this.onComunaChanged = this.onComunaChanged.bind(this);
+    this.onParedesChanged = this.onParedesChanged.bind(this);
   }
 
   componentDidMount(){
@@ -32,6 +33,10 @@ export default class TabPanel extends Component {
 
   onComunaChanged(comuna){
     this.props.onComunaChanged(comuna);
+  }
+
+  onParedesChanged(paredes){
+    this.props.onParedesChanged(paredes);
   }
 
   render() {
@@ -87,14 +92,18 @@ export default class TabPanel extends Component {
             />
           </TabPane>
           <TabPane tabId="2">
-            {this.state.width?
+            {/* {this.state.width?
             <Scene width={this.state.width} height={this.state.height}/> :
             <div></div>
-            }
+            } */}
           </TabPane>
           <TabPane tabId="3">
             {this.state.width?
-              <Scene width={this.state.width} height={this.state.height}/> :
+              <Scene
+                width={this.state.width}
+                height={this.state.height}
+                onParedesChanged={this.onParedesChanged}
+              /> :
               <div></div>
             }
           </TabPane>

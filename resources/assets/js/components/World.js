@@ -16,7 +16,8 @@ class Scene extends Component {
         this.onKeyDown = this.onKeyDown.bind(this);
         this.state = {
           height: props.height,
-          width: props.width
+          width: props.width,
+          paredes: [],
         }
   }
 
@@ -33,9 +34,7 @@ class Scene extends Component {
         var objetos = [];
         var paredes = [];
         var ventanas = [];
-        this.objetos = objetos;
-        this.paredes = paredes;
-        this.ventanas = ventanas;
+
 
         //Hay que cargar escena, camara, y renderer,
         //Escena
@@ -44,7 +43,7 @@ class Scene extends Component {
         this.escena = escena;
 
         //Camara
-        var camara = new THREE.PerspectiveCamera( 45, width / height, 1, 10000 );
+        var camara = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
     	camara.position.set( 5, 8, 13 );
     	camara.lookAt( new THREE.Vector3() );
         this.camara = camara;
@@ -63,17 +62,35 @@ class Scene extends Component {
         /*controls.minDistance = 10;*/
 
         //Plano se agrega a objetos //
-        var planoGeometria = new THREE.PlaneBufferGeometry( 100, 100 );
-		planoGeometria.rotateX( - Math.PI / 2 );
-
+        var planoGeometria = new THREE.PlaneBufferGeometry( 50, 50 );
+    		planoGeometria.rotateX( - Math.PI / 2 );
         var plano = new THREE.Mesh( planoGeometria, new THREE.MeshBasicMaterial( { visible: true } ) );
-		escena.add( plano );
-		objetos.push( plano );
+    		escena.add( plano );
+    		objetos.push( plano );
 
         //Grid del plano
-        var gridHelper = new THREE.GridHelper( 50, 100 );
+        var gridHelper = new THREE.GridHelper( 50, 50 );
         escena.add(gridHelper);
 
+        //Indicador de puntos cardinales
+        var curve = new THREE.EllipseCurve(
+        	0,  0,            // ax, aY
+        	10, 10,           // xRadius, yRadius
+        	0,  2 * Math.PI,  // aStartAngle, aEndAngle
+        	false,            // aClockwise
+        	0                 // aRotation
+        );
+        var points = curve.getPoints( 359 );
+        var circleGeometry = new THREE.BufferGeometry().setFromPoints( points );
+        var circleMaterial = new THREE.LineBasicMaterial( { color : 0x808080 } );
+        var cardinalPointsCircle = new THREE.Line( circleGeometry, circleMaterial );
+        cardinalPointsCircle.rotateX(- Math.PI /2);
+        cardinalPointsCircle.position.set(0,0.001,0);
+        cardinalPointsCircle.name = "cardinalPointsCircle";
+        this.cardinalPointsCircle = cardinalPointsCircle;
+        this.circlePoints = points;
+        escena.add(cardinalPointsCircle);
+        //objetos.push(cardinalPointsCircle);
 
 
         //Indicador de la pared
@@ -82,7 +99,7 @@ class Scene extends Component {
         const materialIndPared = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
         var indicadorPared = new THREE.Mesh(geomeIndPared, materialIndPared);
         indicadorPared.visible = false;
-		escena.add( indicadorPared );
+		    escena.add( indicadorPared );
         this.indicadorPared = indicadorPared;
 
         //pared que dibuja nuevas paredes
@@ -99,17 +116,17 @@ class Scene extends Component {
         escena.add( light );
         const factor = 1
         var directionalLight = new THREE.DirectionalLight( 0xffffff );
-		directionalLight.position.x = factor*(Math.random() - 0.5);
-		directionalLight.position.y = factor*(Math.random() - 0.5);
-		directionalLight.position.z = factor*(Math.random() - 0.5);
-		directionalLight.position.normalize();
-		escena.add( directionalLight );
-		var directionalLight = new THREE.DirectionalLight( 0x808080 );
-		directionalLight.position.x = factor*(Math.random() - 0.5);
-		directionalLight.position.y = factor*(Math.random() - 0.5);
-		directionalLight.position.z = factor*(Math.random() - 0.5);
-		directionalLight.position.normalize();
-		escena.add( directionalLight );
+    		directionalLight.position.x = factor*(Math.random() - 0.5);
+    		directionalLight.position.y = factor*(Math.random() - 0.5);
+    		directionalLight.position.z = factor*(Math.random() - 0.5);
+    		directionalLight.position.normalize();
+    		escena.add( directionalLight );
+    		var directionalLight = new THREE.DirectionalLight( 0x808080 );
+    		directionalLight.position.x = factor*(Math.random() - 0.5);
+    		directionalLight.position.y = factor*(Math.random() - 0.5);
+    		directionalLight.position.z = factor*(Math.random() - 0.5);
+    		directionalLight.position.normalize();
+    		escena.add( directionalLight );
 
         //raycaster, usado para apuntar objetos
         var raycaster = new THREE.Raycaster();
@@ -127,6 +144,11 @@ class Scene extends Component {
 
         this.mount.appendChild(this.renderer.domElement)
         this.start()
+        this.setState({
+          objetos: objetos,
+          paredes: paredes,
+          ventanas: ventanas,
+        });
   }
 
   componentWillUnmount() {
@@ -155,15 +177,33 @@ class Scene extends Component {
   }
 
   agregarPared() {
-      if (this.dibujando) {
+      if (this.state.dibujando) {
           var pared = this.paredFantasma.clone();
           var material = new THREE.MeshLambertMaterial({ color: '#433F81', transparent: false });
           pared.material = material
           this.paredFantasma.visible = false;
           pared.castShadow = true;
+          this.orientacion = this.orientacion.normalize();
+          var hex = 0xffff;
+          var arrowHelper = new THREE.ArrowHelper( this.orientacion, pared.position, 5, hex );
+          this.escena.add( arrowHelper );
+          this.orientacion = this.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), Math.PI/2);
+          pared.orientacion = this.orientacion;
+          var hex = 0xffff00;
+          var arrowHelper = new THREE.ArrowHelper( this.orientacion, pared.position, 5, hex );
+          this.escena.add( arrowHelper );
+          pared.name = "pared";
           this.escena.add(pared);
-          this.paredes.push(pared);
-          this.dibujando = false;/*
+          let paredes = this.state.paredes.slice();
+          paredes.push(pared);
+          this.calcularGammaParedes(paredes);
+          this.props.onParedesChanged(paredes);
+          this.setState({
+              paredes: paredes,
+              dibujando: false,
+          });
+
+          /*
           var endPosition = this.indicadorPared.position;
           var widthPared = endPosition.distanceTo( this.paredFantasma.position );
           //this.paredFantasma.width = widthPared;
@@ -173,8 +213,10 @@ class Scene extends Component {
       }else {
           var geomeIndPared = new THREE.BoxBufferGeometry(0.05, 2, 0.05);
           this.paredFantasma.geometry = geomeIndPared
-          this.paredFantasma.visible = true
-          this.dibujando = true;
+          this.paredFantasma.visible = true;
+          this.setState({
+            dibujando: true,
+          });
           var startPosition = this.indicadorPared.position.clone();
           this.startPosition = startPosition;
           this.paredFantasma.position.copy(startPosition);
@@ -217,9 +259,9 @@ class Scene extends Component {
       //console.log("x: "+this.mouse.x+"\ny: "+this.mouse.y);
 
       if(this.construirPared){
-          intersects = this.raycaster.intersectObjects(this.objetos);
+          intersects = this.raycaster.intersectObjects(this.state.objetos);
       }else if (this.construirVentana) {
-          intersects = this.raycaster.intersectObjects(this.paredes);
+          intersects = this.raycaster.intersectObjects(this.state.paredes);
       }
 
       if(intersects.length > 0){
@@ -236,9 +278,10 @@ class Scene extends Component {
               }
           }
 
-          if(this.dibujando) {
+          if(this.state.dibujando) {
               var nexPosition = this.indicadorPared.position.clone();
               var dir = nexPosition.clone().sub(this.startPosition);
+              this.orientacion = dir.clone();
               var widthPared = this.startPosition.distanceTo(nexPosition);
               var geomeIndPared = new THREE.BoxBufferGeometry(widthPared, 2, 0.05);
               this.paredFantasma.geometry = geomeIndPared
@@ -255,14 +298,60 @@ class Scene extends Component {
       }
   }
 
+  calcularGammaParedes(paredes){
+    for (let pared of paredes){
+      var orientacionRaycaster = new THREE.Raycaster();
+      orientacionRaycaster.set(new THREE.Vector3(),pared.orientacion);
+      var inter = orientacionRaycaster.intersectObject(this.cardinalPointsCircle);
+      let interPoint = inter[11].point.add(inter[10].point);
+      interPoint = interPoint.multiplyScalar(0.5);
+      // var hex = 0xffff;
+      // var arrowHelper = new THREE.ArrowHelper( inter[11].point, new THREE.Vector3(), 10, hex );
+      // this.escena.add(arrowHelper);
+      let closestDistance = 99;
+      let closestPoint = {};
+      let i = 0;
+      let index = 0;
+      for (let point of this.circlePoints){
+        let circlePoint = new THREE.Vector3(point.x,0.001,point.y);
+        let temp = circlePoint.distanceTo(interPoint);
+        if(temp < closestDistance){
+          closestDistance = temp;
+          closestPoint = circlePoint;
+          index = i;
+        }
+        i++;
+      }
+      pared.gamma = this.transformDegreeToGamma(index);
+      console.log("gamma", pared.gamma);
+      console.log("degree", index);
+    }
+  }
+
+  transformDegreeToGamma(degree){
+    if (degree >270 && degree <= 360) degree = 180 - degree;
+    else degree -= 90;
+    return degree;
+  }
+
   onClick(event){
       event.preventDefault()
       if(this.construirPared){
-          this.agregarPared()
+          this.agregarPared();
       }
-
-
   }
+      // for (let pared of this.paredes){
+      //   var orientacionRaycaster = new THREE.Raycaster();
+      //   orientacionRaycaster.set(pared.position,pared.orientacion);
+      //   var inter = orientacionRaycaster.intersectObjects(this.paredes);
+      //   if(inter.length > 0){
+      //     pared.orientacion.multiplyScalar(-1);
+      //     console.log("nueva orientacion",pared.orientacion);
+      //   }
+      //   var hex = 0xffff00;
+      //   var arrowHelper = new THREE.ArrowHelper( pared.orientacion, pared.position, 5, hex );
+      //   this.escena.add( arrowHelper );
+      // }
 
  render() {
   return (

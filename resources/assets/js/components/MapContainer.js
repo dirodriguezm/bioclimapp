@@ -25,8 +25,8 @@ export default class MapContainer extends React.Component {
     .then(response => callback(response.data.results));
   }
 
-  getSunPosition(latlng){
-    let sun = SunCalc.getPosition(/*Date*/ new Date(), /*Number*/ latlng.lat, /*Number*/ latlng.lng);
+  getSunPosition(lat, lng, date = new Date()){
+    let sun = SunCalc.getPosition(/*Date*/ date, /*Number*/ lat, /*Number*/ lng);
     let altitude = sun.altitude * 180 / Math.PI;
     let azimuth = sun.azimuth * 180 / Math.PI;
     return {
@@ -68,7 +68,22 @@ export default class MapContainer extends React.Component {
   }
 
   handleLocationFound(e){
-    console.log("hola");
+    let lng = parseFloat(e.location.x);
+    let lat = parseFloat(e.location.y);
+    console.log(lat + "," + lng);
+    this.createMarker(lat,lng);
+    axios.get("http://127.0.0.1:8000/api/comuna/" + lat + "/" + lng)
+    .then(response => {
+        this.setState({
+          lat: lat,
+          lng: lng,
+          comuna: response.data[0],
+          sunPosition: this.getSunPosition(lat,lng),
+          sunTimes: this.getSolarTimes(lat, lng),
+        });
+        this.props.onComunaChanged(this.state);
+      }
+    );
   }
 
 
@@ -86,7 +101,7 @@ export default class MapContainer extends React.Component {
           style={style}
           onDblclick={this.mapClicked}
           onLocationfound={this.handleLocationFound}
-          onGeosearchShowlocation={this.handleLocationFound}
+          onShowlocation={this.handleLocationFound}
           ref="map"
           doubleClickZoom={false}
         >
