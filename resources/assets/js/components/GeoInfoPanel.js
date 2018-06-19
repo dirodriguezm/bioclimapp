@@ -1,39 +1,66 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Card, CardImg, CardText, CardBody,
-         CardTitle, CardSubtitle, ListGroup, ListGroupItem,
-         Dropdown, DropdownToggle, DropdownMenu, DropdownItem} from 'reactstrap';
 import axios from 'axios';
 import {Bar} from 'react-chartjs-2';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
-export default class GeoInfoPanel extends Component{
+function TabContainer(props) {
+  return (
+    <Typography component="div" style={{ padding:0}}>
+      {props.children}
+    </Typography>
+  );
+}
+
+TabContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+const styles = {
+  card: {
+    minWidth: 275,
+  },
+  bullet: {
+    display: 'inline-block',
+    margin: '0px',
+    transform: 'scale(0.8)',
+  },
+  title: {
+    marginBottom: 16,
+    fontSize: 12,
+  },
+  pos: {
+    marginBottom: 12,
+  },
+};
+
+class GeoInfoPanel extends Component{
 
   constructor(props){
     super(props);
-    this.toggleDropdown = this.toggleDropdown.bind(this);
-    this.selectItem = this.selectItem.bind(this);
+    this.handleChange = this.handleChange.bind(this);
     this.state = {
       comuna: props.comuna,
-      dropdownOpen: false,
-      selectedItem: "Temperatura",
-      width: props.width,
+      selected: 0,
+      width: props.width
     }
   }
 
-  toggleDropdown(){
-    this.setState(prevState => ({
-      dropdownOpen: !prevState.dropdownOpen
-    }));
-  }
-
-  selectItem(e){
-    this.setState({
-      selectedItem: e.currentTarget.textContent
-    });
-  }
+  handleChange(event, value){
+    this.setState({ selected: value });
+  };
 
   componentDidMount(){
-    //console.log("GEO WIDTH",this.state.width);
+
   }
 
   componentWillReceiveProps(nextProps){
@@ -84,23 +111,23 @@ export default class GeoInfoPanel extends Component{
       'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
       datasets: [
         {
-          label: 'Temperatura promedio',
-          backgroundColor: 'rgba(247,201,17,0.2)',
-          borderColor: 'rgba(247,201,17,1)',
+          label: 'Temperatura promedio mensual',
+          backgroundColor: 'rgba(48,63,159,0.5)',
+          borderColor: 'rgba(48,63,159,1)',
           borderWidth: 1,
-          hoverBackgroundColor: 'rgba(247,201,17,0.5)',
-          hoverBorderColor: 'rgba(247,201,17,1)',
+          hoverBackgroundColor: 'rgba(48,63,159,0.8)',
+          hoverBorderColor: 'rgba(48,63,159,1)',
           data: this.state.temps? this.state.temps.map(function(temp){
             return temp.valor;
           }) : null
         },
         {
-          label: 'Anual',
+          label: 'Temperatura promedio anual',
           type: 'line',
           data: Array(12).fill(tempAnual? tempAnual.valor : null),
           fill: false,
-          borderColor: '#EC932F',
-          backgroundColor: "#EC932F",
+          borderColor: '#c51162',
+          backgroundColor: "#c51162",
           borderWidth: 1,
           pointRadius: 0,
           pointHoverRadius: 0
@@ -131,23 +158,23 @@ export default class GeoInfoPanel extends Component{
       'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
       datasets: [
         {
-          label: 'Radiación global promedio',
-          backgroundColor: 'rgba(247,201,17,0.2)',
-          borderColor: 'rgba(247,201,17,1)',
+          label: 'Radiación global promedio mensual',
+          backgroundColor: 'rgba(48,63,159,0.5)',
+          borderColor: 'rgba(48,63,159,1)',
           borderWidth: 1,
-          hoverBackgroundColor: 'rgba(247,201,17,0.5)',
-          hoverBorderColor: 'rgba(247,201,17,1)',
+          hoverBackgroundColor: 'rgba(48,63,159,0.8)',
+          hoverBorderColor: 'rgba(48,63,159,1)',
           data: this.state.rads? this.state.rads.map(function(rad){
             return rad.valor;
           }) : null
         },
         {
-          label: 'Anual',
+          label: 'Radiación global promedio anual',
           type: 'line',
           data: Array(12).fill(radAnual? radAnual.valor/12 : null),
           fill: false,
-          borderColor: '#EC932F',
-          backgroundColor: "#EC932F",
+          borderColor: '#c51162',
+          backgroundColor: "#c51162",
           borderWidth: 1,
           pointRadius: 0,
           pointHoverRadius: 0
@@ -175,44 +202,49 @@ export default class GeoInfoPanel extends Component{
     }
 
 
-
+    const { classes } = this.props;
     return(
       <div>
-      <Card>
+      <Card className={classes.card}>
         {
           this.state.comuna.nombre?
-          <div>
-            <CardBody>
-              <CardTitle>Información Geográfica</CardTitle>
-              <CardSubtitle>{"Comuna: " + this.state.comuna.nombre}</CardSubtitle>
-              <br></br>
-              <Dropdown isOpen={this.state.dropdownOpen} toggle={this.toggleDropdown} size="sm">
-                <DropdownToggle caret>
-                  {this.state.selectedItem}
-                </DropdownToggle>
-                <DropdownMenu>
-                  <DropdownItem header>Gráficos</DropdownItem>
-                  <DropdownItem onClick={this.selectItem}>Temperatura</DropdownItem>
-                  <DropdownItem onClick={this.selectItem}>Radiación</DropdownItem>
-                  {/* <DropdownItem divider />
-                  <DropdownItem>Another Action</DropdownItem> */}
-                </DropdownMenu>
-              </Dropdown>
-              { this.state.selectedItem.localeCompare("Temperatura") == 0 &&
-                <Bar
-                height={200}
-                width={this.state.width- 30}
-                data={dataTemp}
-                options={optionsTemp}
-              />
+          <div >
+            <CardContent>
+              <Typography variant="headline" component="h4">Información Geográfica</Typography>
+              <Typography variant="subheading" color="textSecondary">
+                {"Comuna: " + this.state.comuna.nombre}
+              </Typography>
+              <Paper >
+                <Tabs
+                  value={this.state.selected}
+                  indicatorColor="primary"
+                  textColor="primary"
+                  onChange={this.handleChange}
+                  fullWidth
+                >
+                  <Tab label="Temperatura" />
+                  <Tab label="Radiación" />
+                </Tabs>
+              </Paper>
+              { this.state.selected == 0 &&
+                <TabContainer>
+                  <Bar
+                    height={230}
+                    width={this.state.width- 50}
+                    data={dataTemp}
+                    options={optionsTemp}
+                  />
+                </TabContainer>
               }
-              { this.state.selectedItem.localeCompare("Radiación") == 0 &&
-                <Bar
-                  height={200}
-                  width={this.state.width - 30}
-                  data={dataRad}
-                  options={optionsRad}
-                />
+              { this.state.selected == 1 &&
+                <TabContainer>
+                  <Bar
+                    height={230}
+                    width={this.state.width - 50}
+                    data={dataRad}
+                    options={optionsRad}
+                  />
+                </TabContainer>
               }
               {this.state.omegas != null  &&
                 <CardText>
@@ -229,14 +261,16 @@ export default class GeoInfoPanel extends Component{
               }
 
 
-            </CardBody>
+            </CardContent>
 
           </div>
           :
-          <CardBody>
-            <CardTitle>Información Geográfica</CardTitle>
-            <CardSubtitle>Selecciona una comuna</CardSubtitle>
-          </CardBody>
+          <CardContent >
+            <Typography variant="headline" component="h4">Información Geográfica</Typography>
+            <Typography variant="subheading" color="textSecondary">
+              Selecciona una comuna
+            </Typography>
+          </CardContent>
         }
       </Card>
     </div>
@@ -245,3 +279,5 @@ export default class GeoInfoPanel extends Component{
 
 
 }
+
+export default withStyles(styles)(GeoInfoPanel)

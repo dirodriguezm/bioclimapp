@@ -75,7 +75,7 @@ class Scene extends Component {
         //Indicador de puntos cardinales
         var curve = new THREE.EllipseCurve(
         	0,  0,            // ax, aY
-        	10, 10,           // xRadius, yRadius
+        	20, 20,           // xRadius, yRadius
         	0,  2 * Math.PI,  // aStartAngle, aEndAngle
         	false,            // aClockwise
         	0                 // aRotation

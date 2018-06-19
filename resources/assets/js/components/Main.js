@@ -3,11 +3,28 @@ import ReactDOM from 'react-dom';
 import TabPanel from "./TabPanel";
 import GradePanel from "./GradePanel";
 import GeoInfoPanel from "./GeoInfoPanel";
-import { Container, Row, Col } from 'reactstrap';
+import Grid from '@material-ui/core/Grid';
+import Paper from '@material-ui/core/Paper';
+import { withStyles } from '@material-ui/core/styles';
+import PropTypes from 'prop-types';
+import MapContainer from './MapContainer';
 var SunCalc = require('suncalc');
-export default class Main extends Component {
+
+const styles = theme => ({
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    padding: theme.spacing.unit ,
+    textAlign: 'center',
+    color: theme.palette.text.secondary,
+  },
+});
+
+class Main extends Component {
   constructor(props) {
     super(props);
+    // this.classes = this.props;
     this.state = {
       comuna: "",
       grade: "",
@@ -23,7 +40,7 @@ export default class Main extends Component {
     this.setState({
       width: this.col.clientWidth
     });
-    console.log(this.col);
+    //console.log(this.col);
   }
 
   onComunaChanged(mapState){
@@ -253,45 +270,41 @@ export default class Main extends Component {
 
   render() {
 
+    const { classes } = this.props;
+
       return (
-          <Container fluid>
-            <Row >
-              <Col xs="8">
-                <TabPanel
-                  onComunaChanged={this.onComunaChanged}
-                  onParedesChanged={this.onParedesChanged}
+        <div className={classes.root}>
+         <Grid container spacing={8}>
+           <Grid item xs={12}><Paper className={classes.paper}>Barra de Herramientas</Paper></Grid>
+           <Grid item xs={8}>
+              <TabPanel
+                onComunaChanged={this.onComunaChanged}
+                onParedesChanged={this.onParedesChanged}
+              />
+           </Grid>
+           <Grid item xs={4}>
+             <MapContainer
+               lat={-36.82013519999999}
+               lng={-73.0443904}
+               zoom={12}
+               markers={[]}
+               onComunaChanged={this.onComunaChanged}
+             />
+             <div ref={(col) => { this.col = col }}>
+                <GeoInfoPanel
+                  comuna={this.state.comuna}
+                  width={this.state.width}
+                  omegas={this.state.omegas}
+                  rb={this.state.rb}
                 />
-              </Col>
-              <Col xs="4">
-                <Row>
-                  <Col xs="5">
-                    <GradePanel grade="NOTA"/>
-                  </Col>
-                </Row>
-                <Row>
-                  <Col xs="12" >
-                    <div ref={(col) => { this.col = col }}>
-                      <GeoInfoPanel
-                        comuna={this.state.comuna}
-                        width={this.state.width}
-                        omegas={this.state.omegas}
-                        rb={this.state.rb}
-                      />
-                    </div>
-                  </Col>
-                </Row>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs="8">
-                PANEL HERRAMIENTAS
-              </Col>
-            </Row>
-          </Container>
+              </div>
+           </Grid>
+
+         </Grid>
+
+        </div>
       );
   }
 }
 
-if (document.getElementById('root')) {
-    ReactDOM.render(<Main />, document.getElementById('root'));
-}
+export default withStyles(styles)(Main)

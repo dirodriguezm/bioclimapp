@@ -13,6 +13,6 @@ require('./bootstrap');
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-require('./components/Main');
+require('./components/index');
 
 import 'bootstrap/dist/css/bootstrap.min.css';

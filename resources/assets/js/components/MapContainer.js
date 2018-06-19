@@ -91,7 +91,7 @@ export default class MapContainer extends React.Component {
     const position = [this.state.lat, this.state.lng];
     const style = {
       width: '100%',
-      height: '50vh'
+      height: '35vh'
     }
     return (
       <div>

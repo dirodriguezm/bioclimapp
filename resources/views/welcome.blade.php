@@ -27,6 +27,10 @@
             crossorigin=""></script>
         <!-- Leaflet Geosearch CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch@2.6.0/assets/css/leaflet.css"/>
+        <!-- MATERIAL UI -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+
     </head>
     <body>
         @if (Route::has('login'))
@@ -42,7 +46,7 @@
         <!-- <div class="title">
             Bioclimapp
         </div> -->
-        <div id="root" style="margin-top:20px"></div>
+        <div id="root" style="margin-top:0px"></div>
         <script src="{{mix('js/app.js')}}" ></script>
     </body>
 </html>
