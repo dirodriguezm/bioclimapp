@@ -247,7 +247,7 @@ class GeoInfoPanel extends Component{
                 </TabContainer>
               }
               {this.state.omegas != null  &&
-                <CardText>
+                <Typography>
                   La pared recibe sol desde: {this.state.omegas.wm.desde.getHours()}:{this.state.omegas.wm.desde.getMinutes()}
                   <br></br>
                   Hasta: {this.state.omegas.wm.hasta.getHours()}:{this.state.omegas.wm.hasta.getMinutes()}
@@ -257,7 +257,7 @@ class GeoInfoPanel extends Component{
                   Hasta {this.state.omegas.wt.hasta.getHours()}:{this.state.omegas.wt.hasta.getMinutes()}
                   <br></br>
                   Radiación de la pared: {this.state.rb}
-                </CardText>
+                </Typography>
               }
 
 

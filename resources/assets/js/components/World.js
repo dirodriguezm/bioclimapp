@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom';
 import * as THREE from 'three'
 import OrbitControls from 'orbit-controls-es6';
+import { SpriteText2D, MeshText2D,textAlign } from 'three-text2d'
+
 
 class Scene extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -19,6 +21,38 @@ class Scene extends Component {
           width: props.width,
           paredes: [],
         }
+  }
+
+  componentWillReceiveProps(nextProps){
+    if(this.state.sunLight == null){
+      var sunLight = new THREE.PointLight( 0xFFFFFF, 1, 100 );
+      var sunPos = this.transformGammaToDegree(nextProps.sunPosition.azimuth);
+      let index = Math.round(sunPos);
+      sunPos = this.circlePoints[index];
+      index = Math.round(nextProps.sunPosition.altitude);
+      if(index < 0){
+        index = -1 * index + 270;
+      }
+      let sunAlt = this.circlePoints[index];
+      let xdist = sunAlt.y / Math.tan(nextProps.sunPosition.altitude * Math.PI / 180);
+      console.log("xdist",xdist);
+      sunPos = new THREE.Vector3(sunPos.clone().x,0,sunPos.clone().y);
+      let d = sunPos.distanceTo(new THREE.Vector3());
+      let f = xdist / d;
+      sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
+
+      sunLight.position.set( sunPos.x, sunAlt.y , sunPos.z );
+      this.escena.add( sunLight );
+      //SOL
+      var solGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
+      var solMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
+      var sol = new THREE.Mesh( solGeometry, solMaterial );
+      sol.name = "sunSphere";
+      console.log("sunSphere",sunLight.position);
+      sol.position.set(sunLight.position.x, sunLight.position.y, sunLight.position.z);
+
+      this.escena.add( sol );
+    }
   }
 
   componentDidMount() {
@@ -84,6 +118,7 @@ class Scene extends Component {
         var circleGeometry = new THREE.BufferGeometry().setFromPoints( points );
         var circleMaterial = new THREE.LineBasicMaterial( { color : 0x808080 } );
         var cardinalPointsCircle = new THREE.Line( circleGeometry, circleMaterial );
+
         cardinalPointsCircle.rotateX(- Math.PI /2);
         cardinalPointsCircle.position.set(0,0.001,0);
         cardinalPointsCircle.name = "cardinalPointsCircle";
@@ -91,6 +126,30 @@ class Scene extends Component {
         this.circlePoints = points;
         escena.add(cardinalPointsCircle);
         //objetos.push(cardinalPointsCircle);
+        var sprite = new MeshText2D("S", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        sprite.scale.setX(0.03);
+        sprite.scale.setY(0.03);
+        sprite.position.set(0,0.3,20);
+        sprite.rotateX(- Math.PI / 2);
+        escena.add(sprite);
+        var sprite = new MeshText2D("N", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        sprite.scale.setX(0.03);
+        sprite.scale.setY(0.03);
+        sprite.position.set(0,0.3,-20);
+        sprite.rotateX(- Math.PI / 2);
+        escena.add(sprite);
+        var sprite = new MeshText2D("E", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        sprite.scale.setX(0.03);
+        sprite.scale.setY(0.03);
+        sprite.position.set(20,0.3,0);
+        sprite.rotateX(- Math.PI / 2);
+        escena.add(sprite);
+        var sprite = new MeshText2D("O", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        sprite.scale.setX(0.03);
+        sprite.scale.setY(0.03);
+        sprite.position.set(-20,0.3,0);
+        sprite.rotateX(- Math.PI / 2);
+        escena.add(sprite);
 
 
         //Indicador de la pared
@@ -111,22 +170,6 @@ class Scene extends Component {
         this.paredFantasma = paredFantasma;
         this.materialParedFantasma = materialParedFantasma
 
-        // Luces, es el sol, todavía no se si funcionan
-        var light = new THREE.AmbientLight( 0x404040 ); // soft white light
-        escena.add( light );
-        const factor = 1
-        var directionalLight = new THREE.DirectionalLight( 0xffffff );
-    		directionalLight.position.x = factor*(Math.random() - 0.5);
-    		directionalLight.position.y = factor*(Math.random() - 0.5);
-    		directionalLight.position.z = factor*(Math.random() - 0.5);
-    		directionalLight.position.normalize();
-    		escena.add( directionalLight );
-    		var directionalLight = new THREE.DirectionalLight( 0x808080 );
-    		directionalLight.position.x = factor*(Math.random() - 0.5);
-    		directionalLight.position.y = factor*(Math.random() - 0.5);
-    		directionalLight.position.z = factor*(Math.random() - 0.5);
-    		directionalLight.position.normalize();
-    		escena.add( directionalLight );
 
         //raycaster, usado para apuntar objetos
         var raycaster = new THREE.Raycaster();
@@ -303,7 +346,7 @@ class Scene extends Component {
       var orientacionRaycaster = new THREE.Raycaster();
       orientacionRaycaster.set(new THREE.Vector3(),pared.orientacion);
       var inter = orientacionRaycaster.intersectObject(this.cardinalPointsCircle);
-      let interPoint = inter[11].point.add(inter[10].point);
+      let interPoint = inter[0].point.add(inter[1].point);
       interPoint = interPoint.multiplyScalar(0.5);
       // var hex = 0xffff;
       // var arrowHelper = new THREE.ArrowHelper( inter[11].point, new THREE.Vector3(), 10, hex );
@@ -332,6 +375,12 @@ class Scene extends Component {
     if (degree >270 && degree <= 360) degree = 180 - degree;
     else degree -= 90;
     return degree;
+  }
+
+  transformGammaToDegree(gamma){
+    if(gamma < -90) gamma += 450;
+    else gamma += 90;
+    return gamma;
   }
 
   onClick(event){

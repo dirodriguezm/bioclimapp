@@ -280,6 +280,7 @@ class Main extends Component {
               <TabPanel
                 onComunaChanged={this.onComunaChanged}
                 onParedesChanged={this.onParedesChanged}
+                sunPosition={this.state.sunPosition}
               />
            </Grid>
            <Grid item xs={4}>

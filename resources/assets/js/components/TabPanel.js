@@ -41,7 +41,6 @@ class TabPanel extends Component {
   }
 
   componentDidMount(){
-    console.log("window", window.innerHeight);
     this.setState({
       height:window.innerHeight - 150,
       width: this.tab.clientWidth
@@ -128,20 +127,24 @@ class TabPanel extends Component {
              <Scene
                width={this.state.width}
                height={this.state.height}
+               sunPosition={this.props.sunPosition}
              /> :
              <div></div>
             }
           </TabContainer>
+
           <TabContainer dir={theme.direction}>
             {this.state.width?
              <Scene
                width={this.state.width}
                height={this.state.height}
                onParedesChanged={this.onParedesChanged}
+               sunPosition={this.props.sunPosition}
              /> :
              <div></div>
             }
           </TabContainer>
+
         </SwipeableViews>
       </div>
     );

@@ -37,6 +37,9 @@
         "reactjs-popup": "^1.1.1",
         "reactstrap": "^6.1.0",
         "suncalc": "^1.8.0",
-        "three": "^0.93.0"
+        "three": "^0.93.0",
+        "three-text2d": "^0.4.1",
+        "three.textsprite": "^18.3.19",
+        "three.texttexture": "^18.3.19"
     }
 }
