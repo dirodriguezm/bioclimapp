@@ -26,22 +26,23 @@ class Scene extends Component {
   componentWillReceiveProps(nextProps){
     if(this.state.sunLight == null){
       var sunLight = new THREE.PointLight( 0xFFFFFF, 1, 100 );
-      var sunPos = this.transformGammaToDegree(nextProps.sunPosition.azimuth);
-      let index = Math.round(sunPos);
-      sunPos = this.circlePoints[index];
+      var sunDegrees = this.transformGammaToDegree(nextProps.sunPosition.azimuth);
+      let index = Math.round(sunDegrees);
+      let sunPosCircle = this.circlePoints[index];
       index = Math.round(nextProps.sunPosition.altitude);
       if(index < 0){
         index = -1 * index + 270;
       }
       let sunAlt = this.circlePoints[index];
-      let xdist = sunAlt.y / Math.tan(nextProps.sunPosition.altitude * Math.PI / 180);
-      console.log("xdist",xdist);
-      sunPos = new THREE.Vector3(sunPos.clone().x,0,sunPos.clone().y);
-      let d = sunPos.distanceTo(new THREE.Vector3());
-      let f = xdist / d;
+      //let xdist = sunAlt.y / Math.tan(nextProps.sunPosition.altitude * Math.PI / 180);
+      //console.log("xdist",xdist);
+      console.log("xdist2",sunAlt.x);
+      let sunPos = new THREE.Vector3(sunPosCircle.x,0,sunPosCircle.y);
+      let d = sunPos.distanceTo(new THREE.Vector3(0,0.001,0));
+      let f = sunAlt.x / d;
       sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
 
-      sunLight.position.set( sunPos.x, sunAlt.y , sunPos.z );
+      sunLight.position.set( sunPos.x, sunAlt.y - 1 , sunPos.z );
       this.escena.add( sunLight );
       //SOL
       var solGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );

@@ -57,8 +57,8 @@ export default class MapContainer extends React.Component {
           lat: e.latlng.lat,
           lng: e.latlng.lng,
           comuna: response.data[0],
-          sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng, new Date(2018,1,1,14,0,0,0)),
-          sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng,new Date(2018,1,1,14,0,0,0)),
+          sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng, new Date(2018,6,21,14,0,0,0) ),
+          sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng,  new Date(2018,6,21,14,0,0,0) ),
 
         });
         this.props.onComunaChanged(this.state);
