@@ -9,6 +9,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import SwipeableViews from 'react-swipeable-views';
 import Scene from './World';
+import Context from './Context';
 
 function TabContainer(props) {
   return (
@@ -124,7 +125,7 @@ class TabPanel extends Component {
         >
           <TabContainer dir={theme.direction}>
             {this.state.width?
-             <Scene
+             <Context
                width={this.state.width}
                height={this.state.height}
                sunPosition={this.props.sunPosition}
