@@ -14,5 +14,3 @@ require('./bootstrap');
  */
 
 require('./components/index');
-
-import 'bootstrap/dist/css/bootstrap.min.css';
