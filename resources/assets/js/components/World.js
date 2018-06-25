@@ -4,7 +4,6 @@ import * as THREE from 'three'
 import OrbitControls from 'orbit-controls-es6';
 import { SpriteText2D, MeshText2D,textAlign } from 'three-text2d'
 
-
 class Scene extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
     constructor(props) {
@@ -16,15 +15,21 @@ class Scene extends Component {
         this.onClick = this.onClick.bind(this);
         this.agregarPared = this.agregarPared.bind(this);
         this.onKeyDown = this.onKeyDown.bind(this);
+        this.onChangeCamera = this.onChangeCamera.bind(this);
+        this.crearCasasPredefinidas = this.crearCasasPredefinidas.bind(this);
         this.state = {
           height: props.height,
           width: props.width,
           paredes: [],
+          accion: null,
+          click2D: props.click2D,
+          dibujo: props.dibujo,
         }
-  }
+  };
 
   componentWillReceiveProps(nextProps){
-    if(this.state.sunLight == null){
+
+    if(this.state.sunLight == null && nextProps.sunPosition != undefined){
       var sunLight = new THREE.PointLight( 0xFFFFFF, 1, 100 );
       var sunDegrees = this.transformGammaToDegree(nextProps.sunPosition.azimuth);
       let index = Math.round(sunDegrees);
@@ -53,6 +58,31 @@ class Scene extends Component {
       sol.position.set(sunLight.position.x, sunLight.position.y, sunLight.position.z);
 
       this.escena.add( sol );
+    }
+    if(nextProps.click2D){
+        this.camara.position.set( 0, 16, 0 );
+        this.camara.lookAt( new THREE.Vector3() );
+        this.control.enablePan = true;
+        this.control.enableRotation = false;
+        this.control.mouseButtons = {
+            PAN: THREE.MOUSE.RIGHT,
+            ZOOM: THREE.MOUSE.MIDDLE,
+        	ORBIT: -1,
+        };
+    }else{
+        this.camara.position.set( 5, 8, 13 );
+        this.camara.lookAt( new THREE.Vector3() );
+        this.control.enablePan = false;
+        this.control.enableRotation = true;
+        this.control.mouseButtons = {
+            PAN: -1,
+            ZOOM: THREE.MOUSE.MIDDLE,
+        	ORBIT: THREE.MOUSE.RIGHT,
+        };
+    }
+
+    if(nextProps.dibujo != null){
+        this.state.dibujo = nextProps.dibujo;
     }
   }
 
@@ -193,6 +223,125 @@ class Scene extends Component {
           paredes: paredes,
           ventanas: ventanas,
         });
+
+        var casas = this.crearCasasPredefinidas();
+        var casa_dibujada = null;
+        this.casa_dibujada = casa_dibujada;
+        this.casas = casas;
+  }
+  crearCasasPredefinidas(){
+      //casa simple Predefinida
+      var pos = new THREE.Vector3();
+      var widthWall = 3;
+      var heightWall = 1;
+      var geoParedPre = new THREE.BoxBufferGeometry(widthWall,heightWall,0.05);
+      var halfWidth = widthWall / 2;
+      var casas = []
+      //casa simple
+      var pared1 = new THREE.Mesh( geoParedPre, this.materialParedFantasma );
+      pared1.position.y = heightWall/2;
+      pared1.position.z = pared1.position.z + halfWidth;
+
+      var pared2 = new THREE.Mesh( geoParedPre, this.materialParedFantasma );
+      pared2.position.copy(pared1.position);
+      pared2.rotation.y = Math.PI / 2;
+      pared2.position.x = pared2.position.x + halfWidth;
+      pared2.position.z = pared2.position.z - halfWidth;
+
+      var pared3 = new THREE.Mesh( geoParedPre, this.materialParedFantasma );
+      pared3.position.copy(pared2.position);
+      pared3.rotation.y = Math.PI;
+      pared3.position.z = pared3.position.z - halfWidth;
+      pared3.position.x = pared3.position.x - halfWidth;
+
+      var pared4 = new THREE.Mesh( geoParedPre, this.materialParedFantasma );
+      pared4.position.copy(pared3.position);
+      pared4.rotation.y = Math.PI / 2;
+      pared4.position.x = pared4.position.x - halfWidth;
+      pared4.position.z = pared4.position.z + halfWidth;
+
+      var casa = new THREE.Group();
+      casa.add( pared1 );
+      casa.add( pared2 );
+      casa.add( pared3 );
+      casa.add( pared4 );
+
+      casas.push(casa);
+      //casa doble
+      var pared5 = pared1.clone();
+      pared5.position.x = pared5.position.x + widthWall;
+      var pared6 = pared2.clone();
+      pared6.position.x = pared6.position.x + widthWall;
+      var pared7 = pared3.clone();
+      pared7.position.x = pared7.position.x + widthWall;
+
+      var casa2 = casa.clone();
+      casa2.add( pared5);
+      casa2.add( pared6);
+      casa2.add( pared7);
+      casa2.position.set(-halfWidth,0,0)
+      casas.push(casa2);
+
+      //casa simple dos pisos
+      var newHeight = heightWall + heightWall/2;
+
+      var pared8 = pared1.clone();
+      pared8.position.y = newHeight;
+      var pared9 = pared2.clone();
+      pared9.position.y = newHeight;
+      var pared10 = pared3.clone();
+      pared10.position.y = newHeight;
+      var pared11 = pared4.clone();
+      pared11.position.y = newHeight;
+
+      var geoFloor = new THREE.BoxBufferGeometry(widthWall,0.05,widthWall);
+      var floor = new THREE.Mesh( geoFloor, this.materialParedFantasma );
+      floor.position.x = pared1.position.x;
+      floor.position.z = pared1.position.z - widthWall/2;
+      floor.position.y = heightWall;
+
+      var casa3 = casa.clone();
+      casa3.add(pared8);
+      casa3.add(pared9);
+      casa3.add(pared10);
+      casa3.add(pared11);
+      casa3.add(floor)
+
+      casas.push(casa3);
+      //casa doble dos pisos
+      var pared12 = pared1.clone();
+      pared12.position.y = newHeight;
+      var pared13 = pared2.clone();
+      pared13.position.y = newHeight;
+      var pared14 = pared3.clone();
+      pared14.position.y = newHeight;
+      var pared15 = pared4.clone();
+      pared15.position.y = newHeight;
+      var pared16 = pared5.clone();
+      pared16.position.y = newHeight;
+      var pared17 = pared6.clone();
+      pared17.position.y = newHeight;
+      var pared18 = pared7.clone();
+      pared18.position.y = newHeight;
+
+      var geoFloor = new THREE.BoxBufferGeometry(widthWall*2,0.05,widthWall);
+      var floor = new THREE.Mesh( geoFloor, this.materialParedFantasma );
+      floor.position.x = pared1.position.x + widthWall/2;
+      floor.position.z = pared1.position.z - widthWall/2;
+      floor.position.y = heightWall;
+
+      var casa4 = casa2.clone();
+      casa4.add(pared12);
+      casa4.add(pared13);
+      casa4.add(pared14);
+      casa4.add(pared15);
+      casa4.add(pared16);
+      casa4.add(pared17);
+      casa4.add(pared18);
+      casa4.add(floor);
+
+      casas.push(casa4);
+      return casas;
   }
 
   componentWillUnmount() {
@@ -210,6 +359,8 @@ class Scene extends Component {
       cancelAnimationFrame(this.frameId)
   }
 
+
+
   animate() {
         this.renderScene()
         this.frameId = window.requestAnimationFrame(this.animate)
@@ -218,6 +369,23 @@ class Scene extends Component {
   renderScene() {
 
       this.renderer.render(this.escena, this.camara)
+  }
+
+  agregarCasa() {
+      var material = new THREE.MeshLambertMaterial({ color: '#433F81', transparent: false });
+      this.setState({
+          dibujo : null,
+      })
+      var casa = this.casa_dibujada.clone();
+      this.escena.remove(this.casa_dibujada);
+      var child = casa.children;
+      var i;
+
+      for(i = 0 ; i < casa.children.length; i++){
+          casa.children[i].material = material;
+          casa.children[i].castShadow = true;
+      }
+      this.escena.add(casa);
   }
 
   agregarPared() {
@@ -291,6 +459,10 @@ class Scene extends Component {
       console.log(code);
   }
 
+  onChangeCamera(event) {
+      this.setState({camara: event.target.value})
+  }
+
   onMouseMove(event) {
       event.preventDefault()
       var rect = this.renderer.domElement.getBoundingClientRect();
@@ -306,8 +478,9 @@ class Scene extends Component {
           intersects = this.raycaster.intersectObjects(this.state.objetos);
       }else if (this.construirVentana) {
           intersects = this.raycaster.intersectObjects(this.state.paredes);
+      }else{
+          intersects = this.raycaster.intersectObjects(this.state.objetos);
       }
-
       if(intersects.length > 0){
           var intersect = intersects[0]
           //console.log(intersect.point);
@@ -323,6 +496,7 @@ class Scene extends Component {
           }
 
           if(this.state.dibujando) {
+
               var nexPosition = this.indicadorPared.position.clone();
               var dir = nexPosition.clone().sub(this.startPosition);
               this.orientacion = dir.clone();
@@ -335,6 +509,20 @@ class Scene extends Component {
               this.paredFantasma.position.copy(pos);
               var angleRadians = Math.atan2(nexPosition.z - this.startPosition.z, nexPosition.x - this.startPosition.x);
               this.paredFantasma.rotation.y = -angleRadians
+
+
+          }
+          if(this.state.dibujo != null){
+              var index = parseInt(this.state.dibujo);
+              if(this.casa_dibujada != this.casas[index]){
+                  if(this.casa_dibujada != null){
+                      this.escena.remove(this.casa_dibujada);
+                  }
+                  this.casa_dibujada = this.casas[index];
+                  this.escena.add(this.casa_dibujada);
+              }
+              this.casa_dibujada.position.copy(intersect.point ).add( intersect.face.normal );
+              this.casa_dibujada.position.floor();
 
 
           }
@@ -389,6 +577,9 @@ class Scene extends Component {
       if(this.construirPared){
           this.agregarPared();
       }
+      if(this.state.dibujo){
+          this.agregarCasa();
+      }
   }
       // for (let pared of this.paredes){
       //   var orientacionRaycaster = new THREE.Raycaster();
@@ -406,7 +597,6 @@ class Scene extends Component {
  render() {
   return (
     <div
-      onKeyDown={this.onKeyDown}
       tabIndex="0"
       onMouseMove={this.onMouseMove}
       onClick={this.onClick}

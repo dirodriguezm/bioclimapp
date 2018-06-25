@@ -8,6 +8,7 @@ import Paper from '@material-ui/core/Paper';
 import { withStyles } from '@material-ui/core/styles';
 import PropTypes from 'prop-types';
 import MapContainer from './MapContainer';
+import BarraHerramientas from './BarraHerramientas';
 var SunCalc = require('suncalc');
 
 const styles = theme => ({
@@ -31,7 +32,7 @@ class Main extends Component {
     };
     this.onComunaChanged = this.onComunaChanged.bind(this);
     this.onParedesChanged = this.onParedesChanged.bind(this);
-  }
+}
 
   /*componentDidMount() is a lifecycle method
    * that gets called after the component is rendered
@@ -42,6 +43,7 @@ class Main extends Component {
     });
     //console.log(this.col);
   }
+
 
   onComunaChanged(mapState){
     this.setState({
@@ -271,16 +273,18 @@ class Main extends Component {
   render() {
 
     const { classes } = this.props;
+    const { comuna, grades, camara} = this.state;
 
       return (
         <div className={classes.root}>
          <Grid container spacing={8}>
-           <Grid item xs={12}><Paper className={classes.paper}>Barra de Herramientas</Paper></Grid>
+           
            <Grid item xs={8}>
               <TabPanel
                 onComunaChanged={this.onComunaChanged}
                 onParedesChanged={this.onParedesChanged}
                 sunPosition={this.state.sunPosition}
+                camara={camara}
               />
            </Grid>
            <Grid item xs={4}>

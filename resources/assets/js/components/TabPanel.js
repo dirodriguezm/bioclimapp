@@ -9,6 +9,8 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import SwipeableViews from 'react-swipeable-views';
 import Scene from './World';
+import BarraHerramientas from './BarraHerramientas';
+import Paper from '@material-ui/core/Paper';
 
 function TabContainer(props) {
   return (
@@ -33,11 +35,15 @@ class TabPanel extends Component {
     super(props, context);
     this.state = {
       value: 0,
+      click2D: false,
+      dibujo: null,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeIndex = this.handleChangeIndex.bind(this);
     this.onComunaChanged = this.onComunaChanged.bind(this);
     this.onParedesChanged = this.onParedesChanged.bind(this);
+    this.onPerspectiveChanged = this.onPerspectiveChanged.bind(this);
+    this.onDrawingChanged = this.onDrawingChanged.bind(this);
   }
 
   componentDidMount(){
@@ -55,6 +61,18 @@ class TabPanel extends Component {
   handleChangeIndex(index) {
     this.setState({ value: index });
   };
+
+  onDrawingChanged(drawing){
+      this.setState({
+          dibujo: drawing
+      })
+  }
+
+  onPerspectiveChanged(){
+      this.setState(prevState => ({
+        click2D: !prevState.click2D
+      }));
+  }
 
   onComunaChanged(comuna){
     this.props.onComunaChanged(comuna);
@@ -128,11 +146,14 @@ class TabPanel extends Component {
                width={this.state.width}
                height={this.state.height}
                sunPosition={this.props.sunPosition}
+               click2D={this.state.click2D}
+               dibujo={this.state.dibujo}
              /> :
              <div></div>
             }
           </TabContainer>
 
+          //TabCointainter y Barra de herramientas
           <TabContainer dir={theme.direction}>
             {this.state.width?
              <Scene
@@ -140,12 +161,24 @@ class TabPanel extends Component {
                height={this.state.height}
                onParedesChanged={this.onParedesChanged}
                sunPosition={this.props.sunPosition}
+               click2D={this.state.click2D}
+               dibujo={this.state.dibujo}
+
              /> :
              <div></div>
             }
           </TabContainer>
 
         </SwipeableViews>
+            <Paper className={classes.paper}>
+                <BarraHerramientas
+                    click2D={false}
+                    onPerspectiveChanged={this.onPerspectiveChanged}
+                    dibujo={null}
+                    onDrawingChanged={this.onDrawingChanged}
+                />
+             </Paper>
+
       </div>
     );
   }
