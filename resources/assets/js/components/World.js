@@ -28,20 +28,19 @@ class Scene extends Component {
   };
 
   componentWillReceiveProps(nextProps){
-
-    if(this.state.sunLight == null && nextProps.sunPosition != undefined){
+    if(this.state.sunLight == null && nextProps.sunPosition != null){
       var sunLight = new THREE.PointLight( 0xFFFFFF, 1, 100 );
       var sunDegrees = this.transformGammaToDegree(nextProps.sunPosition.azimuth);
       let index = Math.round(sunDegrees);
       let sunPosCircle = this.circlePoints[index];
       index = Math.round(nextProps.sunPosition.altitude);
       if(index < 0){
-        index = -1 * index + 270;
+        index = 360 + index;
       }
       let sunAlt = this.circlePoints[index];
-      //let xdist = sunAlt.y / Math.tan(nextProps.sunPosition.altitude * Math.PI / 180);
-      //console.log("xdist",xdist);
-      console.log("xdist2",sunAlt.x);
+      // let xdist = sunAlt.y / Math.tan(nextProps.sunPosition.altitude * Math.PI / 180);
+      // console.log("xdist",xdist);
+      // console.log("sunAlt",sunAlt.x + ", " + sunAlt.y);
       let sunPos = new THREE.Vector3(sunPosCircle.x,0,sunPosCircle.y);
       let d = sunPos.distanceTo(new THREE.Vector3(0,0.001,0));
       let f = sunAlt.x / d;
@@ -56,7 +55,6 @@ class Scene extends Component {
       sol.name = "sunSphere";
       console.log("sunSphere",sunLight.position);
       sol.position.set(sunLight.position.x, sunLight.position.y, sunLight.position.z);
-
       this.escena.add( sol );
     }
     if(nextProps.click2D){
@@ -134,7 +132,7 @@ class Scene extends Component {
     		objetos.push( plano );
 
         //Grid del plano
-        var gridHelper = new THREE.GridHelper( 50, 50 );
+        var gridHelper = new THREE.GridHelper( 50, 50, 0xCCCCCC, 0xCCCCCC );
         escena.add(gridHelper);
 
         //Indicador de puntos cardinales
@@ -147,7 +145,7 @@ class Scene extends Component {
         );
         var points = curve.getPoints( 359 );
         var circleGeometry = new THREE.BufferGeometry().setFromPoints( points );
-        var circleMaterial = new THREE.LineBasicMaterial( { color : 0x808080 } );
+        var circleMaterial = new THREE.LineBasicMaterial( { color : 0xCCCCCC } );
         var cardinalPointsCircle = new THREE.Line( circleGeometry, circleMaterial );
 
         cardinalPointsCircle.rotateX(- Math.PI /2);
@@ -157,25 +155,25 @@ class Scene extends Component {
         this.circlePoints = points;
         escena.add(cardinalPointsCircle);
         //objetos.push(cardinalPointsCircle);
-        var sprite = new MeshText2D("S", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        var sprite = new MeshText2D("S", { align: textAlign.center,  font: '40px Arial', fillStyle: '0xCCCCCC' , antialias: false });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
         sprite.position.set(0,0.3,20);
         sprite.rotateX(- Math.PI / 2);
         escena.add(sprite);
-        var sprite = new MeshText2D("N", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        var sprite = new MeshText2D("N", { align: textAlign.center,  font: '40px Arial', fillStyle: '0xCCCCCC' , antialias: false });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
         sprite.position.set(0,0.3,-20);
         sprite.rotateX(- Math.PI / 2);
         escena.add(sprite);
-        var sprite = new MeshText2D("E", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        var sprite = new MeshText2D("E", { align: textAlign.center,  font: '40px Arial', fillStyle: '0xCCCCCC' , antialias: false });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
         sprite.position.set(20,0.3,0);
         sprite.rotateX(- Math.PI / 2);
         escena.add(sprite);
-        var sprite = new MeshText2D("O", { align: textAlign.center,  font: '40px Arial', fillStyle: '#000000' , antialias: false });
+        var sprite = new MeshText2D("O", { align: textAlign.center,  font: '40px Arial', fillStyle: '0xCCCCCC' , antialias: false });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
         sprite.position.set(-20,0.3,0);

@@ -9,6 +9,7 @@ import Tab from '@material-ui/core/Tab';
 import Typography from '@material-ui/core/Typography';
 import SwipeableViews from 'react-swipeable-views';
 import Scene from './World';
+import Context from './Context';
 import BarraHerramientas from './BarraHerramientas';
 import Paper from '@material-ui/core/Paper';
 
@@ -142,7 +143,7 @@ class TabPanel extends Component {
         >
           <TabContainer dir={theme.direction}>
             {this.state.width?
-             <Scene
+             <Context
                width={this.state.width}
                height={this.state.height}
                sunPosition={this.props.sunPosition}
@@ -152,8 +153,6 @@ class TabPanel extends Component {
              <div></div>
             }
           </TabContainer>
-
-          //TabCointainter y Barra de herramientas
           <TabContainer dir={theme.direction}>
             {this.state.width?
              <Scene
