@@ -38,7 +38,6 @@ export default class MapContainer extends React.Component {
   getSolarTimes(lat,lng, date = new Date()){
     return SunCalc.getTimes(date, lat,lng);
   }
-
   createMarker(lat,lng){
     let markers = [];
     markers.push([lat,lng]);
@@ -57,8 +56,8 @@ export default class MapContainer extends React.Component {
           lat: e.latlng.lat,
           lng: e.latlng.lng,
           comuna: response.data[0],
-          sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng ),
-          sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng ),
+          sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng),
+          sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng),
 
         });
         this.props.onComunaChanged(this.state);
