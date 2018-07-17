@@ -18,12 +18,25 @@ Para que laravel funcione con REACT:
   - `sudo npm run watch` : para auto compilar y ejecutar react al modificar el archivo
   - `php artisan serve` : para correr laravel
 
+Para activar localhost:
+ -  `sudo service apache2 stop` (en caso de tenerlo)
+ -  `sudo service mysql stop` (en caso de tenerlo)
+ -  `sudo /opt/lampp/xampp start`
+
 En caso de error, hace falta preparar react en laravel:
   - `php artisan preset react`
   - `sudo npm install`   (en caso de error de escritura usar 
    `sudo npm install --unsafe-perm=true --allow-root`)
    
+   
 
 
-
-
+# Paquetes
+<ul>
+	<li>Three.js</li>
+	<li>Reactstrap</li>
+	<li>Chart.js</li>
+	<li>react-chartjs-2 https://github.com/jerairrest/react-chartjs-2</li>
+	<li>axios</li>
+</ul>
+	
