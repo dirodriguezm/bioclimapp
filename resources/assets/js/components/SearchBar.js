@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import Popup from "reactjs-popup";
-import MapContainer from './MapContainer';
 import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import {MapControl} from 'react-leaflet';
 
@@ -9,6 +8,7 @@ export default class SearchBar extends MapControl{
   constructor(props){
     super(props);
   }
+
 
   createLeafletElement() {
     return GeoSearchControl({
@@ -22,6 +22,7 @@ export default class SearchBar extends MapControl{
       keepResult: true,
       showMarker: false,
       animateZoom: true,
+
     });
   }
 

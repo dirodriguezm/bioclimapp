@@ -1,100 +1,283 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { Card, CardImg, CardText, CardBody,
-  CardTitle, CardSubtitle, ListGroup, ListGroupItem } from 'reactstrap';
-import GradePanel from "./GradePanel";
 import axios from 'axios';
 import {Bar} from 'react-chartjs-2';
+import PropTypes from 'prop-types';
+import { withStyles } from '@material-ui/core/styles';
+import Card from '@material-ui/core/Card';
+import CardActions from '@material-ui/core/CardActions';
+import CardContent from '@material-ui/core/CardContent';
+import Button from '@material-ui/core/Button';
+import Typography from '@material-ui/core/Typography';
+import Paper from '@material-ui/core/Paper';
+import Tabs from '@material-ui/core/Tabs';
+import Tab from '@material-ui/core/Tab';
 
-export default class GeoInfoPanel extends Component{
+function TabContainer(props) {
+  return (
+    <Typography component="div" style={{ padding:0}}>
+      {props.children}
+    </Typography>
+  );
+}
+
+TabContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+};
+
+const styles = {
+  card: {
+    minWidth: 275,
+  },
+  bullet: {
+    display: 'inline-block',
+    margin: '0px',
+    transform: 'scale(0.8)',
+  },
+  title: {
+    marginBottom: 16,
+    fontSize: 12,
+  },
+  pos: {
+    marginBottom: 12,
+  },
+};
+
+class GeoInfoPanel extends Component{
 
   constructor(props){
     super(props);
+    this.handleChange = this.handleChange.bind(this);
     this.state = {
-      comuna: props.comuna
+      comuna: props.comuna,
+      selected: 0,
+      width: props.width
     }
   }
 
+  handleChange(event, value){
+    this.setState({ selected: value });
+  };
+
+  componentDidMount(){
+
+  }
+
   componentWillReceiveProps(nextProps){
-    if(nextProps.comuna.nombre != this.state.comuna.nombre){
-      axios.get('http://127.0.0.1:8000/api/temperaturas/' + nextProps.comuna.id)
-      .then(response => {
-        this.setState({
-          comuna: nextProps.comuna,
-          temps: response.data
-        })
+    if (nextProps.omegas != null ){
+      this.setState({
+        omegas:nextProps.omegas,
       })
     }
+    if(nextProps.rb != null){
+      this.setState({
+        rb: nextProps.rb
+      })
+    }
+    if(nextProps.comuna.nombre != this.state.comuna.nombre){
+      let pointer = this;
+      axios.all([this.getTemperaturesById(nextProps.comuna.id), this.getGlobalRadiationById(nextProps.comuna.id)])
+      .then(axios.spread(function (temps, rads) {
+        pointer.setState({
+          comuna: nextProps.comuna,
+          temps: temps.data,
+          rads: rads.data,
+          width: nextProps.width,
+        })
+      }));
+    }
 
+  }
+
+  getTemperaturesById(id){
+    return axios.get('http://127.0.0.1:8000/api/temperaturas/' + id);
+  }
+  getGlobalRadiationById(id){
+    return axios.get('http://127.0.0.1:8000/api/radiaciones/' + id);
   }
 
 
   render(){
-    let anual = null;
+    let tempAnual = null;
+    let radAnual = null;
     if( this.state.temps){
-      anual = this.state.temps.pop();
+      let tempsCopy = Object.assign([], this.state.temps);
+      let radsCopy = Object.assign([], this.state.rads);
+      tempAnual = tempsCopy.pop();
+      radAnual = radsCopy.pop();
     }
-    const data = {
+    const dataTemp = {
       labels: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
       'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
       datasets: [
         {
-          label: 'Temperatura promedio',
-          backgroundColor: 'rgba(255,99,132,0.2)',
-          borderColor: 'rgba(255,99,132,1)',
+          label: 'Temperatura promedio mensual',
+          backgroundColor: 'rgba(48,63,159,0.5)',
+          borderColor: 'rgba(48,63,159,1)',
           borderWidth: 1,
-          hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-          hoverBorderColor: 'rgba(255,99,132,1)',
+          hoverBackgroundColor: 'rgba(48,63,159,0.8)',
+          hoverBorderColor: 'rgba(48,63,159,1)',
           data: this.state.temps? this.state.temps.map(function(temp){
             return temp.valor;
           }) : null
         },
         {
-          label: 'Anual',
+          label: 'Temperatura promedio anual',
           type: 'line',
-          data: Array(12).fill(anual? anual.valor : null),
+          data: Array(12).fill(tempAnual? tempAnual.valor : null),
           fill: false,
-          borderColor: '#EC932F',
+          borderColor: '#c51162',
+          backgroundColor: "#c51162",
           borderWidth: 1,
           pointRadius: 0,
           pointHoverRadius: 0
         }
       ]
     };
+    const optionsTemp = {
+      maintainAspectRatio: false,
+      responsive: false,
+      scales:{
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: '°C'
+          },
+          ticks:{
+            beginAtZero:true,
+            stepSize: 5,
+            min:0,
+            max:25
+          }
+        }],
+      }
+    }
 
+    const dataRad = {
+      labels: ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+      'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'],
+      datasets: [
+        {
+          label: 'Radiación global promedio mensual',
+          backgroundColor: 'rgba(48,63,159,0.5)',
+          borderColor: 'rgba(48,63,159,1)',
+          borderWidth: 1,
+          hoverBackgroundColor: 'rgba(48,63,159,0.8)',
+          hoverBorderColor: 'rgba(48,63,159,1)',
+          data: this.state.rads? this.state.rads.map(function(rad){
+            return rad.valor;
+          }) : null
+        },
+        {
+          label: 'Radiación global promedio anual',
+          type: 'line',
+          data: Array(12).fill(radAnual? radAnual.valor/12 : null),
+          fill: false,
+          borderColor: '#c51162',
+          backgroundColor: "#c51162",
+          borderWidth: 1,
+          pointRadius: 0,
+          pointHoverRadius: 0
+        }
+      ]
+    }
+
+    const optionsRad = {
+      maintainAspectRatio: false,
+      responsive: false,
+      scales:{
+        yAxes: [{
+          scaleLabel: {
+            display: true,
+            labelString: 'Kw/m^2',
+          },
+          ticks:{
+            beginAtZero:true,
+            stepSize: 50,
+            min:0,
+            max:350
+          }
+        }],
+      }
+    }
+
+
+    const { classes } = this.props;
     return(
       <div>
-      <Card>
-        <CardBody>
-          <CardTitle>Información Geográfica</CardTitle>
-          {
-            this.state.comuna.nombre?
-            <div>
-              <CardSubtitle>{"Comuna: " + this.state.comuna.nombre}</CardSubtitle>
-              <Bar
-                data={data}
-                options={{
-                  maintainAspectRatio: true,
-                  responsive: true,
-                  scales:{
-                    yAxes: [{
-                      scaleLabel: {
-                        display: true,
-                        labelString: '°C'
-                      }
-                    }],
-                  }
-                }}
-              />
+      <Card className={classes.card}>
+        {
+          this.state.comuna.nombre?
+          <div >
+            <CardContent>
+              <Typography variant="headline" component="h4">Información Geográfica</Typography>
+              <Typography variant="subheading" color="textSecondary">
+                {"Comuna: " + this.state.comuna.nombre}
+              </Typography>
+              <Paper >
+                <Tabs
+                  value={this.state.selected}
+                  indicatorColor="primary"
+                  textColor="primary"
+                  onChange={this.handleChange}
+                  fullWidth
+                >
+                  <Tab label="Temperatura" />
+                  <Tab label="Radiación" />
+                </Tabs>
+              </Paper>
+              { this.state.selected == 0 &&
+                <TabContainer>
+                  <Bar
+                    height={230}
+                    width={this.state.width- 50}
+                    data={dataTemp}
+                    options={optionsTemp}
+                  />
+                </TabContainer>
+              }
+              { this.state.selected == 1 &&
+                <TabContainer>
+                  <Bar
+                    height={230}
+                    width={this.state.width - 50}
+                    data={dataRad}
+                    options={optionsRad}
+                  />
+                </TabContainer>
+              }
+              {this.state.omegas != null  &&
+                <Typography>
+                  La pared recibe sol desde: {this.state.omegas.wm.desde.getHours()}:{this.state.omegas.wm.desde.getMinutes()}
+                  <br></br>
+                  Hasta: {this.state.omegas.wm.hasta.getHours()}:{this.state.omegas.wm.hasta.getMinutes()}
+                  <br></br>
+                  Y desde: {this.state.omegas.wt.desde.getHours()}:{this.state.omegas.wt.desde.getMinutes()}
+                  <br></br>
+                  Hasta {this.state.omegas.wt.hasta.getHours()}:{this.state.omegas.wt.hasta.getMinutes()}
+                  <br></br>
+                  Radiación de la pared: {this.state.rb}
+                </Typography>
+              }
 
-            </div>
-            :
-            <CardSubtitle>Selecciona una comuna</CardSubtitle>
-          }
 
-        </CardBody>
+            </CardContent>
+
+          </div>
+          :
+          <CardContent >
+            <Typography variant="headline" component="h4">Información Geográfica</Typography>
+            <Typography variant="subheading" color="textSecondary">
+              Selecciona una comuna
+            </Typography>
+          </CardContent>
+        }
       </Card>
     </div>
     );
   }
+
+
 }
+
+export default withStyles(styles)(GeoInfoPanel)

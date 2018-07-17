@@ -32,7 +32,7 @@ class Radiacion extends Model
     /**
     * Obtener el tipo de la radiacion.
     */
-    public function mes()
+    public function tiporadiacion()
     {
       return $this->belongsTo('App\TipoRadiacion', 'tipo');
     }
