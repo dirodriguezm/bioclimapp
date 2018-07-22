@@ -45,6 +45,7 @@ class TabPanel extends Component {
     this.onParedesChanged = this.onParedesChanged.bind(this);
     this.onPerspectiveChanged = this.onPerspectiveChanged.bind(this);
     this.onDrawingChanged = this.onDrawingChanged.bind(this);
+    this.calcularFAR = this.calcularFAR.bind(this);
   }
 
   componentDidMount(){
@@ -81,6 +82,12 @@ class TabPanel extends Component {
 
   onParedesChanged(paredes){
     this.props.onParedesChanged(paredes);
+  }
+
+  calcularFAR(ventanas){
+    this.setState({
+      ventanas: ventanas
+    })
   }
 
   render() {
@@ -149,6 +156,7 @@ class TabPanel extends Component {
                sunPosition={this.props.sunPosition}
                click2D={this.state.click2D}
                dibujo={this.state.dibujo}
+               ventanas={this.state.ventanas}
              /> :
              <div></div>
             }
@@ -175,6 +183,7 @@ class TabPanel extends Component {
                     onPerspectiveChanged={this.onPerspectiveChanged}
                     dibujo={null}
                     onDrawingChanged={this.onDrawingChanged}
+                    calcularFAR={this.calcularFAR}
                 />
              </Paper>
 

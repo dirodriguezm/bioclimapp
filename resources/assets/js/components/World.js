@@ -47,13 +47,17 @@ class Scene extends Component {
       sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
 
       sunLight.position.set( sunPos.x, sunAlt.y - 1 , sunPos.z );
+      sunLight.name = "sunLight";
+      let remove = this.escena.getObjectByName("sunLight");
+      this.escena.remove(remove);
       this.escena.add( sunLight );
       //SOL
       var solGeometry = new THREE.SphereBufferGeometry( 0.5, 32, 32 );
       var solMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00} );
       var sol = new THREE.Mesh( solGeometry, solMaterial );
       sol.name = "sunSphere";
-      console.log("sunSphere",sunLight.position);
+      remove = this.escena.getObjectByName("sunSphere");
+      this.escena.remove(remove);
       sol.position.set(sunLight.position.x, sunLight.position.y, sunLight.position.z);
       this.escena.add( sol );
     }
