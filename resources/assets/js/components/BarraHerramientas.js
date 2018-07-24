@@ -185,7 +185,7 @@ class BarraHerramientas extends Component {
         this.handleClickCasa = this.handleClickCasa.bind(this);
         this.handleCloseCasa = this.handleCloseCasa.bind(this);
         this.handleClickAddPredefined = this.handleClickAddPredefined.bind(this);
-this.handleCalcularFAR = this.handleCalcularFAR.bind(this);
+        this.handleCalcularFAR = this.handleCalcularFAR.bind(this);
         this.handleClickSeleccionar = this.handleClickSeleccionar.bind(this);
 
     };
@@ -284,9 +284,9 @@ this.handleCalcularFAR = this.handleCalcularFAR.bind(this);
                 </Tooltip>
                 <Tooltip title="Seleccionar">
                     <IconButton
-                    className={classes.button}
-                    aria-label="Seleccionar"
-                    onClick{this.handleClickSeleccionar}>
+                        className={classes.button}
+                        aria-label="Seleccionar"
+                        onClick={this.handleClickSeleccionar}>
                         <CursorIcon/>
                     </IconButton>
                 </Tooltip>
