@@ -11,6 +11,7 @@ import SwipeableViews from 'react-swipeable-views';
 import Scene from './World';
 import Context from './Context';
 import BarraHerramientas from './BarraHerramientas';
+import BarraHerramientasContexto from './BarraHerramientasContexto';
 import Paper from '@material-ui/core/Paper';
 
 function TabContainer(props) {
@@ -45,7 +46,7 @@ class TabPanel extends Component {
     this.onParedesChanged = this.onParedesChanged.bind(this);
     this.onPerspectiveChanged = this.onPerspectiveChanged.bind(this);
     this.onDrawingChanged = this.onDrawingChanged.bind(this);
-    this.calcularFAR = this.calcularFAR.bind(this);
+    this.agregarContexto = this.agregarContexto.bind(this);
   }
 
   componentDidMount(){
@@ -65,9 +66,7 @@ class TabPanel extends Component {
   };
 
   onDrawingChanged(drawing){
-      this.setState({
-          dibujo: drawing
-      })
+      this.setState({ dibujo: drawing })
   }
 
   onPerspectiveChanged(){
@@ -84,58 +83,17 @@ class TabPanel extends Component {
     this.props.onParedesChanged(paredes);
   }
 
-  calcularFAR(ventanas){
-    this.setState({
-      ventanas: ventanas
-    })
+  agregarContexto(){
+    this.setState({agregarContexto:true})
   }
+
+
 
   render() {
     const { classes, theme } = this.props;
     const { value } = this.state;
     return (
-      // <div ref={(tab) => { this.tab = tab }}>
-      //   <Nav tabs>
-      //     <NavItem>
-      //       <NavLink
-      //         className={classnames({ active: this.state.activeTab === '1' })}
-      //         onClick={() => { this.toggle('1'); }}
-      //       >
-      //         Contexto
-      //       </NavLink>
-      //     </NavItem>
-      //     <NavItem>
-      //       <NavLink
-      //         className={classnames({ active: this.state.activeTab === '2' })}
-      //         onClick={() => { this.toggle('2'); }}
-      //       >
-      //         Morfología
-      //       </NavLink>
-      //     </NavItem>
-      //
-      //   </Nav>
-      //   <TabContent activeTab={this.state.activeTab} ref={(tab) => { this.tab = tab }}>
-      //     <TabPane tabId="1">
-      //       {/* {this.state.width?
-      //       <Scene width={this.state.width} height={this.state.height}/> :
-      //       <div></div>
-      //       } */}
-      //     </TabPane>
-      //     <TabPane tabId="2">
-      //       {this.state.width?
-      //         <Scene
-      //           width={this.state.width}
-      //           height={500}
-      //           onParedesChanged={this.onParedesChanged}
-      //         /> :
-      //         <div></div>
-      //       }
-      //     </TabPane>
-      //     <TabPane tabId="4">
-      //       Por definir
-      //     </TabPane>
-      //   </TabContent>
-      // </div>
+
       <div className={classes.root} ref={(tab) => { this.tab = tab }}>
         <AppBar position="static">
           <Tabs value={value} onChange={this.handleChange} fullWidth >
@@ -154,12 +112,16 @@ class TabPanel extends Component {
                width={this.state.width}
                height={this.state.height}
                sunPosition={this.props.sunPosition}
-               click2D={this.state.click2D}
-               dibujo={this.state.dibujo}
-               ventanas={this.state.ventanas}
+               //ventanas={this.state.ventanas}
+               agregarContexto={this.state.agregarContexto}
              /> :
              <div></div>
             }
+            <Paper className={classes.paper}>
+                <BarraHerramientasContexto
+                  agregarContexto={this.agregarContexto}
+                />
+             </Paper>
           </TabContainer>
           <TabContainer dir={theme.direction}>
             {this.state.width?
@@ -174,18 +136,18 @@ class TabPanel extends Component {
              /> :
              <div></div>
             }
-          </TabContainer>
-
-        </SwipeableViews>
             <Paper className={classes.paper}>
                 <BarraHerramientas
                     click2D={false}
                     onPerspectiveChanged={this.onPerspectiveChanged}
                     dibujo={null}
                     onDrawingChanged={this.onDrawingChanged}
-                    calcularFAR={this.calcularFAR}
                 />
              </Paper>
+          </TabContainer>
+
+        </SwipeableViews>
+
 
       </div>
     );
