@@ -18,13 +18,22 @@ class Context extends Component {
         }
   }
 
+  componentWillReceiveProps(nextProps){
+    if(nextProps.ventanas != this.state.ventanas){
+      this.setState({
+        ventanas: nextProps.ventanas
+      });
+      this.calcularFAR(nextProps.ventanas);
+    }
+  }
+
   componentDidMount() {
     const width = this.state.width;
     const height = this.state.height;
     var mouse = new THREE.Vector2();
     this.mouse = mouse;
-    //arreglo de objetos visibles que podrían interactuar
-    var objetos = [];
+    //arreglo de objetos de obstruccion
+    var obstrucciones = [];
     //Hay que cargar escena, camara, y renderer,
     //Escena
     var escena = new THREE.Scene();
@@ -38,7 +47,7 @@ class Context extends Component {
     renderer.setPixelRatio( window.devicePixelRatio );
 
 
-    //Camara
+    // // 2D Camara
     var camara = new THREE.OrthographicCamera( width / -20 , width / 20, height / 20,  height / -20 , 1, 2000 );
     camara.position.set( 0, 10, 0 );
     camara.lookAt( new THREE.Vector3() );
@@ -51,13 +60,20 @@ class Context extends Component {
     control.maxAzimuthAngle = 0;
     control.minAzimuthAngle = 0;
     control.enabled = true;
+    // 3D Camara
+  //   var camara = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+  // camara.position.set( 5, 8, 13 );
+  // camara.lookAt( new THREE.Vector3() );
+  // const control = new OrbitControls( camara, renderer.domElement );
+  // control.enabled = true;
+  // control.maxDistance = 500;
+  // this.control = control;
 
     //Plano
     var planoGeometria = new THREE.PlaneBufferGeometry( 80, 80);
     planoGeometria.rotateX( - Math.PI / 2 );
     var plano = new THREE.Mesh( planoGeometria, new THREE.MeshBasicMaterial( { visible: true } ) );
     escena.add( plano );
-    objetos.push( plano );
 
     //Grid del plano
     var gridHelper = new THREE.GridHelper( 80,80, 0xCCCCCC, 0xCCCCCC);
@@ -75,7 +91,7 @@ class Context extends Component {
     var circleGeometry = new THREE.BufferGeometry().setFromPoints( points );
     var circleMaterial = new THREE.LineBasicMaterial( { color : 0xCCCCCC } );
     var cardinalPointsCircle = new THREE.Line( circleGeometry, circleMaterial );
-
+    //Circulo de puntos cardinales con letras
     cardinalPointsCircle.rotateX(- Math.PI /2);
     cardinalPointsCircle.position.set(0,0.001,0);
     cardinalPointsCircle.name = "cardinalPointsCircle";
@@ -106,15 +122,34 @@ class Context extends Component {
     sprite.position.set(-25,0.3,0);
     sprite.rotateX(- Math.PI / 2);
     escena.add(sprite);
-
+    //caja que representa la casa al centro del plano
     var centerBoxGeom = new THREE.BoxBufferGeometry( 1, 1, 1 );
     var centerBoxMaterial = new THREE.MeshBasicMaterial( {color: 0x000000} );
     var centerBox = new THREE.Mesh( centerBoxGeom, centerBoxMaterial );
     escena.add( centerBox );
 
-    //raycaster, usado para apuntar objetos
-    var raycaster = new THREE.Raycaster();
-    raycaster.linePrecision = 3;
+    // OBSTRUCCIONES POR DEFECTO
+    var obstruccionGeom = new THREE.BoxBufferGeometry(6,5,0.5);
+    var obstruccionMaterial = new THREE.MeshBasicMaterial( {color: 0x000000} );
+    var obstruccion1 = new THREE.Mesh(obstruccionGeom, obstruccionMaterial);
+    obstruccion1.position.set(-10,0,-10);
+    obstruccion1.name = "obstruccion";
+    escena.add(obstruccion1);
+    obstrucciones.push(obstruccion1);
+
+    obstruccionGeom = new THREE.BoxBufferGeometry(6,5,0.5);
+    obstruccionGeom.rotateY(-Math.PI / 4);
+    var obstruccion2 = new THREE.Mesh(obstruccionGeom, obstruccionMaterial);
+    obstruccion2.position.set(12,0,-12);
+    escena.add(obstruccion2);
+    obstrucciones.push(obstruccion2);
+
+    obstruccionGeom = new THREE.BoxBufferGeometry(6,5,0.5);
+    var obstruccion3 = new THREE.Mesh(obstruccionGeom, obstruccionMaterial);
+    obstruccion3.position.set(3,0,-12);
+    escena.add(obstruccion3);
+    obstrucciones.push(obstruccion3);
+
 
     //Se agregan a state
     this.setState({
@@ -122,13 +157,14 @@ class Context extends Component {
       camara: camara,
       control: control,
       renderer: renderer,
-      objetos: objetos,
-      mouse: new THREE.Vector2(),
-      raycaster: raycaster,
-    })
+      plano: plano,
+      obstrucciones: obstrucciones,
+      mouse: mouse,
+    });
 
-    this.mount.appendChild(renderer.domElement)
-    this.start()
+
+    this.mount.appendChild(renderer.domElement);
+    this.start();
   }
 
   componentWillUnmount() {
@@ -163,17 +199,17 @@ class Context extends Component {
     }
     var rect = this.state.renderer.domElement.getBoundingClientRect();
     var mouse = this.state.mouse;
-    var raycaster = new THREE.Raycaster();
+    let raycasterMouse = new THREE.Raycaster();
     mouse.x = ( ( event.clientX - rect.left ) / ( rect.width ) ) * 2 - 1;
     mouse.y = - ( ( event.clientY - rect.top ) / ( rect.height ) ) * 2 + 1;
-    raycaster.setFromCamera( this.state.mouse, this.state.camara );
-    var intersections = raycaster.intersectObjects(this.state.objetos);
+    raycasterMouse.setFromCamera( mouse, this.state.camara );
+    var intersections = raycasterMouse.intersectObject(this.state.plano);
     var point = {x: intersections[0].point.x, y: - intersections[0].point.z}
     this.setState({
       mouse: mouse,
-      raycaster:raycaster,
       mousePoint: point,
     });
+    //elemento HTML que indica las coordenadas en el plano
     if(mouse.x <= 0.98 && mouse.x >= -0.98 && mouse.y <= 0.98 && mouse.y >= -0.98){
       var text2 = document.createElement('div');
       text2.setAttribute("id","text");
@@ -187,6 +223,58 @@ class Context extends Component {
       text2.style.left = (event.clientX + 20) + 'px';
       document.body.appendChild(text2);
     }
+  }
+
+  calcularFAR(ventanas){
+    //let ventanas = this.state.ventanas;
+    let axisY = new THREE.Vector3(0,1,0);
+    let raycasterFAR = new THREE.Raycaster();
+    for(let ventana of ventanas){
+      let angleLeft = ventana.orientacion.clone().applyAxisAngle(axisY, Math.PI / 4);
+      let angleRight = ventana.orientacion.clone().applyAxisAngle(axisY,-Math.PI / 4);
+      let angle = angleLeft.clone();
+      let obstruccionesVentana = [];
+      for(let i = 0; i < 90; i++){
+        angle = angle.normalize();
+        raycasterFAR.set(ventana.pos, angle);
+        let intersections = raycasterFAR.intersectObjects(this.state.obstrucciones);
+        var hex = 0xffff;
+        var arrowHelper = new THREE.ArrowHelper( angle, ventana.pos, 10, hex );
+        this.state.escena.add(arrowHelper);
+        for(let intersection of intersections){
+          if(! intersection.object.marked){
+            intersection.object.pointStart = intersection.point;
+            intersection.object.aDistance = intersection.object.geometry.parameters.height - ventana.pos.y;
+            obstruccionesVentana.push(intersection.object);
+            intersection.object.marked = true;
+          }
+          intersection.object.pointEnd = intersection.point;
+          intersection.object.betaAngle = intersection.object.pointStart.angleTo(intersection.point) * 180 / Math.PI;
+          let middlePoint = this.getPointInBetween(intersection.object.pointStart, intersection.object.pointEnd);
+          let auxPoint = new THREE.Vector3(middlePoint.x, ventana.pos.y, ventana.pos.z);
+          intersection.object.bDistance = middlePoint.distanceTo(auxPoint);
+          intersection.object.far = Math.pow(0.2996,(intersection.object.aDistance/intersection.object.bDistance))
+                                    * intersection.object.betaAngle / 90;
+        }
+        angle.applyAxisAngle(axisY, -Math.PI/180);
+      }
+      let firstElement = 90;
+      let far = 0;
+      for(let obstruccion of obstruccionesVentana){
+        firstElement = firstElement - obstruccion.betaAngle;
+        far += obstruccion.far;
+      }
+      ventana.obstrucciones = obstruccionesVentana;
+      ventana.far = firstElement / 90 + far;
+    }
+    debugger;
+  }
+
+  getPointInBetween(pointA, pointB) {
+    var dir = pointB.clone().sub(pointA);
+    var len = dir.length();
+    dir = dir.normalize().multiplyScalar(len*0.5);
+    return pointA.clone().add(dir);
   }
 
   render() {
