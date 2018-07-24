@@ -23,6 +23,8 @@ class Scene extends Component {
           paredes: [],
           accion: null,
           click2D: props.click2D,
+          activated2D: false,
+          activated3D: true,
           dibujo: props.dibujo,
         }
   };
@@ -58,16 +60,21 @@ class Scene extends Component {
       this.escena.add( sol );
     }
     if(nextProps.click2D){
-        this.camara.position.set( 0, 16, 0 );
-        this.camara.lookAt( new THREE.Vector3() );
-        this.control.enablePan = true;
-        this.control.enableRotation = false;
-        this.control.mouseButtons = {
-            PAN: THREE.MOUSE.RIGHT,
-            ZOOM: THREE.MOUSE.MIDDLE,
-        	ORBIT: -1,
-        };
+        if(!this.state.activated2D){
+            this.camara.position.set( 0, 16, 0 );
+            this.camara.lookAt( new THREE.Vector3() );
+            this.control.enablePan = true;
+            this.control.enableRotation = false;
+            this.control.mouseButtons = {
+                PAN: THREE.MOUSE.RIGHT,
+                ZOOM: THREE.MOUSE.MIDDLE,
+            	ORBIT: -1,
+            };
+            this.state.activated2D = true;
+            this.state.activated3D = false;
+        }
     }else{
+        if(!this.state.activated3D)
         this.camara.position.set( 5, 8, 13 );
         this.camara.lookAt( new THREE.Vector3() );
         this.control.enablePan = false;
@@ -77,6 +84,8 @@ class Scene extends Component {
             ZOOM: THREE.MOUSE.MIDDLE,
         	ORBIT: THREE.MOUSE.RIGHT,
         };
+        this.state.activated2D = false;
+        this.state.activated3D = true;
     }
 
     if(nextProps.dibujo != null){

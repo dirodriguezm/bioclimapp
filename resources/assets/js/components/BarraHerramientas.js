@@ -184,6 +184,7 @@ class BarraHerramientas extends Component {
         this.handleClickCasa = this.handleClickCasa.bind(this);
         this.handleCloseCasa = this.handleCloseCasa.bind(this);
         this.handleClickAddPredefined = this.handleClickAddPredefined.bind(this);
+        this.handleClickSeleccionar = this.handleClickSeleccionar.bind(this);
     };
 
     setCamara(event){
@@ -194,12 +195,16 @@ class BarraHerramientas extends Component {
         this.setState({ anchorEl: event.currentTarget });
     };
 
+    handleClickSeleccionar(){
+        this.props.onSeleccionar();
+    }
+
     handleClickCasa(event){
-        this.setState({ anchor: event.currentTarget })
+        this.setState({ anchor: event.currentTarget });
     }
 
     handleCloseCasa(){
-        this.setState({ anchor: null })
+        this.setState({ anchor: null });
     }
 
     handleClose(){
@@ -245,15 +250,18 @@ class BarraHerramientas extends Component {
                 </Tooltip>
                 <Tooltip title="Camara 3D">
                     <IconButton
-                    className={classes.button}
-                    aria-label="3D"
-                    disabled={!this.state.click2D}
-                    onClick={this.handleClickCamara} >
-                        <IconThreeD/>
+                        className={classes.button}
+                        aria-label="3D"
+                        disabled={!this.state.click2D}
+                        onClick={this.handleClickCamara} >
+                            <IconThreeD/>
                     </IconButton>
                 </Tooltip>
                 <Tooltip title="Seleccionar">
-                    <IconButton className={classes.button} aria-label="Seleccionar">
+                    <IconButton
+                    className={classes.button}
+                    aria-label="Seleccionar"
+                    onClick{this.handleClickSeleccionar}>
                         <CursorIcon/>
                     </IconButton>
                 </Tooltip>
@@ -359,6 +367,7 @@ BarraHerramientas.propTypes = {
     classes: PropTypes.object.isRequired,
     onPerspectiveChanged : PropTypes.func,
     onDrawingChanged : PropTypes.func,
+    onSeleccionar : PropTypes.func,
 };
 
 export default withStyles(styles)(BarraHerramientas);

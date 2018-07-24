@@ -38,6 +38,7 @@ class TabPanel extends Component {
       value: 0,
       click2D: false,
       dibujo: null,
+      select: false,
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -45,6 +46,7 @@ class TabPanel extends Component {
     this.onParedesChanged = this.onParedesChanged.bind(this);
     this.onPerspectiveChanged = this.onPerspectiveChanged.bind(this);
     this.onDrawingChanged = this.onDrawingChanged.bind(this);
+    this.onSeleccionar = this.onSeleccionar.bind(this);
   }
 
   componentDidMount(){
@@ -67,6 +69,16 @@ class TabPanel extends Component {
       this.setState({
           dibujo: drawing
       })
+  }
+
+  onSeleccionar(){
+      this.setState({
+          select = true;
+      })
+  }
+
+  onSelect(){
+
   }
 
   onPerspectiveChanged(){
@@ -161,6 +173,7 @@ class TabPanel extends Component {
                onParedesChanged={this.onParedesChanged}
                sunPosition={this.props.sunPosition}
                click2D={this.state.click2D}
+               select={this.state.select}
                dibujo={this.state.dibujo}
 
              /> :
