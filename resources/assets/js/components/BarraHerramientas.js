@@ -10,7 +10,6 @@ import Delete from '@material-ui/icons/Delete';
 import AddCircle from '@material-ui/icons/AddCircle'
 import SvgIcon from '@material-ui/core/SvgIcon';
 import Tooltip from '@material-ui/core/Tooltip';
-import * as THREE from 'three'
 
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
@@ -185,7 +184,7 @@ class BarraHerramientas extends Component {
         this.handleClickCasa = this.handleClickCasa.bind(this);
         this.handleCloseCasa = this.handleCloseCasa.bind(this);
         this.handleClickAddPredefined = this.handleClickAddPredefined.bind(this);
-        this.handleCalcularFAR = this.handleCalcularFAR.bind(this);
+
         this.handleClickSeleccionar = this.handleClickSeleccionar.bind(this);
 
     };
@@ -227,28 +226,7 @@ class BarraHerramientas extends Component {
         this.setState({dibujo: event.target.value})
         this.props.onDrawingChanged(event.target.value);
     }
-    handleCalcularFAR(event){
-      this.setState({calcularFAR: event.target.value});
-      let ventanas = [
-        // {
-        //   pos: new THREE.Vector3(0.5,0,0),
-        //   orientacion: new THREE.Vector3(1,0,0)
-        // },
-        // {
-        //   pos: new THREE.Vector3(-0.5,0,0),
-        //   orientacion: new THREE.Vector3(-1,0,0)
-        // },
-        // {
-        //   pos: new THREE.Vector3(0,0,0.5),
-        //   orientacion: new THREE.Vector3(0,0,1)
-        // },
-        {
-          pos: new THREE.Vector3(0,0,-0.5),
-          orientacion: new THREE.Vector3(0,0,-1)
-        }
-      ];
-      this.props.calcularFAR(ventanas);
-    }
+
     render(){
         const { classes } = this.props;
         const { spacing, click2D, anchorEl, anchor } = this.state;
@@ -377,12 +355,6 @@ class BarraHerramientas extends Component {
                         aria-haspopup="true"
                         onClick={this.handleClickCasa}>
                         <HomeIcon/>
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="calcularFAR">
-                    <IconButton className={classes.button}
-                    aria-label="AgregarPuerta" onClick={this.handleCalcularFAR}>
-                        <Delete/>
                     </IconButton>
                 </Tooltip>
 

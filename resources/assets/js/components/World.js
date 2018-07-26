@@ -2,7 +2,9 @@ import React, { Component } from 'react'
 import ReactDOM from 'react-dom';
 import * as THREE from 'three'
 import OrbitControls from 'orbit-controls-es6';
-import { SpriteText2D, MeshText2D,textAlign } from 'three-text2d'
+import { SpriteText2D, MeshText2D,textAlign } from 'three-text2d';
+import Popper from '@material-ui/core/Popper';
+import Typography from '@material-ui/core/Typography';
 
 class Scene extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -94,6 +96,42 @@ class Scene extends Component {
 
     if(nextProps.dibujo != null){
         this.state.dibujo = nextProps.dibujo;
+    }
+  }
+
+  onPerspectiveChanged(click2D){
+    console.log(!this.state.activated2D);
+    if(click2D){
+        if(!this.state.activated2D){
+            this.camara.position.set( 0, 16, 0 );
+            this.camara.lookAt( new THREE.Vector3() );
+            this.control.enablePan = true;
+            this.control.enableRotation = false;
+            this.control.mouseButtons = {
+                PAN: THREE.MOUSE.RIGHT,
+                ZOOM: THREE.MOUSE.MIDDLE,
+            	ORBIT: -1,
+            };
+            this.setState({
+              activated2D : true,
+              activated3D : false
+            })
+        }
+    }else{
+        if(!this.state.activated3D)
+        this.camara.position.set( 5, 8, 13 );
+        this.camara.lookAt( new THREE.Vector3() );
+        this.control.enablePan = false;
+        this.control.enableRotation = true;
+        this.control.mouseButtons = {
+            PAN: -1,
+            ZOOM: THREE.MOUSE.MIDDLE,
+        	ORBIT: THREE.MOUSE.RIGHT,
+        };
+        this.setState({
+          activated2D : true,
+          activated3D : false
+        })
     }
   }
 
@@ -611,7 +649,7 @@ class Scene extends Component {
       tabIndex="0"
       onMouseMove={this.onMouseMove}
       onClick={this.onClick}
-      ref={(mount) => { this.mount = mount }}
+      ref={(mount) => { this.mount = mount }}      
     />
   )
  }

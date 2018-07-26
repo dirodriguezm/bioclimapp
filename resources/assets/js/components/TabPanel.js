@@ -14,6 +14,7 @@ import BarraHerramientas from './BarraHerramientas';
 import BarraHerramientasContexto from './BarraHerramientasContexto';
 import Paper from '@material-ui/core/Paper';
 
+
 function TabContainer(props) {
   return (
     <Typography component="div" style={{ padding: 0 }}>
@@ -43,7 +44,6 @@ class TabPanel extends Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeIndex = this.handleChangeIndex.bind(this);
-    this.onComunaChanged = this.onComunaChanged.bind(this);
     this.onParedesChanged = this.onParedesChanged.bind(this);
     this.onPerspectiveChanged = this.onPerspectiveChanged.bind(this);
     this.onDrawingChanged = this.onDrawingChanged.bind(this);
@@ -68,19 +68,13 @@ class TabPanel extends Component {
   };
 
   onDrawingChanged(drawing){
-      this.setState({
-          dibujo: drawing
-      })
+      this.setState({ dibujo: drawing })
   }
 
   onPerspectiveChanged(){
       this.setState(prevState => ({
         click2D: !prevState.click2D
       }));
-  }
-
-  onComunaChanged(comuna){
-    this.props.onComunaChanged(comuna);
   }
 
   onParedesChanged(paredes){
@@ -121,6 +115,7 @@ class TabPanel extends Component {
                width={this.state.width}
                height={this.state.height}
                sunPosition={this.props.sunPosition}
+               //ventanas={this.state.ventanas}
                agregarContexto={this.state.agregarContexto}
              /> :
              <div></div>
@@ -131,9 +126,10 @@ class TabPanel extends Component {
                 />
              </Paper>
           </TabContainer>
-          <TabContainer dir={theme.direction}>
+          <TabContainer dir={theme.direction} ref={(con) => { this.con = con }}>
             {this.state.width?
              <Scene
+
                width={this.state.width}
                height={this.state.height}
                onParedesChanged={this.onParedesChanged}
@@ -153,6 +149,8 @@ class TabPanel extends Component {
                     onDrawingChanged={this.onDrawingChanged}
                 />
              </Paper>
+
+
           </TabContainer>
 
         </SwipeableViews>
