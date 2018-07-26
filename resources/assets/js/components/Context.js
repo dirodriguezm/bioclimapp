@@ -5,7 +5,6 @@ import Orbitcontrols from 'orbit-controls-es6';
 import { SpriteText2D, MeshText2D,textAlign } from 'three-text2d'
 
 class Context extends Component {
-    //Aqui se nomban objetos y se asocian a un metodo
     constructor(props) {
         super(props)
         this.start = this.start.bind(this);
@@ -13,11 +12,20 @@ class Context extends Component {
         this.animate = this.animate.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
         this.onClick = this.onClick.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
         this.state = {
           height: props.height,
           width: props.width,
-          dibujando: false,
         }
+        this.dibujando = false;
+        this.seleccionando = false;
+        this.borrando = false;
+        this.ventanas = [
+          {pos: new THREE.Vector3(0,0,-0.5),
+           orientacion: new THREE.Vector3(0,0,-1)
+          }
+        ];
   }
 
   componentWillReceiveProps(nextProps){
@@ -26,13 +34,18 @@ class Context extends Component {
       this.calcularFAR(nextProps.ventanas);
     }
     if(nextProps.agregarContexto){
-      this.setState({ agregarContexto:true });
+      this.agregarContexto = true;
+      this.seleccionando = false;
       var geometry = new THREE.BoxBufferGeometry(0.05,2,0.05);
       const material = new THREE.MeshBasicMaterial({ color: '#433F81', opacity: 0.5, transparent: true });
       var obstruccionFantasma = new THREE.Mesh( geometry, material );
       obstruccionFantasma.visible = false;
       this.escena.add( obstruccionFantasma );
       this.obstruccionFantasma = obstruccionFantasma;
+    }
+    if(nextProps.seleccionar){
+      this.seleccionando = true;
+      this.agregarContexto = false;
     }
   }
 
@@ -70,13 +83,12 @@ class Context extends Component {
     this.control.minAzimuthAngle = 0;
     this.control.enabled = true;
     // 3D this.camara
-  //   var this.camara = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
-  // this.camara.position.set( 5, 8, 13 );
-  // this.camara.lookAt( new THREE.Vector3() );
-  // const this.control = new Orbitthis.controls( this.camara, renderer.domElement );
-  // this.control.enabled = true;
-  // this.control.maxDistance = 500;
-  // this.this.control = this.control;
+    // this.camara = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
+    // this.camara.position.set( 5, 8, 13 );
+    // this.camara.lookAt( new THREE.Vector3() );
+    // this.control = new Orbitcontrols( this.camara, this.renderer.domElement );
+    // this.control.enabled = true;
+    // this.control.maxDistance = 500;
 
     //Plano
     let planoGeometria = new THREE.PlaneBufferGeometry( 80, 80);
@@ -137,27 +149,8 @@ class Context extends Component {
     let centerBox = new THREE.Mesh( centerBoxGeom, centerBoxMaterial );
     this.escena.add( centerBox );
 
-    // OBSTRUCCIONES POR DEFECTO
-    let obstruccionGeom = new THREE.BoxBufferGeometry(6,5,0.5);
-    let obstruccionMaterial = new THREE.MeshBasicMaterial( {color: 0x000000} );
-    let obstruccion1 = new THREE.Mesh(obstruccionGeom, obstruccionMaterial);
-    obstruccion1.position.set(-10,0,-10);
-    obstruccion1.name = "obstruccion";
-    this.escena.add(obstruccion1);
-    this.obstrucciones.push(obstruccion1);
-
-    obstruccionGeom = new THREE.BoxBufferGeometry(6,5,0.5);
-    obstruccionGeom.rotateY(-Math.PI / 4);
-    let obstruccion2 = new THREE.Mesh(obstruccionGeom, obstruccionMaterial);
-    obstruccion2.position.set(12,0,-12);
-    this.escena.add(obstruccion2);
-    this.obstrucciones.push(obstruccion2);
-
-    obstruccionGeom = new THREE.BoxBufferGeometry(6,5,0.5);
-    let obstruccion3 = new THREE.Mesh(obstruccionGeom, obstruccionMaterial);
-    obstruccion3.position.set(3,0,-12);
-    this.escena.add(obstruccion3);
-    this.obstrucciones.push(obstruccion3);
+    var light = new THREE.AmbientLight( 0x404040, 100 ); // soft white light
+    this.escena.add( light );
 
     this.mount.appendChild(this.renderer.domElement);
     this.start();
@@ -204,30 +197,66 @@ class Context extends Component {
     this.mouse = mouse;
     this.mousePoint = point; // Coordenadas del mouse en el world pero 2D x: eje x, y: -eje z
     //elemento HTML que indica las coordenadas en el plano
-    if(mouse.x <= 0.98 && mouse.x >= -0.98 && mouse.y <= 0.98 && mouse.y >= -0.98){
-      var text2 = document.createElement('div');
-      text2.setAttribute("id","text");
-      text2.style.position = 'absolute';
-      text2.style.width = 100;
-      text2.style.height = 100;
-      text2.style.backgroundColor = "#f0f0f0";
-      text2.innerHTML = Math.round(point.x) + "," + Math.round(point.y);
-      text2.style.top = (event.clientY) + 'px';
-      text2.style.left = (event.clientX + 20) + 'px';
-      document.body.appendChild(text2);
+    var text2 = document.createElement('div');
+    text2.setAttribute("id","text");
+    text2.style.position = 'absolute';
+    text2.style.width = 100;
+    text2.style.height = 100;
+    text2.style.backgroundColor = "#f0f0f0";
+    text2.innerHTML = Math.round(point.x) + "," + Math.round(point.y);
+    text2.style.top = (event.clientY) + 'px';
+    text2.style.left = (event.clientX + 20) + 'px';
+    document.body.appendChild(text2);
+
+    if(this.dibujando){
+      this.nuevoContexto();
     }
-    if(this.state.dibujando){
-      this.agregarContexto();
+    if(this.seleccionando){
+      intersections = raycasterMouse.intersectObjects(this.obstrucciones);
+      if(intersections.length > 0){
+        this.selectedObstruction = intersections[0].object;
+        this.selectedObstructionMaterial = intersections[0].object.material.clone();
+        this.selectedObstruction.material = this.obstruccionFantasma.material;
+      }
+      else if(this.selectedObstruction != null){
+        debugger;
+        this.selectedObstruction.material = this.selectedObstructionMaterial;
+        this.selectedObstruction = null;
+        this.selectedObstructionMaterial = null;
+      }
+
     }
   }
 
   onClick(event){
-    if(this.state.agregarContexto){
-      this.setState(prevState => ({
-        dibujando: !prevState.dibujando
-      }));
+
+
+  }
+
+  onMouseDown(event){
+    if(this.agregarContexto && event.button == 0){
+      this.dibujando = true;
       this.puntoInicial = new THREE.Vector3(Math.round(this.mousePoint.x) , 0,
                                             -Math.round(this.mousePoint.y));
+    }
+  }
+  onMouseUp(event){
+    if(this.dibujando){
+      let material = new THREE.MeshBasicMaterial({color: 0x000000});
+      let obstruccion = this.obstruccionFantasma.clone();
+      obstruccion.material = material;
+      this.obstrucciones.push(obstruccion);
+      this.escena.add(obstruccion);
+      this.obstruccionFantasma.visible = false;
+      this.dibujando = false;
+      this.calcularFAR(this.ventanas);
+    }
+  }
+
+  onMouseLeave(event){
+    if(document.getElementById("text")){
+      var text = document.getElementById("text");
+      text.parentNode.removeChild(text);
     }
   }
 
@@ -243,7 +272,7 @@ class Context extends Component {
       for(let i = 0; i < 90; i++){
         angle = angle.normalize();
         raycasterFAR.set(ventana.pos, angle);
-        let intersections = raycasterFAR.intersectObjects(this.state.obstrucciones);
+        let intersections = raycasterFAR.intersectObjects(this.obstrucciones);
         for(let intersection of intersections){
           if(! intersection.object.marked){
             intersection.object.pointStart = intersection.point;
@@ -264,12 +293,16 @@ class Context extends Component {
       let firstElement = 90;
       let far = 0;
       for(let obstruccion of obstruccionesVentana){
-        firstElement = firstElement - obstruccion.betaAngle;
+        obstruccion.marked = false;
+        firstElement = firstElement - obstruccion.betaAngle; //el primer elemento de la formula de FAR (90 - sum(beta)) / 90
         far += obstruccion.far;
+        obstruccion.material.color.set(0xff0000);
+        console.log("obstruccion", obstruccion);
       }
       ventana.obstrucciones = obstruccionesVentana;
       ventana.far = firstElement / 90 + far;
     }
+    this.props.onFarChanged(ventanas);
   }
 
   getPointInBetween(pointA, pointB) {
@@ -279,7 +312,7 @@ class Context extends Component {
     return pointA.clone().add(dir);
   }
 
-  agregarContexto(){
+  nuevoContexto(){
     let puntoActual = new THREE.Vector3(Math.round(this.mousePoint.x), 0,
                                         -Math.round(this.mousePoint.y));
     let dir = puntoActual.sub(this.puntoInicial);
@@ -289,14 +322,9 @@ class Context extends Component {
     dir = dir.normalize().multiplyScalar(largo/2);
     let pos = this.puntoInicial.clone().add(dir);
     this.obstruccionFantasma.position.set(pos.x, 0, pos.z)
-    var angleRadians = Math.atan2(puntoActual.z - this.puntoInicial.z, puntoActual.x - this.puntoInicial.x);
-    //this.obstruccionFantasma.rotation.y = -angleRadians;
+    var angleRadians = Math.atan2(-dir.z, dir.x);
+    this.obstruccionFantasma.rotation.y = angleRadians;
     this.obstruccionFantasma.visible = true;
-    // let material = new THREE.MeshLambertMaterial({ color: '#433F81', transparent: false });
-    // let obstruccion = this.obstruccionFantasma.clone();
-    // obstruccion.material = material;
-
-
   }
 
   render() {
@@ -305,6 +333,10 @@ class Context extends Component {
        ref={(mount) => { this.mount = mount }}
        onMouseMove={this.onMouseMove}
        onClick={this.onClick}
+       onMouseDown={this.onMouseDown}
+       onMouseUp={this.onMouseUp}
+       onMouseEnter={this.onMouseEnter}
+       onMouseLeave={this.onMouseLeave}
      />
    )
   }

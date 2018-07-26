@@ -13,6 +13,7 @@ import Context from './Context';
 import BarraHerramientas from './BarraHerramientas';
 import BarraHerramientasContexto from './BarraHerramientasContexto';
 import Paper from '@material-ui/core/Paper';
+import Popper from '@material-ui/core/Popper';
 
 function TabContainer(props) {
   return (
@@ -47,6 +48,8 @@ class TabPanel extends Component {
     this.onPerspectiveChanged = this.onPerspectiveChanged.bind(this);
     this.onDrawingChanged = this.onDrawingChanged.bind(this);
     this.agregarContexto = this.agregarContexto.bind(this);
+    this.seleccionar = this.seleccionar.bind(this);
+    this.onFarChanged = this.onFarChanged.bind(this);
   }
 
   componentDidMount(){
@@ -84,7 +87,14 @@ class TabPanel extends Component {
   }
 
   agregarContexto(){
-    this.setState({agregarContexto:true})
+    this.setState({agregarContexto:true, seleccionar:false})
+  }
+  seleccionar(){
+    this.setState({seleccionar: true, agregarContexto: false})
+  }
+
+  onFarChanged(ventanas){
+    this.setState({ventanas: ventanas});
   }
 
 
@@ -92,6 +102,24 @@ class TabPanel extends Component {
   render() {
     const { classes, theme } = this.props;
     const { value } = this.state;
+    if(this.state.ventanas != null){
+      var ventanasPapers = this.state.ventanas.map(function(ventana){
+        var obstruccionesVentana = ventana.obstrucciones.map(function(obstruccion){
+          return <Paper className={classes.paper}>
+            <h6>FAR obstruccion: {obstruccion.far}</h6>
+            <h6>A: {obstruccion.aDistance}</h6>
+            <h6>B: {obstruccion.bDistance}</h6>
+            <h6>beta: {obstruccion.betaAngle}</h6>
+          </Paper>
+        });
+        return <Paper className={classes.paper}>
+          <h3>Posicion ventana: {ventana.pos.x}, {-ventana.pos.z}</h3>
+          <h3>Orientacion ventana: {ventana.orientacion.x}, {-ventana.orientacion.z}</h3>
+          <h3>FAR ventana: {ventana.far}</h3>
+          {obstruccionesVentana}
+        </Paper>;
+      });
+    }
     return (
 
       <div className={classes.root} ref={(tab) => { this.tab = tab }}>
@@ -112,14 +140,16 @@ class TabPanel extends Component {
                width={this.state.width}
                height={this.state.height}
                sunPosition={this.props.sunPosition}
-               //ventanas={this.state.ventanas}
                agregarContexto={this.state.agregarContexto}
+               seleccionar={this.state.seleccionar}
+               onFarChanged={this.onFarChanged}
              /> :
              <div></div>
             }
             <Paper className={classes.paper}>
                 <BarraHerramientasContexto
                   agregarContexto={this.agregarContexto}
+                  seleccionar={this.seleccionar}
                 />
              </Paper>
           </TabContainer>
@@ -147,7 +177,11 @@ class TabPanel extends Component {
           </TabContainer>
 
         </SwipeableViews>
-
+        {/* <Paper>
+          <h1>VENTANAS</h1>
+          {ventanasPapers}
+        </Paper> */}
+        
 
       </div>
     );
