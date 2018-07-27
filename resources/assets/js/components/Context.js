@@ -11,13 +11,6 @@ import { withStyles } from '@material-ui/core/styles';
 import MapContainer from './MapContainer';
 
 
-const styles = theme => ({
-  root: {
-    flexGrow: 1,
-    backgroundColor: theme.palette.background.paper,
-  },
-});
-
 
 class Context extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -323,20 +316,9 @@ class Context extends Component {
        onMouseMove={this.onMouseMove}
        onClick={this.onClick}
      >
-     <Popper open={true} anchorEl={this.text2} >
-     <MapContainer
-       lat={-36.82013519999999}
-       lng={-73.0443904}
-       zoom={12}
-       markers={[]}
-     />
-      </Popper>
      </div>
    )
   }
 }
 
-Context.propTypes = {
-  classes: PropTypes.object.isRequired
-};
-export default withStyles(styles, { withTheme: true })(Context)
+export default Context
