@@ -14,6 +14,7 @@ import BarraHerramientas from './BarraHerramientas';
 import BarraHerramientasContexto from './BarraHerramientasContexto';
 import Paper from '@material-ui/core/Paper';
 import Popper from '@material-ui/core/Popper';
+import * as THREE from "three";
 
 function TabContainer(props) {
   return (
@@ -49,6 +50,7 @@ class TabPanel extends Component {
     this.onDrawingChanged = this.onDrawingChanged.bind(this);
     this.agregarContexto = this.agregarContexto.bind(this);
     this.seleccionar = this.seleccionar.bind(this);
+    this.borrarContexto = this.borrarContexto.bind(this);
     this.onFarChanged = this.onFarChanged.bind(this);
   }
 
@@ -87,10 +89,13 @@ class TabPanel extends Component {
   }
 
   agregarContexto(){
-    this.setState({agregarContexto:true, seleccionar:false})
+    this.setState({agregarContexto:true, seleccionar:false, borrarContexto: false});
   }
   seleccionar(){
-    this.setState({seleccionar: true, agregarContexto: false})
+    this.setState({seleccionar: true, agregarContexto: false, borrarContexto: false});
+  }
+  borrarContexto(){
+    this.setState({borrarContexto: true, seleccionar: false, agregarContexto: false});
   }
 
   onFarChanged(ventanas){
@@ -109,7 +114,7 @@ class TabPanel extends Component {
             <h6>FAR obstruccion: {obstruccion.far}</h6>
             <h6>A: {obstruccion.aDistance}</h6>
             <h6>B: {obstruccion.bDistance}</h6>
-            <h6>beta: {obstruccion.betaAngle}</h6>
+            <h6>beta: {obstruccion.betaAngle[0]}, {obstruccion.betaAngle[1]}</h6>
           </Paper>
         });
         return <Paper className={classes.paper}>
@@ -120,6 +125,7 @@ class TabPanel extends Component {
         </Paper>;
       });
     }
+
     return (
 
       <div className={classes.root} ref={(tab) => { this.tab = tab }}>
@@ -142,6 +148,7 @@ class TabPanel extends Component {
                sunPosition={this.props.sunPosition}
                agregarContexto={this.state.agregarContexto}
                seleccionar={this.state.seleccionar}
+               borrarContexto={this.state.borrarContexto}
                onFarChanged={this.onFarChanged}
              /> :
              <div></div>
@@ -150,6 +157,7 @@ class TabPanel extends Component {
                 <BarraHerramientasContexto
                   agregarContexto={this.agregarContexto}
                   seleccionar={this.seleccionar}
+                  borrarContexto={this.borrarContexto}
                 />
              </Paper>
           </TabContainer>
@@ -177,10 +185,10 @@ class TabPanel extends Component {
           </TabContainer>
 
         </SwipeableViews>
-        {/* <Paper>
+        <Paper>
           <h1>VENTANAS</h1>
           {ventanasPapers}
-        </Paper> */}
+        </Paper>
         
 
       </div>
