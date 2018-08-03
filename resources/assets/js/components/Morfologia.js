@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import OrbitControls from 'orbit-controls-es6';
 import {MeshText2D, textAlign} from 'three-text2d';
 import PropTypes from "prop-types";
+import Graph from '../Utils/Graph';
 
 class Morfologia extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -12,11 +13,12 @@ class Morfologia extends Component {
         this.stop = this.stop.bind(this);
         this.animate = this.animate.bind(this);
         this.onMouseMove = this.onMouseMove.bind(this);
+        this.onMouseDown = this.onMouseDown.bind(this);
+        this.onMouseUp = this.onMouseUp.bind(this);
         this.onClick = this.onClick.bind(this);
         this.agregarPared = this.agregarPared.bind(this);
-        this.onKeyDown = this.onKeyDown.bind(this);
         this.onChangeCamera = this.onChangeCamera.bind(this);
-        this.crearCasasPredefinidas = this.crearCasasPredefinidas.bind(this);
+        this.crearIndicadores = this.crearIndicadores.bind(this);
 
         this.state = {
             height: props.height,
@@ -36,7 +38,7 @@ class Morfologia extends Component {
     }
 
     onSunpositionChanged() {
-        var sunLight = new THREE.PointLight(0xFFFFFF, 1, 100);
+
         var sunDegrees = this.transformGammaToDegree(this.props.sunPosition.azimuth);
         let index = Math.round(sunDegrees);
         let sunPosCircle = this.circlePoints[index];
@@ -51,44 +53,21 @@ class Morfologia extends Component {
         let f = sunAlt.x / d;
         sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
 
-        sunLight.position.set(sunPos.x, sunAlt.y - 1, sunPos.z);
-        sunLight.name = "sunLight";
-        let remove = this.escena.getObjectByName("sunLight");
-        this.escena.remove(remove);
-        this.escena.add(sunLight);
-        //SOL
-        var solGeometry = new THREE.SphereBufferGeometry(0.5, 32, 32);
-        var solMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
-        var sol = new THREE.Mesh(solGeometry, solMaterial);
-        sol.name = "sunSphere";
-        remove = this.escena.getObjectByName("sunSphere");
-        this.escena.remove(remove);
-        sol.position.set(sunLight.position.x, sunLight.position.y, sunLight.position.z);
-        this.escena.add(sol);
+        this.light.position.set(sunPos.x, sunAlt.y - 1, sunPos.z);
+
+        this.sol.position.set(this.light.position.x, this.light.position.y, this.light.position.z);
     }
 
     onPerspectiveChanged() {
         if (this.props.click2D) {
-            this.camara.position.set(0, 16, 0);
-            this.camara.lookAt(new THREE.Vector3());
-            this.control.enablePan = true;
-            this.control.enableRotation = false;
-            this.control.mouseButtons = {
-                PAN: THREE.MOUSE.RIGHT,
-                ZOOM: THREE.MOUSE.MIDDLE,
-                ORBIT: -1,
-            };
+            this.camara = this.camara2D;
+            this.control2D.enabled = true;
+            this.control3D.enabled = false;
 
         } else {
-            this.camara.position.set(5, 8, 13);
-            this.camara.lookAt(new THREE.Vector3());
-            this.control.enablePan = false;
-            this.control.enableRotation = true;
-            this.control.mouseButtons = {
-                PAN: -1,
-                ZOOM: THREE.MOUSE.MIDDLE,
-                ORBIT: THREE.MOUSE.RIGHT,
-            };
+            this.camara = this.camara3D;
+            this.control3D.enabled = true;
+            this.control2D.enabled = false;
         }
     }
 
@@ -102,10 +81,18 @@ class Morfologia extends Component {
         this.mouse = new THREE.Vector2();
 
         //arreglo de objetos visibles que podrían interactuar
-        var objetos = [];
-        var paredes = [];
-        var ventanas = [];
+        this.objetos = [];
 
+        this.paredes = [];
+        this.ventanas = [];
+        this.paredDeVentana = null;
+        this.grafoParedes = new Graph(0);
+        this.pisos = [];
+        this.techos = [];
+
+        this.casas = this.crearCasaVacia();
+
+        var ventanas = [];
 
         //Hay que cargar escena, camara, y renderer,
         //Escena
@@ -113,33 +100,86 @@ class Morfologia extends Component {
         escena.background = new THREE.Color(0xf0f0f0);
         this.escena = escena;
 
-        //Camara
-        let camara = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
-        camara.position.set(5, 8, 13);
-        camara.lookAt(new THREE.Vector3());
-        this.camara = camara;
+        //Camaras
+
+        //camara 2d
+        const val = 2 * 16;
+        let camara2D = new THREE.OrthographicCamera(width / -val, width / val, height / val, height / -val, 1, 1000 );
+        camara2D.position.set(0,10,0);
+        this.camara2D = camara2D;
+        //CAMARA 3D
+        let camara3D = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+        camara3D.position.set(5, 8, 13);
+        camara3D.lookAt(new THREE.Vector3());
+        this.camara3D = camara3D;
+
+        //camara de la escena es 3D al principio
+        this.camara = this.camara3D;
 
         //Renderer
-        const renderer = new THREE.WebGLRenderer({antialias: true});
+        var renderer = new THREE.WebGLRenderer({antialias: true});
         renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFShadowMap;
         renderer.setClearColor('#F0F0F0');
         renderer.setSize(width, height);
         renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer = renderer;
 
-        //Controles para la camara
-        const control = new OrbitControls(camara, renderer.domElement);
-        control.enabled = true;
-        control.maxDistance = 100;
-        control.minDistance = 10;
-        this.control = control;
+        this.escena.add(new THREE.AmbientLight(0x666666));
+        this.escena.add(this.casas);
+
+        //Luz
+        this.light = new THREE.DirectionalLight( 0xffffff, 1, 100 );
+        this.light.position.set( 10, 10, 1 ); 			//default; light shining from top
+        this.light.castShadow = true;            // default false
+        this.escena.add( this.light );
+
+        this.light.shadow.mapSize.width = 512;  // default
+        this.light.shadow.mapSize.height = 512; // default
+        this.light.shadow.camera.near = 0.5;    // default
+        this.light.shadow.camera.far = 500;
+
+        var helper = new THREE.CameraHelper( this.light.shadow.camera);
+
+        this.escena.add( helper );
+
+        //Mesh Sol
+        var solGeometry = new THREE.SphereBufferGeometry(0.5, 32, 32);
+        var solMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
+        this.sol = new THREE.Mesh(solGeometry, solMaterial);
+        this.sol.position.set(this.light.position.x, this.light.position.y, this.light.position.z);
+        this.escena.add( this.sol );
+
+        //Controles para la camara2D
+        const control2D = new OrbitControls(camara2D, renderer.domElement);
+        control2D.enabled = false;
+        control2D.maxDistance = 10;
+        control2D.mouseButtons = {
+            PAN: THREE.MOUSE.RIGHT,
+            ZOOM: THREE.MOUSE.MIDDLE,
+            ORBIT: -1,
+        };
+        this.control2D = control2D;
+
+        //Controles para la camara3D
+        const control3D = new OrbitControls(camara3D, renderer.domElement);
+        control3D.enabled = true;
+        control3D.maxDistance = 100;
+        control3D.mouseButtons = {
+            PAN: -1,
+            ZOOM: THREE.MOUSE.MIDDLE,
+            ORBIT: THREE.MOUSE.RIGHT,
+        };
+        this.control3D = control3D;
+
 
         //Plano se agrega a objetos
         let planoGeometria = new THREE.PlaneBufferGeometry(50, 50);
         planoGeometria.rotateX(-Math.PI / 2);
         let plano = new THREE.Mesh(planoGeometria, new THREE.MeshBasicMaterial({visible: true}));
+        plano.receiveShadow = true;
         escena.add(plano);
-        objetos.push(plano);
+        this.objetos.push(plano);
 
         //Grid del plano
         let gridHelper = new THREE.GridHelper(50, 50, 0xCCCCCC, 0xCCCCCC);
@@ -219,15 +259,28 @@ class Morfologia extends Component {
         escena.add(indicadorPared);
         this.indicadorPared = indicadorPared;
 
-        //pared que dibuja nuevas paredes
-        var geoParedFantasma = new THREE.BoxBufferGeometry(0.05, 2, 0.05);
-        const materialParedFantasma = new THREE.MeshBasicMaterial({color: '#433F81', opacity: 0.5, transparent: true});
-        var paredFantasma = new THREE.Mesh(geoParedFantasma, materialParedFantasma);
-        paredFantasma.visible = false;
-        escena.add(paredFantasma);
-        this.paredFantasma = paredFantasma;
-        this.materialParedFantasma = materialParedFantasma;
+        //Materiales
+        this.materialParedConstruccion =  new THREE.MeshBasicMaterial({color: '#433F81', opacity: 0.7, transparent: true});
+        this.materialParedConstruccion.side = THREE.DoubleSide;
 
+        this.materialPisoConstruccion = new THREE.MeshBasicMaterial({color: '#392481', opacity: 0.7, transparent: true});
+        this.materialPisoConstruccion.side = THREE.DoubleSide;
+
+        this.materialTechoConstruccion = new THREE.MeshBasicMaterial({color: '#3d8179', opacity: 0.7, transparent: true});
+        this.materialTechoConstruccion.side = THREE.DoubleSide;
+
+        this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({color: '#f10700', opacity: 0.7, transparent: true});
+        this.materialVentanaConstruccion.side = THREE.DoubleSide;
+
+        this.materialParedConstruida = new THREE.MeshLambertMaterial({
+            color: '#433F81'
+        });
+        this.materialParedConstruida.side = THREE.DoubleSide;
+
+        //pared que dibuja nuevas paredes
+        this.paredConstruccion = this.crearMeshPared(0,this.heightWall);
+        this.paredConstruccion.visible = false;
+        escena.add(this.paredConstruccion);
 
         //raycaster, usado para apuntar objetos
         var raycaster = new THREE.Raycaster();
@@ -235,135 +288,239 @@ class Morfologia extends Component {
         this.raycaster = raycaster;
 
         this.construyendo = false;
+        this.paredNivel = null; //Para saber si se agrega a una pared
         this.construirPared = false;
         this.construirVentana = false;
 
-        //controles, ahora con teclas para probar
+        this.startNewPared = null;
+        this.endNewPared = null;
+
+        this.widthWall = 4;
+        this.heightWall = 1;
+
+        this.indicadores = this.crearIndicadores(this.widthWall, this.heightWall);
+        for(let indicador of this.indicadores){
+            escena.add(indicador);
+        }
+
+        this.indicador_dibujado = null;
+
         this.mount.appendChild(this.renderer.domElement);
         this.start();
-        this.setState({
-            objetos: objetos,
-            paredes: paredes,
-            ventanas: ventanas,
-        });
-
-        var casas = this.crearCasasPredefinidas();
-        this.casa_dibujada = null;
-        this.casas = casas;
     }
 
-    crearCasasPredefinidas() {
-        //casa simple Predefinida
-        var widthWall = 3;
-        var heightWall = 1;
-        var geoParedPre = new THREE.BoxBufferGeometry(widthWall, heightWall, 0.05);
+    // line intercept math by Paul Bourke http://paulbourke.net/geometry/pointlineplane/
+    // Determine the intersection point of two line segments
+    // Return FALSE if the lines don't intersect
+    intersectLines(x1, y1, x2, y2, x3, y3, x4, y4) {
+
+        // Check if none of the lines are of length 0
+        if ((x1 === x2 && y1 === y2) || (x3 === x4 && y3 === y4)) {
+            return false;
+        }
+
+        var denominator = ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
+
+        // Lines are parallel
+        if (denominator === 0) {
+            return false
+        }
+
+        let ua = ((x4 - x3) * (y1 - y3) - (y4 - y3) * (x1 - x3)) / denominator;
+        let ub = ((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) / denominator;
+
+        // is the intersection along the segments
+        if (ua < 0 || ua > 1 || ub < 0 || ub > 1) {
+            return false
+        }
+
+        // Return a object with the x and y coordinates of the intersection
+        let x = x1 + ua * (x2 - x1);
+        let y = y1 + ua * (y2 - y1);
+
+        return {x, y}
+    }
+
+    crearCasaVacia(){
+        var casas = new THREE.Group();
+        var casa = new THREE.Group();
+
+        var nivel = new THREE.Group();
+
+        var habitacion = new THREE.Group();
+
+        var paredes = new THREE.Group();
+        paredes.name = "Paredes";
+        var pisos = new THREE.Group();
+        pisos.name = "Pisos";
+        var techos = new THREE.Group();
+        techos.name = "Techos";
+
+        habitacion.add(paredes);
+        habitacion.add(pisos);
+        habitacion.add(techos);
+
+        nivel.add(habitacion);
+
+        casa.add(nivel);
+
+        casas.add(casa);
+
+        return casas;
+
+    }
+
+    crearNivel(widthWall, heightWall, valorNivel){
+        var nivel = new THREE.Group();
+        nivel.position.y = (valorNivel - 1) * heightWall;
+
+        var paredes = new THREE.Group();
+        paredes.name = "Paredes";
+        var pisos = new THREE.Group();
+        pisos.name = "Pisos";
+        var techos = new THREE.Group();
+        techos.name = "Techos";
+
         var halfWidth = widthWall / 2;
-        var casas = [];
-        //casa simple
-        var pared1 = new THREE.Mesh(geoParedPre, this.materialParedFantasma);
-        pared1.position.y = heightWall / 2;
+
+        var pared1 = this.crearMeshPared(widthWall, heightWall);
         pared1.position.z = pared1.position.z + halfWidth;
 
-        var pared2 = new THREE.Mesh(geoParedPre, this.materialParedFantasma);
-        pared2.position.copy(pared1.position);
+        var pared2 = this.crearMeshPared(widthWall, heightWall);
         pared2.rotation.y = Math.PI / 2;
         pared2.position.x = pared2.position.x + halfWidth;
-        pared2.position.z = pared2.position.z - halfWidth;
 
-        var pared3 = new THREE.Mesh(geoParedPre, this.materialParedFantasma);
-        pared3.position.copy(pared2.position);
+        var pared3 = this.crearMeshPared(widthWall, heightWall);
         pared3.rotation.y = Math.PI;
         pared3.position.z = pared3.position.z - halfWidth;
-        pared3.position.x = pared3.position.x - halfWidth;
 
-        var pared4 = new THREE.Mesh(geoParedPre, this.materialParedFantasma);
-        pared4.position.copy(pared3.position);
+        var pared4 = this.crearMeshPared(widthWall, heightWall);
         pared4.rotation.y = Math.PI / 2;
         pared4.position.x = pared4.position.x - halfWidth;
-        pared4.position.z = pared4.position.z + halfWidth;
+
+        var piso = this.crearMeshPiso(widthWall, widthWall);
+        var techo = this.crearMeshTecho(widthWall, widthWall, heightWall);
+
+        paredes.add(pared1);
+        paredes.add(pared2);
+        paredes.add(pared3);
+        paredes.add(pared4);
+        pisos.add(piso);
+        techos.add(techo);
+
+        nivel.add(paredes);
+        nivel.add(pisos);
+        nivel.add(techos);
+
+        return nivel;
+    }
+
+    //Metodo que crea grupo casa y agrega un nivel con metodo crearNivel.
+    crearCasaSimple(widthWall, heightWall){
+        var casas = new THREE.Group();
 
         var casa = new THREE.Group();
-        casa.add(pared1);
-        casa.add(pared2);
-        casa.add(pared3);
-        casa.add(pared4);
+        casa.add(this.crearNivel(widthWall, heightWall, 1));
 
-        casas.push(casa);
-        //casa doble
-        var pared5 = pared1.clone();
-        pared5.position.x = pared5.position.x + widthWall;
-        var pared6 = pared2.clone();
-        pared6.position.x = pared6.position.x + widthWall;
-        var pared7 = pared3.clone();
-        pared7.position.x = pared7.position.x + widthWall;
+        casas.add(casa);
 
-        var casa2 = casa.clone();
-        casa2.add(pared5);
-        casa2.add(pared6);
-        casa2.add(pared7);
-        casa2.position.set(-halfWidth, 0, 0);
-        casas.push(casa2);
+        casas.visible = false;
 
-        //casa simple dos pisos
-        var newHeight = heightWall + heightWall / 2;
-
-        var pared8 = pared1.clone();
-        pared8.position.y = newHeight;
-        var pared9 = pared2.clone();
-        pared9.position.y = newHeight;
-        var pared10 = pared3.clone();
-        pared10.position.y = newHeight;
-        var pared11 = pared4.clone();
-        pared11.position.y = newHeight;
-
-        var geoFloor = new THREE.BoxBufferGeometry(widthWall, 0.05, widthWall);
-        floor = new THREE.Mesh(geoFloor, this.materialParedFantasma);
-        floor.position.x = pared1.position.x;
-        floor.position.z = pared1.position.z - widthWall / 2;
-        floor.position.y = heightWall;
-
-        var casa3 = casa.clone();
-        casa3.add(pared8);
-        casa3.add(pared9);
-        casa3.add(pared10);
-        casa3.add(pared11);
-        casa3.add(floor);
-
-        casas.push(casa3);
-        //casa doble dos pisos
-        var pared12 = pared1.clone();
-        pared12.position.y = newHeight;
-        var pared13 = pared2.clone();
-        pared13.position.y = newHeight;
-        var pared14 = pared3.clone();
-        pared14.position.y = newHeight;
-        var pared15 = pared4.clone();
-        pared15.position.y = newHeight;
-        var pared16 = pared5.clone();
-        pared16.position.y = newHeight;
-        var pared17 = pared6.clone();
-        pared17.position.y = newHeight;
-        var pared18 = pared7.clone();
-        pared18.position.y = newHeight;
-
-        geoFloor = new THREE.BoxBufferGeometry(widthWall * 2, 0.05, widthWall);
-        var floor = new THREE.Mesh(geoFloor, this.materialParedFantasma);
-        floor.position.x = pared1.position.x + widthWall / 2;
-        floor.position.z = pared1.position.z - widthWall / 2;
-        floor.position.y = heightWall;
-
-        var casa4 = casa2.clone();
-        casa4.add(pared12);
-        casa4.add(pared13);
-        casa4.add(pared14);
-        casa4.add(pared15);
-        casa4.add(pared16);
-        casa4.add(pared17);
-        casa4.add(pared18);
-        casa4.add(floor);
-
-        casas.push(casa4);
         return casas;
+    }
+    //Metodo que crea grupo de casas, y crea dos grupos de casa, casa una con nivel usando crearNivel.
+    crearCasaDoble(widthWall, heightWall){
+        var casas = this.crearCasaSimple(widthWall, heightWall);
+
+        var casa = new THREE.Group();
+        casa.add(this.crearNivel(widthWall, heightWall, 1));
+
+        casas.add(casa);
+
+        var halfWidth = widthWall / 2;
+
+        casas.children[0].position.x = casas.children[0].position.x  - halfWidth;
+        casas.children[1].position.x = casas.children[1].position.x  + halfWidth;
+
+        casas.visible = false;
+
+        return casas;
+    }
+    //Metodo que extiende la casa de crearCasaSimple con un segundo piso
+    crearCasaSimpleDosPisos(widthWall, heightWall){
+        var casas = this.crearCasaSimple(widthWall, heightWall);
+
+        casas.children[0].add(this.crearNivel(widthWall, heightWall, 2));
+
+        casas.visible = false;
+
+        return casas;
+    }
+
+    crearCasaDobleDosPisos(widthWall, heightWall){
+        var casas = this.crearCasaDoble(widthWall, heightWall);
+
+        casas.children[0].add(this.crearNivel(widthWall, heightWall, 2));
+        casas.children[1].add(this.crearNivel(widthWall, heightWall, 2));
+
+        casas.visible = false;
+
+        return casas;
+    }
+
+    crearIndicadorConstruccionPared(heightWall, radius){
+        const geometria = new THREE.CylinderBufferGeometry(radius, radius, heightWall, 32);
+        var indicadorPared = new THREE.Mesh(geometria, this.materialParedConstruccion);
+        indicadorPared.visible = false;
+        return indicadorPared;
+    }
+
+    crearIndicadorConstruccionVentana(widthWindow, heightWindow, heightWall){
+        const geometria = new THREE.Geometry();
+
+        let x1 = 0, x2 = widthWindow, y1 = heightWall / 4, y2 = heightWall / 4 + heightWindow;
+        let z_offset = 0.01;
+
+        geometria.vertices.push(new THREE.Vector3(x1,y1,z_offset));
+        geometria.vertices.push(new THREE.Vector3(x1,y2,z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2,y1,z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2,y2,z_offset));
+
+        geometria.vertices.push(new THREE.Vector3(x1,y1,-z_offset));
+        geometria.vertices.push(new THREE.Vector3(x1,y2,-z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2,y1,-z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2,y2,-z_offset));
+
+        let face = new THREE.Face3(0,2,1);
+        let face2 = new THREE.Face3(1,2,3);
+        let face3 = new THREE.Face3(4,6,5);
+        let face4 = new THREE.Face3(5,6,7);
+
+        geometria.faces.push(face);
+        geometria.faces.push(face2);
+        geometria.faces.push(face3);
+        geometria.faces.push(face4);
+
+        var indicadorVentana = new THREE.Mesh(geometria, this.materialVentanaConstruccion);
+        indicadorVentana.visible = false;
+
+        return indicadorVentana;
+
+    }
+
+    crearIndicadores(widthWall, heightWall) {
+        //arreglo con todos los indicadores
+        var indicadores = [];
+        var radius = 0.05;
+
+        indicadores.push(this.crearCasaSimple(widthWall, heightWall));
+        indicadores.push(this.crearCasaDoble(widthWall, heightWall));
+        indicadores.push(this.crearCasaSimpleDosPisos(widthWall, heightWall));
+        indicadores.push(this.crearCasaDobleDosPisos(widthWall, heightWall));
+        indicadores.push(this.crearIndicadorConstruccionPared(heightWall, radius));
+        indicadores.push(this.crearIndicadorConstruccionVentana(widthWall / 4 , heightWall / 2, heightWall));
+
+        return indicadores;
     }
 
     componentWillUnmount() {
@@ -392,15 +549,97 @@ class Morfologia extends Component {
         this.renderer.render(this.escena, this.camara)
     }
 
+    crearMeshPared(width, height){
+        let geometria = this.crearGeometriaPared(width, height);
+
+        return new THREE.Mesh(geometria, this.materialParedConstruccion);
+    }
+
+    crearGeometriaPared(width, height){
+        let geometria = new THREE.Geometry();
+
+        let x1 = width / -2 , x2 = width / 2, y1 = 0, y2 = height;
+
+        geometria.vertices.push(new THREE.Vector3(x1,y1,0));
+        geometria.vertices.push(new THREE.Vector3(x1,y2,0));
+        geometria.vertices.push(new THREE.Vector3(x2,y1,0));
+        geometria.vertices.push(new THREE.Vector3(x2,y2,0));
+
+        geometria.faces.push(new THREE.Face3(0,2,1));
+        geometria.faces.push(new THREE.Face3(1,2,3));
+
+        geometria.computeFaceNormals();
+        geometria.computeVertexNormals();
+
+        return geometria;
+    }
+
+    crearMeshPiso(width, depth){
+        //piso representa el numero de piso donde se encuentra el piso
+        let geometria = new THREE.Geometry();
+        let offset = 0.01;
+        let x1 = width / -2 , x2 = width / 2, y = offset, z1 = depth / -2, z2 = depth / 2;
+
+
+        geometria.vertices.push(new THREE.Vector3(x1,y,z1));
+        geometria.vertices.push(new THREE.Vector3(x1,y,z2));
+        geometria.vertices.push(new THREE.Vector3(x2,y,z1));
+        geometria.vertices.push(new THREE.Vector3(x2,y,z2));
+
+        geometria.faces.push(new THREE.Face3(0,2,1));
+        geometria.faces.push(new THREE.Face3(1,2,3));
+
+        return new THREE.Mesh(geometria, this.materialPisoConstruccion);
+    }
+
+    crearMeshTecho(width, depth, heigth){
+        let geometria = new THREE.Geometry();
+
+        let x1 = width / -2 , x2 = width / 2, y = heigth , z1 = depth / -2, z2 = depth / 2;
+
+        geometria.vertices.push(new THREE.Vector3(x1,y,z1));
+        geometria.vertices.push(new THREE.Vector3(x1,y,z2));
+        geometria.vertices.push(new THREE.Vector3(x2,y,z1));
+        geometria.vertices.push(new THREE.Vector3(x2,y,z2));
+
+        geometria.faces.push(new THREE.Face3(0,2,1));
+        geometria.faces.push(new THREE.Face3(1,2,3));
+
+        return new THREE.Mesh(geometria, this.materialTechoConstruccion);
+    }
+
     agregarCasa() {
-        var material = new THREE.MeshLambertMaterial({color: '#433F81', transparent: false});
-        var casa = this.casa_dibujada.clone();
-        var i;
-        for (i = 0; i < casa.children.length; i++) {
-            casa.children[i].material = material;
-            casa.children[i].castShadow = true;
+        var casas = this.indicador_dibujado.clone();
+        for(let i = 0; i < casas.children.length; i++){
+            let casa = casas.children[i];
+
+            for(let j = 0; j < casa.children.length ; j++){
+                let nivel = casa.children[j];
+                let paredes = nivel.getObjectByName("Paredes");
+                for(let k = 0; k < paredes.children.length; k++ ){
+                    let pared = paredes.children[k];
+                    pared.material = this.materialParedConstruida;
+                    pared.castShadow = true;
+                    pared.receiveShadow = false;
+                    pared.piso = j;
+                    this.paredes.push(pared);
+                }
+            }
         }
-        this.escena.add(casa);
+        this.escena.add(casas);
+        /*var i;
+        let paredes = casa.getObjectByName("Paredes");
+        let pisos = casa.getObjectByName("Pisos");
+        let techos = casa.getObjectByName("Techos");
+        var pared;
+        for(i = 0; i < paredes.children.length; i++){
+            pared = paredes.children[i];
+            pared.material = material;
+            pared.castShadow = true;
+
+            this.paredes.push(pared);
+        }
+        this.escena.add(casa);*/
     }
 
     agregarPared() {
@@ -448,48 +687,188 @@ class Morfologia extends Component {
         }
     }
 
-
-    onKeyDown(event) {
-        event.preventDefault()
-        const code = event.keyCode;
-        if (code == 49) {
-            this.control.enabled = false;
-            this.construirPared = true
-            this.construirVentana = false
-            this.renderScene()
-            this.indicadorPared.visible = true
-        } else if (code == 50) {
-            this.control.enabled = false;
-            this.construirPared = false
-            this.construirVentana = true
-            this.indicadorPared.visible = false
-        } else if (code == 48) {
-            this.control.enabled = true;
-            this.construirPared = false
-            this.construirVentana = false
-            this.indicadorPared.visible = false
-        }
-        console.log(code);
-    }
-
     onChangeCamera(event) {
         this.setState({camara: event.target.value})
     }
 
+    onMouseDown(event){
+        event.preventDefault();
+        let rect = this.renderer.domElement.getBoundingClientRect();
+        this.mouse.x = ((event.clientX - rect.left) / (rect.width)) * 2 - 1;
+        this.mouse.y = -((event.clientY - rect.top) / (rect.height)) * 2 + 1;
+        this.raycaster.setFromCamera(this.mouse, this.camara);
+
+        //seleccionado construccion de pared
+        if(this.props.dibujando == 4){
+            if(event.button === 0){
+                this.construyendo = true;
+                let intersects = this.raycaster.intersectObjects(this.objetos);
+                if (intersects.length > 0){
+                    let intersect = intersects[0];
+                    this.startNewPared = (intersect.point).add(intersect.face.normal).clone();
+                    this.paredConstruccion.geometry = this.crearGeometriaPared(0, this.heightWall);
+                    this.startNewPared.round();
+                    this.paredConstruccion.visible = true;
+                }
+            }
+        }
+    }
+
+    onMouseUp(event){
+        event.preventDefault();
+        let rect = this.renderer.domElement.getBoundingClientRect();
+        this.mouse.x = ((event.clientX - rect.left) / (rect.width)) * 2 - 1;
+        this.mouse.y = -((event.clientY - rect.top) / (rect.height)) * 2 + 1;
+        this.raycaster.setFromCamera(this.mouse, this.camara);
+
+        //seleccionado construccion de pared
+        if(this.props.dibujando == 4){
+            //click derecho
+            if(event.button === 0){
+                this.construyendo = false;
+                var pared = this.paredConstruccion.clone();
+                this.paredConstruccion.visible = false;
+                pared.material = this.materialParedConstruida;
+                pared.castShadow = true;
+                pared.receiveShadow = false;
+
+                pared.startPoint =  this.startNewPared.clone();
+                pared.endPoint = this.indicador_dibujado.position.clone();
+                pared.endPoint.y = 1;
+
+                console.log(pared.startPoint);
+                console.log(pared.endPoint);
+
+                this.escena.add(pared);
+                this.grafoParedes.addVertex(pared);
+
+                //deteccion pared de origen
+
+                var dir = pared.endPoint.clone();
+                dir.sub(pared.startPoint).normalize();
+
+                this.raycaster.set(pared.startPoint, dir);
+
+                let intersects = this.raycaster.intersectObjects(this.paredes);
+
+                if (intersects.length > 0){
+                    let paredInter = intersects[0].object;
+                    console.log(paredInter);
+                    if(paredInter.startPoint.equals(pared.endPoint) || paredInter.endPoint.equals(pared.endPoint)){
+                        this.grafoParedes.addEdge(pared, paredInter);
+                    }
+                }
+
+                //deteccion pared de fin
+
+                dir = pared.startPoint.clone();
+                dir.sub(pared.endPoint).normalize();
+
+                this.raycaster.set(pared.endPoint, dir);
+
+                intersects = this.raycaster.intersectObjects(this.paredes);
+
+                if (intersects.length > 0){
+                    let paredInter = intersects[0].object;
+                    if(paredInter.startPoint.equals(pared.startPoint) || paredInter.endPoint.equals(pared.startPoint)){
+                        this.grafoParedes.addEdge(pared, paredInter);
+                    }
+                }
+                this.grafoParedes.printGraph();
+
+                if(this.grafoParedes.isCyclic()){
+                    console.log("ciclo");
+                }else{
+                    console.log("no");
+                }
+                this.paredes.push(pared)
+
+            }
+        }
+    }
+
     onMouseMove(event) {
         event.preventDefault();
+        let rect = this.renderer.domElement.getBoundingClientRect();
+        this.mouse.x = ((event.clientX - rect.left) / (rect.width)) * 2 - 1;
+        this.mouse.y = -((event.clientY - rect.top) / (rect.height)) * 2 + 1;
+        this.raycaster.setFromCamera(this.mouse, this.camara);
+
+        //Si se está dibujando
+        if(this.props.dibujando !== -1 && this.props.dibujando < 6){
+            //se actualiza el indicador dependiendo que se esté dibujando
+            let index = parseInt(this.props.dibujando);
+            if (this.indicador_dibujado !== this.indicadores[index]) {
+                if (this.indicador_dibujado != null) {
+                    this.indicador_dibujado.visible = false;
+                }
+                this.indicador_dibujado = this.indicadores[index];
+                this.indicador_dibujado.visible = true;
+            }
+            let intersect;
+            //si se dibujan casas pre-definidas, se intersecta con el plano.
+            if(this.props.dibujando < 5){
+                let intersects = this.raycaster.intersectObjects(this.objetos);
+                if (intersects.length > 0) {
+                    intersect = intersects[0];
+
+                    this.indicador_dibujado.position.copy(intersect.point).add(intersect.face.normal);
+                    this.indicador_dibujado.position.round();
+                    //si es pared
+                    if(this.props.dibujando == 4){
+                        this.indicador_dibujado.position.y = this.heightWall / 2;
+                        if(this.construyendo){
+                            var nextPosition = (intersect.point).add(intersect.face.normal).clone();
+                            nextPosition.round();
+                            var dir = nextPosition.clone().sub(this.startNewPared);
+                            var widthPared = this.startNewPared.distanceTo(nextPosition);
+                            this.paredConstruccion.geometry = this.crearGeometriaPared(widthPared, this.heightWall);
+                            var len = dir.length();
+                            dir = dir.normalize().multiplyScalar(len * 0.5);
+                            let pos = this.startNewPared.clone().add(dir);
+                            this.paredConstruccion.position.copy(pos);
+                            var angleRadians = Math.atan2(nextPosition.z - this.startNewPared.z, nextPosition.x - this.startNewPared.x);
+                            this.paredConstruccion.rotation.y = - angleRadians;
+                            this.paredConstruccion.position.y = 0;
+                        }
+                    }else{
+                        this.indicador_dibujado.position.y = 0;
+                    }
+
+                }
+            }
+            //si se dibuja una ventana, se intersecta con paredes.
+            else if(this.props.dibujando == 5){
+                let intersects = this.raycaster.intersectObjects(this.paredes);
+                if (intersects.length > 0) {
+                    intersect = intersects[0];
+                    let pared = intersect.object;
+                    let pos = intersect.point.clone();
+                    pared.worldToLocal(pos);
+                    pos.round();
+                    if(pos.x < 2){
+                        this.paredDeVentana = pared;
+                        this.indicador_dibujado.setRotationFromEuler(pared.rotation);
+                        this.indicador_dibujado.position.copy(intersect.point).round();
+                        this.indicador_dibujado.position.y = pared.piso * this.heightWall;
+                    }
+
+                }
+            }
+
+        }
 
         /*if (this.dibujando != -1 && this.dibujando < 4) {
             var index = parseInt(this.dibujando);
-            if (this.casa_dibujada != this.casas[index]) {
-                if (this.casa_dibujada != null) {
-                    this.escena.remove(this.casa_dibujada);
+            if (this.indicador_dibujado != this.indicadores[index]) {
+                if (this.indicador_dibujado != null) {
+                    this.escena.remove(this.indicador_dibujado);
                 }
-                this.casa_dibujada = this.casas[index];
-                this.escena.add(this.casa_dibujada);
+                this.indicador_dibujado = this.indicadores[index];
+                this.escena.add(this.indicador_dibujado);
             }
-            this.casa_dibujada.position.copy(intersect.point).add(intersect.face.normal);
-            this.casa_dibujada.position.floor();
+            this.indicador_dibujado.position.copy(intersect.point).add(intersect.face.normal);
+            this.indicador_dibujado.position.floor();
 
             /*
             este codigo se usaba para hacer crecer las paredes
@@ -509,70 +888,6 @@ class Morfologia extends Component {
 
 
         }*/
-
-        var rect = this.renderer.domElement.getBoundingClientRect();
-        this.mouse.x = ((event.clientX - rect.left) / (rect.width)) * 2 - 1;
-        this.mouse.y = -((event.clientY - rect.top) / (rect.height)) * 2 + 1;
-        this.raycaster.setFromCamera(this.mouse, this.camara);
-
-        var intersects = 0;
-
-        //console.log("x: "+this.mouse.x+"\ny: "+this.mouse.y);
-
-        if (this.construirPared) {
-            intersects = this.raycaster.intersectObjects(this.state.objetos);
-        } else if (this.construirVentana) {
-            intersects = this.raycaster.intersectObjects(this.state.paredes);
-        } else {
-            intersects = this.raycaster.intersectObjects(this.state.objetos);
-        }
-        if (intersects.length > 0) {
-            var intersect = intersects[0];
-            //console.log(intersect.point);
-            if (this.construirVentana) {
-                console.log(intersect);
-
-            } else if (this.construirPared) {
-                this.indicadorPared.position.copy(intersect.point).add(intersect.face.normal);
-                this.indicadorPared.position.floor();
-                if (this.indicadorPared.position.y < 1) {
-                    this.indicadorPared.position.y = 1
-                }
-            }
-
-            if (this.props.dibujando !== -1 && this.props.dibujando < 4) {
-                var index = parseInt(this.props.dibujando);
-                if (this.casa_dibujada !== this.casas[index]) {
-                    if (this.casa_dibujada != null) {
-                        this.escena.remove(this.casa_dibujada);
-                    }
-                    this.casa_dibujada = this.casas[index];
-                    this.escena.add(this.casa_dibujada);
-                }
-                this.casa_dibujada.position.copy(intersect.point).add(intersect.face.normal);
-                this.casa_dibujada.position.floor();
-
-                /*
-                este codigo se usaba para hacer crecer las paredes
-                todo: mover de aca
-                var nexPosition = this.indicadorPared.position.clone();
-                var dir = nexPosition.clone().sub(this.startPosition);
-                this.orientacion = dir.clone();
-                var widthPared = this.startPosition.distanceTo(nexPosition);
-                var geomeIndPared = new THREE.BoxBufferGeometry(widthPared, 2, 0.05);
-                this.paredFantasma.geometry = geomeIndPared
-                var len = dir.length();
-                dir = dir.normalize().multiplyScalar(len * 0.5);
-                var pos = this.startPosition.clone().add(dir);
-                this.paredFantasma.position.copy(pos);
-                var angleRadians = Math.atan2(nexPosition.z - this.startPosition.z, nexPosition.x - this.startPosition.x);
-                this.paredFantasma.rotation.y = -*/
-
-
-            }
-
-
-        }
     }
 
     calcularGammaParedes(paredes) {
@@ -619,11 +934,22 @@ class Morfologia extends Component {
 
     onClick(event) {
         event.preventDefault();
-        if (this.construirPared) {
-            this.agregarPared();
-        }
         if (this.props.dibujando < 4) {
             this.agregarCasa();
+        }
+
+        if(this.props.dibujando == 5){
+            this.agregarVentana();
+        }
+    }
+
+    agregarVentana(){
+        if(this.paredDeVentana != null){
+            var ventana = this.indicador_dibujado.clone();
+            ventana.setRotationFromEuler(new THREE.Euler(0,0,0,'XYZ'));
+            this.paredDeVentana.add(ventana);
+            this.paredDeVentana.worldToLocal(ventana.position);
+            this.ventanas.push(ventana);
         }
     }
 
@@ -644,6 +970,8 @@ class Morfologia extends Component {
         return (
             <div
                 tabIndex="0"
+                onMouseDown={this.onMouseDown}
+                onMouseUp={this.onMouseUp}
                 onMouseMove={this.onMouseMove}
                 onClick={this.onClick}
                 ref={(mount) => {
@@ -658,8 +986,8 @@ Morfologia.propTypes = {
     dibujando: PropTypes.number,
     click2D: PropTypes.bool,
     sunPosition: PropTypes.object,
-    borrando: PropTypes.number,
-    seleccionando: PropTypes.number,
+    borrando: PropTypes.bool,
+    seleccionando: PropTypes.bool,
 
 };
 
