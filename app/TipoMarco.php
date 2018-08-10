@@ -9,6 +9,6 @@ class TipoMarco extends Model
     protected $table = 'tipos_marcos';
 
     public function ventana(){
-        return $this->hasMany('App\MarcoTienePropiedad');
+        return $this->belongsToMany('App\MarcoTienePropiedad','marco_propiedad_tipo','tipo_id','marco_propiedad_id');
     }
 }

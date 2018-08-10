@@ -9,6 +9,6 @@ class Ventana extends Model
     protected $table = 'ventanas';
 
     public function propiedades(){
-        return $this->hasMany('App\PropiedadVentana');
+        return $this->belongsToMany('App\PropiedadVentana','ventana_tiene_propiedades','ventana_id','propiedad_id');
     }
 }
