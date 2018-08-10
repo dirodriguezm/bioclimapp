@@ -8,13 +8,17 @@ import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Morfologia from "./Morfologia";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import Button from "@material-ui/core/Button";
-import Select from 'react-select';
+import axios from 'axios';
+import Select from '@material-ui/core/Select';
 
 
 import classNames from 'classnames';
 import NoSsr from '@material-ui/core/NoSsr';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
+import InputLabel from "@material-ui/core/InputLabel";
+
+const ITEM_HEIGHT = 48;
 
 const styles = theme => ({
     button: {
@@ -56,128 +60,9 @@ const styles = theme => ({
 
 });
 
-const suggestions = [
-    {label: 'Afghanistan'},
-    {label: 'Aland Islands'},
-    {label: 'Albania'},
-    {label: 'Algeria'},
-    {label: 'American Samoa'},
-    {label: 'Andorra'},
-    {label: 'Angola'},
-    {label: 'Anguilla'},
-    {label: 'Antarctica'},
-    {label: 'Antigua and Barbuda'},
-    {label: 'Argentina'},
-    {label: 'Armenia'},
-    {label: 'Aruba'},
-    {label: 'Australia'},
-    {label: 'Austria'},
-    {label: 'Azerbaijan'},
-    {label: 'Bahamas'},
-    {label: 'Bahrain'},
-    {label: 'Bangladesh'},
-    {label: 'Barbados'},
-    {label: 'Belarus'},
-    {label: 'Belgium'},
-    {label: 'Belize'},
-    {label: 'Benin'},
-    {label: 'Bermuda'},
-    {label: 'Bhutan'},
-    {label: 'Bolivia, Plurinational State of'},
-    {label: 'Bonaire, Sint Eustatius and Saba'},
-    {label: 'Bosnia and Herzegovina'},
-    {label: 'Botswana'},
-    {label: 'Bouvet Island'},
-    {label: 'Brazil'},
-    {label: 'British Indian Ocean Territory'},
-    {label: 'Brunei Darussalam'},
-].map(suggestion => ({
-    value: suggestion.label,
-    label: suggestion.label,
-}));
 
 
-function inputComponent({inputRef, ...props}) {
-    return <div ref={inputRef} {...props} />;
-}
 
-function Control(props) {
-    return (
-        <TextField
-            fullWidth
-            InputProps={{
-                inputComponent,
-                inputProps: {
-                    className: props.selectProps.classes.input,
-                    ref: props.innerRef,
-                    children: props.children,
-                    ...props.innerProps,
-                },
-            }}
-        />
-    );
-}
-
-function Option(props) {
-    return (
-        <MenuItem
-            buttonRef={props.innerRef}
-            selected={props.isFocused}
-            component="div"
-            style={{
-                fontWeight: props.isSelected ? 500 : 400,
-            }}
-            {...props.innerProps}
-        >
-            {props.children}
-        </MenuItem>
-    );
-}
-
-function NoOptionsMessage(props) {
-    return (
-        <Typography
-            color="textSecondary"
-            className={props.selectProps.classes.noOptionsMessage}
-            {...props.innerProps}
-        >
-            {props.children}
-        </Typography>
-    );
-}
-
-function Placeholder(props) {
-    return (
-        <Typography
-            color="textSecondary"
-            className={props.selectProps.classes.placeholder}
-            {...props.innerProps}
-        >
-            {props.children}
-        </Typography>
-    );
-}
-
-function SingleValue(props) {
-    return (
-        <Typography className={props.selectProps.classes.singleValue} {...props.innerProps}>
-            {props.children}
-        </Typography>
-    );
-}
-
-function ValueContainer(props) {
-    return <div className={props.selectProps.classes.valueContainer}>{props.children}</div>;
-}
-
-const components = {
-    Option,
-    Control,
-    NoOptionsMessage,
-    Placeholder,
-    SingleValue,
-    ValueContainer,
-};
 
 class InformacionEstructura extends Component {
 
@@ -186,9 +71,18 @@ class InformacionEstructura extends Component {
         this.state = {
             materiales: [],
             single: null,
+            material: null,
 
         };
+        this.info_material = [];
+        axios.get("http://127.0.0.1:8000/api/info_materiales")
+            .then( response => this.getJson(response));
         this.handleChange = this.handleChange.bind(this);
+    }
+
+    getJson(response){
+        this.info_material = response.data;
+        console.log(this.info_material)
     }
 
     handleChange(value) {
@@ -196,6 +90,12 @@ class InformacionEstructura extends Component {
             single: value,
         });
     };
+
+    handleChangeSel(value) {
+        this.setState({
+            material: value,
+        })
+    }
 
     render() {
         const {classes, seleccionado} = this.props;
@@ -215,6 +115,22 @@ class InformacionEstructura extends Component {
                                 <Typography className={classes.heading}>Materiales</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
+                                <InputLabel htmlFor="age-simple">Age</InputLabel>
+                                <Select
+                                    value={this.state.age}
+                                    onChange={this.handleChange}
+                                    inputProps={{
+                                        name: 'age',
+                                        id: 'age-simple',
+                                    }}
+                                >
+                                    <MenuItem value="">
+                                        <em>None</em>
+                                    </MenuItem>
+                                    <MenuItem value={10}>Ten</MenuItem>
+                                    <MenuItem value={20}>Twenty</MenuItem>
+                                    <MenuItem value={30}>Thirty</MenuItem>
+                                </Select>
 
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
