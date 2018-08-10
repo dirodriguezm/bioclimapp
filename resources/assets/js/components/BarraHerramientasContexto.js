@@ -49,7 +49,7 @@ class BarraHerramientasContexto extends Component {
         this.state = {
             seleccionar: false,
             agregar: false,
-        }
+        };
         this.handleSeleccionar = this.handleSeleccionar.bind(this);
         this.handleAgregar = this.handleAgregar.bind(this);
         this.handleBorrar = this.handleBorrar.bind(this);

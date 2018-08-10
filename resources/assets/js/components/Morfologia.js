@@ -25,6 +25,7 @@ class Morfologia extends Component {
             width: props.width,
         };
 
+
     };
 
     componentDidUpdate(prevProps) {
@@ -88,6 +89,7 @@ class Morfologia extends Component {
         this.paredes = [];
         this.ventanas = [];
         this.objetoSeleccionado = null;
+        this.objetoClick = null;
         this.paredDeVentana = null;
         this.grafoParedes = new Graph(0);
         this.pisos = [];
@@ -311,7 +313,15 @@ class Morfologia extends Component {
 
         });
 
-        this.materialParedConstruidaSeleccionada = new THREE.MeshLambertMaterial({
+        this.materialVentanaConstruida = new THREE.MeshLambertMaterial({
+            color: '#00ff00',
+            opacity: 0.7,
+            transparent: true,
+            side : THREE.DoubleSide,
+        });
+
+
+        this.materialSeleccionado = new THREE.MeshLambertMaterial({
             color: '#FF0000',
             side : THREE.DoubleSide,
 
@@ -426,6 +436,7 @@ class Morfologia extends Component {
                     vertices.push(point);
                 }
                 paredes.add(pared);
+                pared.tipo = Morfologia.tipos.PARED;
                 this.paredes.push(pared);
                 this.allObjects.push(pared);
             }
@@ -728,6 +739,7 @@ class Morfologia extends Component {
                         pared.castShadow = true;
                         pared.receiveShadow = false;
                         pared.piso = j;
+                        pared.tipo =  Morfologia.tipos.PARED;
                         this.paredes.push(pared);
                         this.allObjects.push(pared);
                     }
@@ -746,6 +758,7 @@ class Morfologia extends Component {
                     pared.castShadow = true;
                     pared.receiveShadow = false;
                     pared.piso = j;
+                    pared.tipo =  Morfologia.tipos.PARED;
                     this.paredes.push(pared);
                     this.allObjects.push(pared);
                 }
@@ -811,6 +824,7 @@ class Morfologia extends Component {
             }
         }else{
             this.escena.add(pared);
+            pared.tipo =  Morfologia.tipos.PARED;
             this.paredes.push(pared);
             this.allObjects.push(pared);
         }
@@ -872,14 +886,43 @@ class Morfologia extends Component {
         if(this.props.seleccionando){
             let intersects = this.raycaster.intersectObjects(this.allObjects);
             if(intersects.length > 0){
-
                 let intersect = intersects[0].object;
                 if(this.objetoSeleccionado != intersect && this.objetoSeleccionado != null){
-                    this.objetoSeleccionado.material = this.materialParedConstruida.clone();
+
+                    switch (this.objetoSeleccionado.tipo) {
+                        case  Morfologia.tipos.PARED:
+                            this.objetoSeleccionado.material = this.materialParedConstruida.clone();
+                            break;
+                        case  Morfologia.tipos.VENTANA:
+                            this.objetoSeleccionado.material = this.materialVentanaConstruida.clone();
+                        default:
+                            break;
+                    }
                 }
                 this.objetoSeleccionado = intersect;
-                intersect.material = this.materialParedConstruidaSeleccionada.clone();
+                switch (this.objetoSeleccionado.tipo) {
+                    case  Morfologia.tipos.PARED:
+                        this.objetoSeleccionado.material = this.materialSeleccionado.clone();
+                        break;
+                    case  Morfologia.tipos.VENTANA:
+                        this.objetoSeleccionado.material = this.materialSeleccionado.clone();
+                    default:
+                        break;
+                }
 
+            }else{
+                if(this.objetoSeleccionado != null){
+                    switch (this.objetoSeleccionado.tipo) {
+                        case  Morfologia.tipos.PARED:
+                            this.objetoSeleccionado.material = this.materialParedConstruida.clone();
+                            break;
+                        case  Morfologia.tipos.VENTANA:
+                            this.objetoSeleccionado.material = this.materialVentanaConstruida.clone();
+                        default:
+                            break;
+                    }
+                    this.objetoSeleccionado = null;
+                }
             }
         }
 
@@ -927,7 +970,7 @@ class Morfologia extends Component {
                 }
             }
             //si se dibuja una ventana, se intersecta con paredes.
-            else if (this.props.dibujando == 5) {
+            else if (this.props.dibujando == 5 ) {
                 let intersects = this.raycaster.intersectObjects(this.paredes);
                 if (intersects.length > 0) {
                     intersect = intersects[0];
@@ -937,6 +980,7 @@ class Morfologia extends Component {
                     pos.round();
                     if (pos.x < 2) {
                         this.paredDeVentana = pared;
+                        console.log(pared);
                         this.indicador_dibujado.setRotationFromEuler(pared.rotation);
                         this.indicador_dibujado.position.copy(intersect.point).round();
                         this.indicador_dibujado.position.y = pared.piso * this.heightWall;
@@ -1026,19 +1070,32 @@ class Morfologia extends Component {
 
     onClick(event) {
         event.preventDefault();
-        if (this.props.dibujando < 4) {
+        if (this.props.dibujando < 4 && this.props.dibujando != -1) {
             this.agregarCasa();
         }
 
-        if (this.props.dibujando == 5) {
+        if (this.props.dibujando == 5 && this.props.dibujando != -1) {
             this.agregarVentana();
+        }
+
+        if(this.props.seleccionando){
+            console.log(this.props.dibujando);
+            this.handleSeleccionado();
+        }
+    }
+
+    handleSeleccionado(){
+        if (this.objetoSeleccionado != null){
+            this.props.onSeleccionadoChanged(this.objetoSeleccionado);
         }
     }
 
     agregarVentana() {
+
         if (this.paredDeVentana != null) {
             var ventana = this.indicador_dibujado.clone();
             ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
+            ventana.tipo =  Morfologia.tipos.VENTANA;
             this.paredDeVentana.add(ventana);
             this.paredDeVentana.worldToLocal(ventana.position);
             this.ventanas.push(ventana);
@@ -1081,7 +1138,17 @@ Morfologia.propTypes = {
     sunPosition: PropTypes.object,
     borrando: PropTypes.bool,
     seleccionando: PropTypes.bool,
+    onSeleccionadoChanged: PropTypes.func,
 
+};
+
+Morfologia.tipos = {PARED : 0, VENTANA : 1, PUERTA : 2, TECHO : 3, PISO : 4,};
+Morfologia.tipos_texto = {
+    0 : 'Pared',
+    1 : 'Ventana',
+    2 : 'Puerta',
+    3 : 'Techo',
+    4 : 'Piso',
 };
 
 export default Morfologia
