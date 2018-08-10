@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateEstructurasTable extends Migration
+class CreateTiposMaterialesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,9 @@ class CreateEstructurasTable extends Migration
      */
     public function up()
     {
-        Schema::create('estructuras', function (Blueprint $table) {
+        Schema::create('tipos_materiales', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('nombre');            
+            $table->string('nombre');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ class CreateEstructurasTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('estrucuras');
+        Schema::dropIfExists('tipos_materiales');
     }
 }

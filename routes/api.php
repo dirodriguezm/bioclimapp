@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Http\Request;
-use App\Mes;
 //use App\Http\Controllers;
 
 /*
@@ -19,10 +18,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::get('/materiales', function(){
-  return response(DB::table('materiales')->get());
-});
 
 Route::get('/comuna/{lat}/{lng}', 'ComunaController@getComunaByPoint');
 Route::get('/temperaturas/{id}', 'ComunaController@getTemperaturesById');
 Route::get('/radiaciones/{id}', 'ComunaController@getGlobalRadiationById');
+Route::get('/materiales', 'MaterialController@getAll');
+Route::get('/propiedades_material/{material}', 'MaterialController@getPropiedades');
+Route::get('/tipos_material/{material}', 'MaterialController@getTipos');
+Route::get('/info_materiales', 'MaterialController@getInfoMateriales');
+

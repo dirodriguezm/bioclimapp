@@ -303,7 +303,7 @@ class Context extends Component {
             obstruccion.material = material;
             this.obstrucciones.push(obstruccion);
             this.escena.add(obstruccion);
-            this.crearDivObstruccion(obstruccion);
+            this.crearTextoObstruccion(obstruccion);
             this.obstruccionFantasma.visible = false;
             this.dibujando = false;
             this.calcularFAR(this.ventanas);
@@ -396,7 +396,7 @@ class Context extends Component {
                 }
                 //si no hay obstruccion en el angulo actual entonces pasamos al siguiente
                 if (masAlto.point == null) {
-                    angle.applyAxisAngle(axisY, -Math.PI / 180);
+                    angle.applyAxisAngle(axisY, -Math.PI / 180); //angulo + 1
                     continue;
                 }
                 //si cambiamos de obstruccion mas alta entonces se reinicia el start point
@@ -461,7 +461,7 @@ class Context extends Component {
         this.obstruccionFantasma.visible = true;
     }
 
-    crearDivObstruccion(obstruccion){
+    crearTextoObstruccion(obstruccion){
         let sprite = new MeshText2D("alt: " + obstruccion.geometry.parameters.height + "   long: " +  Math.round(obstruccion.geometry.parameters.width), {
             align: textAlign.center,
             font: '40px Arial',
