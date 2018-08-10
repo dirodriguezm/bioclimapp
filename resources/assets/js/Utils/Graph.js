@@ -14,9 +14,16 @@ class Graph {
     {
         // initialize the adjacent list with a
         // null array
-        console.log(v);
         this.AdjList.set(v, []);
         this.noOfVertices++;
+    }
+
+    removeVertex(vert){
+        var get_neighbours = this.AdjList.get(vert);
+        for(let neighbours of get_neighbours){
+            this.removeEdge(vert, neighbours);
+        }
+        this.AdjList.delete(vert);
     }
     // add edge to the graph
     addEdge(v, w)
@@ -28,6 +35,13 @@ class Graph {
         // Since graph is undirected,
         // add an edge from w to w also
         this.AdjList.get(w).push(v);
+    }
+
+    removeEdge(v, w){
+        let removedW = this.AdjList.get(v).filter(id => id !== w);
+        let removedV = this.AdjList.get(w).filter(id => id !== v);
+        this.AdjList.set(v,removedW);
+        this.AdjList.set(w,removedV);
     }
 
 
@@ -59,42 +73,54 @@ class Graph {
 // all the adjacent vertex of the vertex with which it is called
     isCyclicUtil(vert, visited, parent)
     {
-        visited[vert] = true;
-        console.log(vert);
+        visited.set(vert, true);
 
         var get_neighbours = this.AdjList.get(vert);
 
-        for (var i in get_neighbours) {
-            var get_elem = get_neighbours[i];
-            if (!visited[get_elem]){
-                if(this.isCyclicUtil(get_elem, visited, vert))
+        for (let neighbour of get_neighbours) {
+            if (!visited.get(neighbour)){
+                if(this.isCyclicUtil(neighbour, visited, vert))
                     return true;
             }
 
-            else if( get_elem != parent )
+            else if( neighbour != parent )
                 return true;
 
         }
         return false;
     }
 
-    isCyclic()
+    getCycle()
     {
+        var cycles = [];
 
-        var visited = [];
-        for (var i = 0; i < this.noOfVertices; i++)
-            visited[i] = false;
 
+        var visited = new Map();
         // Call the recursive helper function to detect cycle in
         // different DFS trees
-        for (var u = 0; u < this.noOfVertices ; u++){
-            if(!visited[u]){
-                if (this.isCyclicUtil(u, visited, -1))
-                    return true;
+        for(let key of this.AdjList.keys()){
+            visited.set(key, false);
+        }
+        var visited_reset = new Map(visited);
+
+        for(let key of this.AdjList.keys()){
+            if(!visited.get(key)){
+                if(cycles.length > 0){
+                    continue;
+                }
+                else {
+                    visited = new Map(visited_reset);
+                }
+                if (this.isCyclicUtil(key, visited, -1)){
+                    cycles.push(new Map(visited));
+
+                }
+
             }
+
         }
 
-        return false;
+        return cycles;
     }
 }
 
