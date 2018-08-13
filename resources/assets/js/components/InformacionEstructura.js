@@ -10,13 +10,15 @@ import ExpansionPanel from "@material-ui/core/ExpansionPanel";
 import Button from "@material-ui/core/Button";
 import axios from 'axios';
 import Select from '@material-ui/core/Select';
-
+import Input from '@material-ui/core/Input';
 
 import classNames from 'classnames';
 import NoSsr from '@material-ui/core/NoSsr';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from '@material-ui/core/FormControl';
+import InputAdornment from '@material-ui/core/InputAdornment';
 
 const ITEM_HEIGHT = 48;
 
@@ -24,44 +26,22 @@ const styles = theme => ({
     button: {
         margin: theme.spacing.unit,
     },
-    avatar: {
-        margin: 10,
-    },
     root: {
         width: '100%',
     },
-    paper: {
-        marginRight: theme.spacing.unit * 2,
+    formControl: {
+        margin: theme.spacing.unit,
+        minWidth: 120,
     },
-    popperClose: {
-        pointerEvents: 'none',
-    },
-    input: {
+    form: {
         display: 'flex',
-        padding: 0,
+        flexWrap: 'wrap',
     },
-    valueContainer: {
-        display: 'flex',
-        flex: 1,
-        alignItems: 'center',
-    },
-    singleValue: {
-        fontSize: 16,
-    },
-    placeholder: {
-        position: 'absolute',
-        left: 2,
-        fontSize: 16,
-    },
-    noOptionsMessage: {
-        fontSize: 16,
-        padding: `${theme.spacing.unit}px ${theme.spacing.unit * 2}px`,
+    selectEmpty: {
+        marginTop: theme.spacing.unit * 2,
     },
 
 });
-
-
-
 
 
 class InformacionEstructura extends Component {
@@ -71,35 +51,40 @@ class InformacionEstructura extends Component {
         this.state = {
             materiales: [],
             single: null,
-            material: null,
+            material: 0,
+            tipo: 0,
+            espesor: 0,
 
         };
         this.info_material = [];
         axios.get("http://127.0.0.1:8000/api/info_materiales")
-            .then( response => this.getJson(response));
+            .then(response => this.getJson(response));
         this.handleChange = this.handleChange.bind(this);
     }
 
-    getJson(response){
+    getJson(response) {
         this.info_material = response.data;
+        for (let i = 0; i < this.info_material.length; i++) {
+            this.info_material[i].index = i;
+            if(this.info_material[i].hasOwnProperty('tipos')){
+                for(let j = 0; j < this.info_material[i].tipos.length ; j++){
+                    this.info_material[i].tipos[j].index = j;
+                }
+            }
+        }
         console.log(this.info_material)
     }
 
-    handleChange(value) {
-        this.setState({
-            single: value,
-        });
-    };
 
-    handleChangeSel(value) {
+    handleChange(event) {
         this.setState({
-            material: value,
+            [event.target.name]: event.target.value,
         })
     }
 
     render() {
         const {classes, seleccionado} = this.props;
-        const {single} = this.state;
+        const {material, tipo, espesor} = this.state;
         return (
             <div>
                 {seleccionado !== null ?
@@ -115,23 +100,57 @@ class InformacionEstructura extends Component {
                                 <Typography className={classes.heading}>Materiales</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <InputLabel htmlFor="age-simple">Age</InputLabel>
-                                <Select
-                                    value={this.state.age}
-                                    onChange={this.handleChange}
-                                    inputProps={{
-                                        name: 'age',
-                                        id: 'age-simple',
-                                    }}
-                                >
-                                    <MenuItem value="">
-                                        <em>None</em>
-                                    </MenuItem>
-                                    <MenuItem value={10}>Ten</MenuItem>
-                                    <MenuItem value={20}>Twenty</MenuItem>
-                                    <MenuItem value={30}>Thirty</MenuItem>
-                                </Select>
+                                <form className={classes.form} autoComplete="off">
+                                    <FormControl className={classes.formControl}>
+                                        <InputLabel htmlFor="material-simple">Material</InputLabel>
+                                        <Select
+                                            value={material}
+                                            onChange={this.handleChange}
+                                            input={<Input name="material" id="material-simple"/>}
+                                        >
+                                            {this.info_material.map(material => (
+                                                <MenuItem value={material.index}>
+                                                    {material.material}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
+                                    </FormControl>
+                                    {this.info_material[material].hasOwnProperty('tipos') ?
+                                        <FormControl className={classes.formControl}>
+                                            <InputLabel htmlFor="tipo-simple">Tipo</InputLabel>
+                                            <Select
+                                                value={tipo}
+                                                onChange={this.handleChange}
+                                                input={<Input name="tipo" id="tipo-simple"/>}
+                                            >
+                                                {this.info_material[material].tipos.map(tipo => (
+                                                    <MenuItem value={tipo.index}>
+                                                        {tipo.nombre}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                        :
+                                        <div/>
+                                    }
 
+                                    <FormControl className={classes.formControl}>
+                                        <TextField
+                                            label="Espesor (mm)"
+                                            name="espesor"
+                                            value={espesor}
+                                            onChange={this.handleChange}
+                                            type="number"
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            margin="normal"
+                                        />
+                                    </FormControl>
+
+                                    
+
+                                </form>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
@@ -161,8 +180,8 @@ class InformacionEstructura extends Component {
 }
 
 InformacionEstructura.propTypes = {
-        classes: PropTypes.object.isRequired,
-        seleccionado: PropTypes.object,
+    classes: PropTypes.object.isRequired,
+    seleccionado: PropTypes.object,
 };
 
 export default withStyles(styles)(InformacionEstructura);
