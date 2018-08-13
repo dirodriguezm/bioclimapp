@@ -26,4 +26,13 @@ Route::get('/materiales', 'MaterialController@getAll');
 Route::get('/propiedades_material/{material}', 'MaterialController@getPropiedades');
 Route::get('/tipos_material/{material}', 'MaterialController@getTipos');
 Route::get('/info_materiales', 'MaterialController@getInfoMateriales');
+Route::get('ventanas','VentanaController@getAll');
+Route::get('/propiedades_ventana/{ventana}', 'VentanaController@getPropiedades');
+Route::get('/tipos_ventana/{ventana}', 'VentanaController@getTipos');
+Route::get('/info_ventanas', 'VentanaController@getInfoVentanas');
+Route::get('marcos','MarcoController@getAll');
+Route::get('/propiedades_marco/{marco}', 'MarcoController@getPropiedades');
+Route::get('/tipos_marco/{marco}', 'MarcoController@getTipos');
+Route::get('/info_marcos', 'MarcoController@getInfoMarcos');
+
 
