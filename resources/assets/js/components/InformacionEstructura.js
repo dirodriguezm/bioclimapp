@@ -11,14 +11,16 @@ import Button from "@material-ui/core/Button";
 import axios from 'axios';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
-
-import classNames from 'classnames';
-import NoSsr from '@material-ui/core/NoSsr';
+import List from '@material-ui/core/List';
+import ListItem from '@material-ui/core/ListItem';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from "@material-ui/core/InputLabel";
-import FormControl from '@material-ui/core/FormControl';
-import InputAdornment from '@material-ui/core/InputAdornment';
+import FormControl from '@material-ui/core/FormControl'
+    ;
+import Clear from '@material-ui/icons/Clear';
+import IconButton from '@material-ui/core/IconButton';
+import Grid from "@material-ui/core/Grid";
 
 const ITEM_HEIGHT = 48;
 
@@ -31,7 +33,11 @@ const styles = theme => ({
     },
     formControl: {
         margin: theme.spacing.unit,
-        minWidth: 120,
+        minWidth: 200,
+        maxWidth: 220,
+    },
+    textField: {
+        width: 100,
     },
     form: {
         display: 'flex',
@@ -54,21 +60,27 @@ class InformacionEstructura extends Component {
             material: 0,
             tipo: 0,
             espesor: 0,
+            propiedad: 0,
 
         };
         this.info_material = [];
         axios.get("http://127.0.0.1:8000/api/info_materiales")
             .then(response => this.getJson(response));
         this.handleChange = this.handleChange.bind(this);
+        this.handleClickAgregar = this.handleClickAgregar.bind(this);
     }
 
     getJson(response) {
         this.info_material = response.data;
         for (let i = 0; i < this.info_material.length; i++) {
             this.info_material[i].index = i;
-            if(this.info_material[i].hasOwnProperty('tipos')){
-                for(let j = 0; j < this.info_material[i].tipos.length ; j++){
+            if (this.info_material[i].hasOwnProperty('tipos')) {
+                for (let j = 0; j < this.info_material[i].tipos.length; j++) {
                     this.info_material[i].tipos[j].index = j;
+                }
+            } else {
+                for (let k = 0; k < this.info_material[i].propiedades.length; k++) {
+                    this.info_material[i].propiedades[k].index = k;
                 }
             }
         }
@@ -82,75 +94,296 @@ class InformacionEstructura extends Component {
         })
     }
 
+    handleClickAgregar() {
+        let materiales = this.state.materiales;
+        materiales.push({
+            material: this.state.material,
+            tipo: this.state.tipo,
+            espesor: this.state.espesor,
+            propiedad: this.state.propiedad
+        });
+        this.setState({
+            materiales: materiales,
+        })
+
+    }
+
     render() {
         const {classes, seleccionado} = this.props;
-        const {material, tipo, espesor} = this.state;
+        const {material, tipo, espesor, propiedad, materiales} = this.state;
+        let hasTipos;
+
+        if (seleccionado !== null) {
+            hasTipos = this.info_material[material].hasOwnProperty('tipos');
+        } else {
+            hasTipos = null;
+        }
+
+
         return (
             <div>
                 {seleccionado !== null ?
                     <div className={classes.root}>
                         <Typography
-                            variant={"display1"}
+                            variant={"title"}
                         >
                             {Morfologia.tipos_texto[seleccionado.tipo] + ' ' + seleccionado.id}
                         </Typography>
 
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>Materiales</Typography>
+                                <Typography className={classes.heading}>Capas</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <form className={classes.form} autoComplete="off">
-                                    <FormControl className={classes.formControl}>
-                                        <InputLabel htmlFor="material-simple">Material</InputLabel>
-                                        <Select
-                                            value={material}
-                                            onChange={this.handleChange}
-                                            input={<Input name="material" id="material-simple"/>}
-                                        >
-                                            {this.info_material.map(material => (
-                                                <MenuItem value={material.index}>
-                                                    {material.material}
-                                                </MenuItem>
-                                            ))}
-                                        </Select>
-                                    </FormControl>
-                                    {this.info_material[material].hasOwnProperty('tipos') ?
-                                        <FormControl className={classes.formControl}>
-                                            <InputLabel htmlFor="tipo-simple">Tipo</InputLabel>
-                                            <Select
-                                                value={tipo}
-                                                onChange={this.handleChange}
-                                                input={<Input name="tipo" id="tipo-simple"/>}
+                                <Grid container spacing={8}>
+                                    <Grid item xs={12}>
+                                        {materiales.length === 0 ?
+                                            <Typography
+                                                variant={"subheading"}
                                             >
-                                                {this.info_material[material].tipos.map(tipo => (
-                                                    <MenuItem value={tipo.index}>
-                                                        {tipo.nombre}
+                                                {"No hay capas"}
+                                            </Typography>
+                                            :
+                                            <List>
+                                                {materiales.map(material => (
+                                                    <ListItem>
+                                                        <ExpansionPanel>
+                                                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                                                <Typography className={classes.heading}>
+                                                                    {this.info_material[material.material].material}
+                                                                </Typography>
+                                                            </ExpansionPanelSummary>
+                                                            <ExpansionPanelDetails>
+                                                                <Grid container spacing={8}>
+                                                                {this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    <Grid item xs={12}>
+                                                                        <TextField
+                                                                            label="Tipo"
+                                                                            defaultValue={this.info_material[material.material].tipos[material.tipo].nombre}
+                                                                            className={classes.textField}
+                                                                            margin="normal"
+                                                                            InputProps={{
+                                                                                readOnly: true,
+                                                                            }}
+                                                                        />
+                                                                    </Grid>
+                                                                    :
+                                                                    <div/>
+                                                                }
+                                                                {this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    <Grid item xs={12}>
+                                                                        <TextField
+                                                                            label="Densidad"
+                                                                            defaultValue={this.info_material[material.material].tipos[material.tipo].propiedad.densidad}
+                                                                            className={classes.textField}
+                                                                            margin="normal"
+                                                                            InputProps={{
+                                                                                readOnly: true,
+                                                                            }}
+                                                                        />
+                                                                    </Grid>
+                                                                    :
+                                                                    <div/>
+                                                                }
+                                                                {this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    <Grid item xs={12}>
+                                                                        <TextField
+                                                                            label="Conductividad"
+                                                                            defaultValue={this.info_material[material.material].tipos[material.tipo].propiedad.conductividad}
+                                                                            className={classes.textField}
+                                                                            margin="normal"
+                                                                            InputProps={{
+                                                                                readOnly: true,
+                                                                            }}
+                                                                        />
+                                                                    </Grid>
+                                                                    :
+                                                                    <div/>
+                                                                }
+                                                                {!this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    <Grid item xs={12}>
+                                                                        <TextField
+                                                                            label="Densidad"
+                                                                            defaultValue={this.info_material[material.material].propiedades[material.propiedad].densidad}
+                                                                            className={classes.textField}
+                                                                            margin="normal"
+                                                                            InputProps={{
+                                                                                readOnly: true,
+                                                                            }}
+                                                                        />
+                                                                    </Grid>
+                                                                    :
+                                                                    <div/>
+                                                                }
+                                                                {!this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    <Grid item xs={12}>
+                                                                        <TextField
+                                                                            label="Conductividad"
+                                                                            defaultValue={this.info_material[material.material].propiedades[material.propiedad].conductividad}
+                                                                            className={classes.textField}
+                                                                            margin="normal"
+                                                                            InputProps={{
+                                                                                readOnly: true,
+                                                                            }}
+                                                                        />
+                                                                    </Grid>
+                                                                    :
+                                                                    <div/>
+                                                                }
+                                                                <Grid item xs={12}>
+                                                                    <TextField
+                                                                        label="Espesor (mm)"
+                                                                        defaultValue={material.espesor}
+                                                                        className={classes.textField}
+                                                                        margin="normal"
+                                                                        InputProps={{
+                                                                            readOnly: true,
+                                                                        }}
+                                                                    />
+                                                                </Grid>
+                                                            </Grid>
+
+                                                        </ExpansionPanelDetails>
+                                                    </ExpansionPanel>
+                                                    </ListItem>
+                                                ), this)}
+                                            </List>
+                                        }
+
+                                    </Grid>
+
+
+                                    <Grid item xs={12}>
+                                        <FormControl className={classes.formControl}>
+                                            <InputLabel htmlFor="material-simple">Material</InputLabel>
+                                            <Select
+                                                value={material}
+                                                onChange={this.handleChange}
+                                                input={<Input name="material" id="material-simple"/>}
+                                            >
+                                                {this.info_material.map(material => (
+                                                    <MenuItem value={material.index}>
+                                                        {material.material}
                                                     </MenuItem>
                                                 ))}
                                             </Select>
                                         </FormControl>
-                                        :
-                                        <div/>
+                                    </Grid>
+                                    {hasTipos ?
+                                        <Grid item xs={12}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="tipo-simple">Tipo</InputLabel>
+                                                <Select
+                                                    value={tipo}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="tipo" id="tipo-simple"/>}
+                                                >
+                                                    {this.info_material[material].tipos.map(tipo => (
+                                                        <MenuItem value={tipo.index}>
+                                                            {tipo.nombre}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid> : <div/>
+                                    }
+                                    {hasTipos ?
+                                        <Grid item xs={12}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="densidad-simple">Densidad</InputLabel>
+                                                <Select
+                                                    value={propiedad}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="propiedad" id="densidad-simple"/>}
+                                                >
+                                                    <MenuItem value={0}>
+                                                        {this.info_material[material].tipos[tipo].propiedad.densidad}
+                                                    </MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid> : <div/>
+                                    }
+                                    {hasTipos ?
+                                        <Grid item xs={12}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="conductividad-simple">Conductividad</InputLabel>
+                                                <Select
+                                                    value={propiedad}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="propiedad" id="conductividad-simple"/>}
+                                                >
+                                                    <MenuItem value={0}>
+                                                        {this.info_material[material].tipos[tipo].propiedad.conductividad}
+                                                    </MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid> : <div/>
+                                    }
+                                    {!hasTipos ?
+                                        <Grid item xs={12}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="densidad-simple">Densidad</InputLabel>
+                                                <Select
+                                                    value={propiedad}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="propiedad" id="densidad-simple"/>}
+                                                >
+                                                    {this.info_material[material].propiedades.map(propiedades => (
+                                                        <MenuItem value={propiedades.index}>
+                                                            {propiedades.densidad}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid> : <div/>
                                     }
 
-                                    <FormControl className={classes.formControl}>
-                                        <TextField
-                                            label="Espesor (mm)"
-                                            name="espesor"
-                                            value={espesor}
-                                            onChange={this.handleChange}
-                                            type="number"
-                                            InputLabelProps={{
-                                                shrink: true,
-                                            }}
-                                            margin="normal"
-                                        />
-                                    </FormControl>
+                                    {!hasTipos ?
+                                        <Grid item xs={12}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="conductividad-simple">Conductividad</InputLabel>
+                                                <Select
+                                                    value={propiedad}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="propiedad" id="conductividad-simple"/>}
+                                                >
+                                                    {this.info_material[material].propiedades.map(propiedades => (
+                                                        <MenuItem value={propiedades.index}>
+                                                            {propiedades.conductividad}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid> : <div/>
+                                    }
+                                    <Grid item xs={12}>
+                                        <FormControl className={classes.formControl}>
+                                            <TextField
+                                                label="Espesor (mm)"
+                                                name="espesor"
+                                                value={espesor}
+                                                onChange={this.handleChange}
+                                                type="number"
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                margin="normal"
+                                            />
+                                        </FormControl>
+                                    </Grid>
 
-                                    
+                                    <Grid item xs={12}>
+                                        <Button variant="contained" color="secondary" className={classes.button}
+                                                onClick={this.handleClickAgregar}
+                                        >
+                                            Agregar
+                                        </Button>
+                                    </Grid>
 
-                                </form>
+
+                                </Grid>
+
+
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 

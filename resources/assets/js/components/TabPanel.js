@@ -29,7 +29,7 @@ function TabContainer(props) {
     );
 }
 
-const drawerWidth = 300;
+const drawerWidth = 320;
 
 TabContainer.propTypes = {
     children: PropTypes.node.isRequired,
