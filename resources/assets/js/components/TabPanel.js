@@ -197,8 +197,8 @@ class TabPanel extends Component {
     }
 
     render() {
-        const {classes, theme} = this.props;
-        const {value, click2D, dibujandoMorf, seleccionandoMorf, sunPosition, borrandoMorf, width, height, openMorf, seleccionadoMorf} = this.state;
+        const {classes, theme, sunPosition} = this.props;
+        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf} = this.state;
         return (
 
             <div className={classes.root} ref={(tab) => {
