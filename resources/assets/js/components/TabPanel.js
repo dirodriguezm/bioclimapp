@@ -199,6 +199,25 @@ class TabPanel extends Component {
     render() {
         const {classes, theme, sunPosition} = this.props;
         const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf} = this.state;
+        if(this.state.ventanas != null){
+            var ventanasPapers = this.state.ventanas.map(function(ventana){
+                var obstruccionesVentana = ventana.obstrucciones.map(function(obstruccion){
+                    return <Paper className={classes.paper}>
+                        <h6>FAR obstruccion: {obstruccion.far}</h6>
+                        <h6>A: {obstruccion.aDistance}</h6>
+                        <h6>B: {obstruccion.bDistance}</h6>
+                        <h6>beta: {obstruccion.betaAngle[0]}, {obstruccion.betaAngle[1]}</h6>
+                    </Paper>
+                });
+                return <Paper className={classes.paper}>
+                    <h3>Posicion ventana: {ventana.pos.x}, {-ventana.pos.z}</h3>
+                    <h3>Orientacion ventana: {ventana.orientacion.x}, {-ventana.orientacion.z}</h3>
+                    <h3>FAR ventana: {ventana.far}</h3>
+                    {obstruccionesVentana}
+                </Paper>;
+            });
+        }
+
         return (
 
             <div className={classes.root} ref={(tab) => {
@@ -288,6 +307,10 @@ class TabPanel extends Component {
                         </div>
                     </TabContainer>
                 </SwipeableViews>
+                <Paper>
+                    <h1>VENTANAS</h1>
+                    {ventanasPapers}
+                </Paper>
             </div>
         );
     }

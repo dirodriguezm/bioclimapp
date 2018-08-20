@@ -43,6 +43,49 @@ class Context extends Component {
                 orientacion: new THREE.Vector3(0, 0, -1)
             }
         ];
+        let PW_N = new Map(); // p/w orientacion norte para calculo de FAV2
+        this.PW_N = PW_N;
+        PW_N.set(0, [1,1,1,1,1,1,1,1,1,1]);
+        PW_N.set(0.2, [0.89,0.94,0.97,0.99,0.99,0.99,1,1,1,1]);
+        PW_N.set(0.4, [0.75,0.81,0.89,0.94,0.96,0.98,0.99,1,1,1]);
+        PW_N.set(0.6, [0.64,0.71,0.81,0.87,0.91,0.94,0.99,0.99,1,1]);
+        PW_N.set(0.8, [0.57,0.64,0.74,0.81,0.86,0.89,0.96,0.99,1,1]);
+        PW_N.set(1, [0.53,0.59,0.7,0.77,0.82,0.85,0.95,0.99,1,1]);
+        PW_N.set(1.5, [0.49,0.55,0.65,0.72,0.78,0.81,0.9,0.98,0.99,0.99]);
+        PW_N.set(2, [0.44,0.5,0.62,0.7,0.76,0.79,0.92,0.99,1,1]);
+        PW_N.set(4, [0.35,0.41,0.53,0.63,0.7,0.74,0.87,0.99,1,1]);
+        PW_N.set(6, [0.3,0.37,0.49,0.58,0.67,0.71,0.85,0.98,0.99,1]);
+        PW_N.set(10, [0.26,0.32,0.44,0.54,0.63,0.68,0.83,0.97,0.99,1]);
+        let SW = [0.1,0.2,0.4,0.6,0.8,1,2,4,6,8]; // s/w para calculo de FAV2
+        this.SW = SW;
+        let PW_EOS = new Map(); // p/w orientaciones este, oeste y sur para calculo de FAV2
+        this.PW_EOS = PW_EOS;
+        PW_EOS.set(0, [1,1,1,1,1,1,1,1,1,1]);
+        PW_EOS.set(0.2, [0.9,0.94,0.98,0.99,0.99,1,1,1,1,1]);
+        PW_EOS.set(0.4, [0.77,0.83,0.91,0.95,0.97,0.99,1,1,1,1]);
+        PW_EOS.set(0.6, [0.67,0.74,0.84,0.9,0.94,0.97,0.99,1,1,1]);
+        PW_EOS.set(0.8, [0.61,0.68,0.79,0.86,0.91,0.95,0.99,1,1,1]);
+        PW_EOS.set(1, [0.56,0.63,0.74,0.82,0.88,0.92,0.99,1,1,1]);
+        PW_EOS.set(1.5, [0.5,0.57,0.68,0.76,0.82,0.86,0.97,0.99,1,1]);
+        PW_EOS.set(2, [0.45,0.53,0.64,0.73,0.79,0.84,0.97,0.99,1,1]);
+        PW_EOS.set(4, [0.37,0.45,0.57,0.67,0.75,0.8,0.96,0.99,1,1]);
+        PW_EOS.set(6, [0.33,0.41,0.53,0.63,0.72,0.77,0.94,0.99,1,1]);
+        PW_EOS.set(10, [0.28,0.35,0.48,0.59,0.68,0.73,0.9,0.99,1,1]);
+        let LH_N = new Map(); // l/h orientacion norte para calculo de FAV1
+        this.LH_N = LH_N;
+        LH_N.set(0.5, [0.79,0.87,0.93]);
+        LH_N.set(1, [0.57,0.69,0.81]);
+        LH_N.set(1.5, [0.42,0.55,0.69]);
+        LH_N.set(2, [0.33,0.44,0.59]);
+        LH_N.set(3, [0.22,0.32,0.44]);
+        let LH_EOS = new Map();
+        this.LH_EOS = LH_EOS; // l/h orientacion oeste, este y sur para calculo de FAV1
+        LH_EOS.set(0.5, [0.88,0.93,0.96]);
+        LH_EOS.set(1, [0.74,0.82,0.89]);
+        LH_EOS.set(1.5, [0.63,0.73,0.82]);
+        LH_EOS.set(2, [0.54,0.65,0.76]);
+        LH_EOS.set(3, [0.42,0.52,0.65]);
+        this.DH = [0.2,0.5,1]; // d/h para calculo de FAV1
     }
 
     componentWillReceiveProps(nextProps) {
@@ -76,10 +119,8 @@ class Context extends Component {
     componentDidUpdate(prevProps, prevState, snapshot){
         //Si se cerró el popper y se modificó alguna obstrucción entonces se debe volver a calcular el FAR
         if(prevState.open === true && this.state.open === false ){
-            console.log("MODIFIED");
             this.calcularFAR(this.ventanas);
         }
-        console.log("SI");
     }
 
     componentDidMount() {
@@ -108,14 +149,14 @@ class Context extends Component {
         this.camara.zoom = 0.8;
         this.camara.updateProjectionMatrix();
         this.escena.add(this.camara);
-        //this.controles de this.camara
+        //controles de camara
         this.control = new Orbitcontrols(this.camara, this.renderer.domElement);
         this.control.maxPolarAngle = 0;
         this.control.maxAzimuthAngle = 0;
         this.control.minAzimuthAngle = 0;
         this.control.enabled = true;
         this.control.enableKeys = true;
-        // 3D this.camara
+        // 3D camara
         // this.camara = new THREE.PerspectiveCamera( 45, width / height, 1, 1000 );
         // this.camara.position.set( 5, 8, 13 );
         // this.camara.lookAt( new THREE.Vector3() );
@@ -124,19 +165,19 @@ class Context extends Component {
         // this.control.maxDistance = 500;
 
         //Plano
-        let planoGeometria = new THREE.PlaneBufferGeometry(80, 80);
+        let planoGeometria = new THREE.PlaneBufferGeometry(150, 150);
         planoGeometria.rotateX(-Math.PI / 2);
         this.plano = new THREE.Mesh(planoGeometria, new THREE.MeshBasicMaterial({visible: true}));
         this.escena.add(this.plano);
 
         //Grid del plano
-        let gridHelper = new THREE.GridHelper(80, 80, 0xCCCCCC, 0xCCCCCC);
+        let gridHelper = new THREE.GridHelper(150, 150, 0xCCCCCC, 0xCCCCCC);
         this.escena.add(gridHelper);
 
         //Indicador de puntos cardinales
         let curve = new THREE.EllipseCurve(
             0, 0,            // ax, aY
-            25, 25,           // xRadius, yRadius
+            50, 50,           // xRadius, yRadius
             0, 2 * Math.PI,  // aStartAngle, aEndAngle
             false,            // aClockwise
             0                 // aRotation
@@ -159,7 +200,7 @@ class Context extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, 0.3, 25);
+        sprite.position.set(0, 0.3, 50);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
         sprite = new MeshText2D("N", {
@@ -170,7 +211,7 @@ class Context extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, 0.3, -25);
+        sprite.position.set(0, 0.3, -50);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
         sprite = new MeshText2D("E", {
@@ -181,7 +222,7 @@ class Context extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(25, 0.3, 0);
+        sprite.position.set(50, 0.3, 0);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
         sprite = new MeshText2D("O", {
@@ -192,7 +233,7 @@ class Context extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(-25, 0.3, 0);
+        sprite.position.set(-50, 0.3, 0);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
         //caja que representa la casa al centro del plano
@@ -386,6 +427,7 @@ class Context extends Component {
                 console.log(intersections.length);
                 //para cada obstruccion en el angulo actual se obtiene su aDistance y su bDistance, además se almacena el más alto
                 for (let i = 0; i < intersections.length; i++) {
+                    if(intersections[i].distance > 50){intersections[i].object.fuera = true}
                     intersections[i].object.aDistance = intersections[i].object.geometry.parameters.height - ventana.pos.y;
                     let auxPoint = new THREE.Vector3(intersections[i].object.position.x, ventana.pos.y, ventana.pos.z);
                     intersections[i].object.bDistance = auxPoint.distanceTo(intersections[i].object.position);
@@ -423,11 +465,9 @@ class Context extends Component {
                 //además las obstrucciones de una ventana se pintan rojas
                 if (!obstruccionesVentana.includes(current)) {
                     obstruccionesVentana.push(current);
-                    current.material.color.setHex(0xff0000);
-                    current.currentHex = 0xff0000;
                 }
-                // let arrowHelper = new THREE.ArrowHelper(angle, ventana.pos, 10, 0x00ff00);
-                // this.escena.add(arrowHelper);
+                let arrowHelper = new THREE.ArrowHelper(angle, ventana.pos, 50, 0x00ff00);
+                this.escena.add(arrowHelper);
                 //pasamos al siguiente angulo
                 angle.applyAxisAngle(axisY, -Math.PI / 180);
             }
@@ -436,7 +476,16 @@ class Context extends Component {
             let f1 = 1;
             let f2 = 0;
             for(let obs of ventana.obstrucciones){
+                // Si la obstrucción está fuera del rango y tiene FAR > 0.95 no se considera
+                if(obs.far > 0.95 && obs.fuera){
+                    ventana.obstrucciones.splice( ventana.obstrucciones.indexOf(obs), 1 );
+                    obs.startPoint = null;
+                    continue;
+                }
                 obs.startPoint = null; //reseteamos el punto de inicio de la obstruccion para futuros cálculos
+
+                obs.material.color.setHex(0xff0000);
+                obs.currentHex = 0xff0000;
                 for(let beta of obs.betaAngle){
                     f1 -= beta / 90;
                     f2 += obs.far * beta/90;
@@ -445,6 +494,7 @@ class Context extends Component {
             ventana.far = f1 + f2;
         }
         this.props.onFarChanged(ventanas);
+        console.log(ventanas);
     }
 
 
@@ -506,6 +556,32 @@ class Context extends Component {
             selectedObstruction: this.selectedObstruction
         })
 
+    }
+
+    getFAV2(pw,sw, orientacion){
+        let pw_values = [0,0.2,0.4,0.6,0.8,1,1.5,2,4,6,10];
+        let closest = pw_values.reduce(function (prev, curr) {
+            return (Math.abs(curr - pw) < Math.abs(prev - pw) ? curr : prev);
+        });
+        if(orientacion.z > 0){ //orientacion norte
+            return this.PW_N.get(closest)[this.SW.indexOf(sw)];
+        }
+        else{
+            return this.PW_EOS.get(closest)[this.SW.indexOf(sw)];
+        }
+    }
+
+    getFAV1(lh,dh,orientacion){
+        let lh_values = [0.5,1,1.5,2,3];
+        let closest = lh_values.reduce(function (prev, curr) {
+            return (Math.abs(curr - lh) < Math.abs(prev - lh) ? curr : prev);
+        });
+        if(orientacion.z > 0){ //orientacion norte
+            return this.LH_N.get(closest)[this.DH.indexOf(sw)];
+        }
+        else{
+            return this.LH_EOS.get(closest)[this.DH.indexOf(sw)];
+        }
     }
 
 
