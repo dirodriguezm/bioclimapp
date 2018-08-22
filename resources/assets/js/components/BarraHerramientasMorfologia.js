@@ -272,15 +272,16 @@ class BarraHerramientasMorfologia extends Component {
         this.handleCloseCasa();
         let dibujandoStatesButtons = this.state.dibujandoStatesButtons;
         dibujandoStatesButtons[this.state.dibujando] = false;
-        dibujandoStatesButtons[event.target.value] = true;
+        dibujandoStatesButtons[event.currentTarget.value] = true;
         this.setState({
-            dibujando: parseInt(event.target.value),
+            dibujando: parseInt(event.currentTarget.value),
             borrando: false,
             seleccionando: false,
             dibujandoStatesButtons: dibujandoStatesButtons,
         });
-        this.onActionChanged(parseInt(event.target.value), false, false);
+        this.onActionChanged(parseInt(event.currentTarget.value), false, false);
     }
+
 
     onActionChanged(dibujando, borrando, seleccionando) {
         this.props.onSeleccionandoMorfChanged(seleccionando);

@@ -99,7 +99,7 @@ class InformacionVentana extends Component {
     render() {
         const {classes, seleccionado} = this.props;
         const {material, tipo, espesor, propiedad} = this.state;
-        console.log(this.info_material)
+        //console.log(this.info_material)
 
         return (
             <div>
@@ -205,6 +205,49 @@ class InformacionVentana extends Component {
                                     ex,
                                     sit amet blandit leo lobortis eget.
                                 </Typography>
+                            </ExpansionPanelDetails>
+                        </ExpansionPanel>
+
+                        <ExpansionPanel>
+                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                <Typography className={classes.heading}>FAR</Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails>
+                                <Grid container spacing={8}>
+                                    <Grid item xs={12}>
+                                        <FormControl className={classes.formControl}>
+                                            <Typography>
+                                                FAR de la ventana: {seleccionado.far}
+                                            </Typography>
+                                            {seleccionado.obstrucciones != null ? seleccionado.obstrucciones.map((obstruccion,index) => (
+                                                <ExpansionPanel>
+                                                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                                        <Typography className={classes.heading}>Obstruccion: {index}</Typography>
+                                                    </ExpansionPanelSummary>
+                                                    <ExpansionPanelDetails>
+                                                        <Grid container spacing={8}>
+                                                            <Grid item xs={12}>
+                                                                <Typography>FAR obstruccion: {obstruccion.far}</Typography>
+                                                            </Grid>
+                                                            <Grid item xs={12}>
+                                                                <Typography>Altura respecto a la ventana: {obstruccion.aDistance}</Typography>
+                                                            </Grid>
+                                                            <Grid item xs={12}>
+                                                                <Typography>Distancia respecto a la ventana: {obstruccion.bDistance}</Typography>
+                                                            </Grid>
+                                                            <Grid item xs={12}>
+                                                                <Typography>Ángulo(s) que obstruye:</Typography>
+                                                                {obstruccion.betaAngle.map(angle => (
+                                                                    <Typography>{angle}</Typography>
+                                                                ))}
+                                                            </Grid>
+                                                        </Grid>
+                                                    </ExpansionPanelDetails>
+                                                </ExpansionPanel>
+                                            )) : <div></div>}
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 

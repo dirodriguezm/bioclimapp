@@ -113,9 +113,9 @@ export default class MapContainer extends Component {
                     {this.state.markers.map((position) =>
                             <Marker key={position} position={position}>
                                 <Popup>
-                <span>
-                  {this.state.comuna ? this.state.comuna.nombre : ""}
-                </span>
+                                    <span>
+                                      {this.state.comuna ? this.state.comuna.nombre : ""}
+                                    </span>
                                 </Popup>
                             </Marker>
                     )}

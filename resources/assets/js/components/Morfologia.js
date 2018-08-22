@@ -499,18 +499,22 @@ class Morfologia extends Component {
 
         var pared1 = this.crearMeshPared(widthWall, heightWall);
         pared1.position.z = pared1.position.z + halfWidth;
+        pared1.userData.orientacion = new THREE.Vector3(0,0,1);
 
         var pared2 = this.crearMeshPared(widthWall, heightWall);
         pared2.rotation.y = Math.PI / 2;
         pared2.position.x = pared2.position.x + halfWidth;
+        pared2.userData.orientacion = new THREE.Vector3(1,0,0);
 
         var pared3 = this.crearMeshPared(widthWall, heightWall);
         pared3.rotation.y = Math.PI;
         pared3.position.z = pared3.position.z - halfWidth;
+        pared3.userData.orientacion = new THREE.Vector3(0,0,-1);
 
         var pared4 = this.crearMeshPared(widthWall, heightWall);
-        pared4.rotation.y = Math.PI / 2;
+        pared4.rotation.y = -Math.PI / 2;
         pared4.position.x = pared4.position.x - halfWidth;
+        pared4.userData.orientacion = new THREE.Vector3(-1,0,0);
 
         var piso = this.crearMeshPiso(widthWall, widthWall);
         var techo = this.crearMeshTecho(widthWall, widthWall, heightWall);
@@ -765,6 +769,8 @@ class Morfologia extends Component {
             }
             this.escena.add(casa);
         }
+        this.calcularGammaParedes(this.paredes);
+        this.props.onParedesChanged(this.paredes);
     }
 
     agregarPared() {
@@ -980,7 +986,6 @@ class Morfologia extends Component {
                     pos.round();
                     if (pos.x < 2) {
                         this.paredDeVentana = pared;
-                        console.log(pared);
                         this.indicador_dibujado.setRotationFromEuler(pared.rotation);
                         this.indicador_dibujado.position.copy(intersect.point).round();
                         this.indicador_dibujado.position.y = pared.piso * this.heightWall;
@@ -990,8 +995,10 @@ class Morfologia extends Component {
             }
 
         }else{
-            this.indicador_dibujado.visible = false;
-            this.indicador_dibujado = null;
+            if(this.indicador_dibujado != null){
+                this.indicador_dibujado.visible = false;
+                this.indicador_dibujado = null;
+            }
         }
 
         /*if (this.dibujando != -1 && this.dibujando < 4) {
@@ -1094,12 +1101,15 @@ class Morfologia extends Component {
 
         if (this.paredDeVentana != null) {
             var ventana = this.indicador_dibujado.clone();
+            ventana.orientacion = new THREE.Vector3(this.paredDeVentana.userData.orientacion.x, this.paredDeVentana.userData.orientacion.y,this.paredDeVentana.userData.orientacion.z);
+            ventana.pos = new THREE.Vector3();
             ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
             ventana.tipo =  Morfologia.tipos.VENTANA;
             this.paredDeVentana.add(ventana);
             this.paredDeVentana.worldToLocal(ventana.position);
             this.ventanas.push(ventana);
             this.allObjects.push(ventana);
+            this.props.onVentanasChanged(this.ventanas);
         }
     }
 
@@ -1119,7 +1129,7 @@ class Morfologia extends Component {
     render() {
         return (
             <div
-                tabIndex="0"
+                //tabIndex="0"
                 onMouseDown={this.onMouseDown}
                 onMouseUp={this.onMouseUp}
                 onMouseMove={this.onMouseMove}

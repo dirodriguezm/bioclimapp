@@ -36,13 +36,7 @@ class Context extends Component {
         this.dibujando = false;
         this.seleccionando = false;
         this.borrando = false;
-        this.modified = false;
-        this.ventanas = [
-            {
-                pos: new THREE.Vector3(0, 0, 0),
-                orientacion: new THREE.Vector3(0, 0, -1)
-            }
-        ];
+        this.ventanas = this.props.ventanas;
         let PW_N = new Map(); // p/w orientacion norte para calculo de FAV2
         this.PW_N = PW_N;
         PW_N.set(0, [1,1,1,1,1,1,1,1,1,1]);
@@ -113,6 +107,11 @@ class Context extends Component {
             this.seleccionando = true;
             this.agregarContexto = false;
             this.borrando = true;
+        }
+        if(nextProps.ventanas != null && this.ventanas !== nextProps.ventanas){
+            console.log("en contexto ventanas != nuevas ventanas");
+            this.ventanas = nextProps.ventanas;
+            this.calcularFAR(this.ventanas);
         }
     }
 
@@ -424,7 +423,7 @@ class Context extends Component {
                 raycasterFAR.set(ventana.pos, angle);
                 let intersections = raycasterFAR.intersectObjects(this.obstrucciones);
                 let masAlto = {object: {aDistance: 0}};
-                console.log(intersections.length);
+                //console.log(intersections.length);
                 //para cada obstruccion en el angulo actual se obtiene su aDistance y su bDistance, además se almacena el más alto
                 for (let i = 0; i < intersections.length; i++) {
                     if(intersections[i].distance > 50){intersections[i].object.fuera = true}
@@ -494,7 +493,6 @@ class Context extends Component {
             ventana.far = f1 + f2;
         }
         this.props.onFarChanged(ventanas);
-        console.log(ventanas);
     }
 
 

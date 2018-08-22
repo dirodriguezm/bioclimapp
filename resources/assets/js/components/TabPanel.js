@@ -107,6 +107,7 @@ class TabPanel extends Component {
         this.handleDrawerOpen = this.handleDrawerOpen.bind(this);
         this.handleDrawerClose = this.handleDrawerClose.bind(this);
         this.onSeleccionadoMorfChanged = this.onSeleccionadoMorfChanged.bind(this);
+        this.onVentanasChanged = this.onVentanasChanged.bind(this);
     }
 
     handleDrawerOpen() {
@@ -150,6 +151,10 @@ class TabPanel extends Component {
 
     onParedesChanged(paredes) {
         this.props.onParedesChanged(paredes);
+    }
+
+    onVentanasChanged(ventanas){
+        this.setState({ventanas: ventanas});
     }
 
     agregarContexto() {
@@ -200,22 +205,23 @@ class TabPanel extends Component {
         const {classes, theme, sunPosition} = this.props;
         const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf} = this.state;
         if(this.state.ventanas != null){
-            var ventanasPapers = this.state.ventanas.map(function(ventana){
-                var obstruccionesVentana = ventana.obstrucciones.map(function(obstruccion){
-                    return <Paper className={classes.paper}>
-                        <h6>FAR obstruccion: {obstruccion.far}</h6>
-                        <h6>A: {obstruccion.aDistance}</h6>
-                        <h6>B: {obstruccion.bDistance}</h6>
-                        <h6>beta: {obstruccion.betaAngle[0]}, {obstruccion.betaAngle[1]}</h6>
-                    </Paper>
-                });
-                return <Paper className={classes.paper}>
-                    <h3>Posicion ventana: {ventana.pos.x}, {-ventana.pos.z}</h3>
-                    <h3>Orientacion ventana: {ventana.orientacion.x}, {-ventana.orientacion.z}</h3>
-                    <h3>FAR ventana: {ventana.far}</h3>
-                    {obstruccionesVentana}
-                </Paper>;
-            });
+            console.log("ventanas",this.state.ventanas);
+            // var ventanasPapers = this.state.ventanas.map(function(ventana){
+            //     var obstruccionesVentana = ventana.obstrucciones.map(function(obstruccion){
+            //         return <Paper className={classes.paper}>
+            //             <h6>FAR obstruccion: {obstruccion.far}</h6>
+            //             <h6>A: {obstruccion.aDistance}</h6>
+            //             <h6>B: {obstruccion.bDistance}</h6>
+            //             <h6>beta: {obstruccion.betaAngle[0]}, {obstruccion.betaAngle[1]}</h6>
+            //         </Paper>
+            //     });
+            //     return <Paper className={classes.paper}>
+            //         <h3>Posicion ventana: {ventana.pos.x}, {-ventana.pos.z}</h3>
+            //         <h3>Orientacion ventana: {ventana.orientacion.x}, {-ventana.orientacion.z}</h3>
+            //         <h3>FAR ventana: {ventana.far}</h3>
+            //         {obstruccionesVentana}
+            //     </Paper>;
+            // });
         }
 
         return (
@@ -245,6 +251,7 @@ class TabPanel extends Component {
                                 seleccionar={this.state.seleccionar}
                                 borrarContexto={this.state.borrarContexto}
                                 onFarChanged={this.onFarChanged}
+                                ventanas={this.state.ventanas}
                             /> :
                             <div></div>
                         }
@@ -286,7 +293,7 @@ class TabPanel extends Component {
                                     dibujando={dibujandoMorf}
                                     seleccionando={seleccionandoMorf}
                                     borrando={borrandoMorf}
-
+                                    onVentanasChanged={this.onVentanasChanged}
                                 />
                                 <Paper className={classNames(classes.paper, classes.contentBarra, {
                                     [classes.contentShift]: openMorf,
@@ -307,10 +314,10 @@ class TabPanel extends Component {
                         </div>
                     </TabContainer>
                 </SwipeableViews>
-                <Paper>
-                    <h1>VENTANAS</h1>
-                    {ventanasPapers}
-                </Paper>
+                {/*<Paper>*/}
+                    {/*<h1>VENTANAS</h1>*/}
+                    {/*{ventanasPapers}*/}
+                {/*</Paper>*/}
             </div>
         );
     }
