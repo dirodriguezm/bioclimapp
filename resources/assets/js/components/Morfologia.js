@@ -4,6 +4,8 @@ import OrbitControls from 'orbit-controls-es6';
 import {MeshText2D, textAlign} from 'three-text2d';
 import PropTypes from "prop-types";
 import Graph from '../Utils/Graph';
+import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
+import axios from "axios";
 
 class Morfologia extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -19,6 +21,9 @@ class Morfologia extends Component {
         this.agregarPared = this.agregarPared.bind(this);
         this.onChangeCamera = this.onChangeCamera.bind(this);
         this.crearIndicadores = this.crearIndicadores.bind(this);
+
+        this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+        this.temperaturaConfort = 19;
 
         this.state = {
             height: props.height,
@@ -36,6 +41,24 @@ class Morfologia extends Component {
         if (this.props.click2D !== prevProps.click2D) {
             this.onPerspectiveChanged();
         }
+
+        if(this.props.comuna !== prevProps.comuna){
+            this.onComunaChanged();
+        }
+    }
+
+    onComunaChanged() {
+        axios.get("http://127.0.0.1:8000/api/temperaturas/"+this.props.comuna.id)
+            .then(response => this.getJson(response));
+
+    }
+
+    getJson(response) {
+        let data = response.data.slice();
+        for (let i = 0; i < data.length; i++) {
+            this.temperaturasMes[i] = data[i].valor;
+        }
+        this.gradoDias = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort)
     }
 
     onSunpositionChanged() {
@@ -361,6 +384,7 @@ class Morfologia extends Component {
         this.mount.appendChild(this.renderer.domElement);
         this.start();
     }
+
     crearCasaVacia() {
         var casa = new THREE.Group();
 
@@ -517,18 +541,21 @@ class Morfologia extends Component {
         pared4.userData.orientacion = new THREE.Vector3(-1,0,0);
 
         var piso = this.crearMeshPiso(widthWall, widthWall);
-        var techo = this.crearMeshTecho(widthWall, widthWall, heightWall);
 
+        var techo = this.crearMeshTecho(widthWall, widthWall, heightWall);
         paredes.add(pared1);
         paredes.add(pared2);
         paredes.add(pared3);
         paredes.add(pared4);
         pisos.add(piso);
+        piso.userData.superficie = widthWall * widthWall;
         techos.add(techo);
 
         nivel.add(paredes);
         nivel.add(pisos);
         nivel.add(techos);
+
+        nivel.userData.volumen = widthWall * widthWall * heightWall;
 
         return nivel;
     }
@@ -658,7 +685,6 @@ class Morfologia extends Component {
         cancelAnimationFrame(this.frameId)
     }
 
-
     animate() {
         this.renderScene();
         this.frameId = window.requestAnimationFrame(this.animate)
@@ -734,6 +760,10 @@ class Morfologia extends Component {
             for (let i = 0; i < casas.children.length; i++) {
                 let casa = casas.children[i];
 
+                let aporteInterno = 0;
+                let ocupantes = 4, horasIluminacion = 5, aireRenovado = 3;
+                let perdidaPorVentilacion = 0;
+
                 for (let j = 0; j < casa.children.length; j++) {
                     let nivel = casa.children[j];
                     let paredes = nivel.getObjectByName("Paredes");
@@ -747,12 +777,24 @@ class Morfologia extends Component {
                         this.paredes.push(pared);
                         this.allObjects.push(pared);
                     }
+                    let pisos = nivel.getObjectByName("Pisos");
+                    for (let k = 0; k < pisos.children.length; k++) {
+                        let piso = pisos.children[k];
+                        aporteInterno += BalanceEnergetico.aporteInterno(ocupantes, piso.userData.superficie, horasIluminacion);
+                    }
+                    perdidaPorVentilacion += BalanceEnergetico.perdidasVentilacion(nivel.userData.volumen, aireRenovado, this.gradoDias);
                 }
+                casa.userData.aporteInterno = aporteInterno;
+                casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
+                console.log(casa);
             }
             this.escena.add(casas);
 
         } else {
             var casa = this.indicador_dibujado.clone();
+            let aporteInterno = 0;
+            let ocupantes = 4, horasIluminacion = 5, aireRenovado = 3;
+            let perdidaPorVentilacion = 0;
             for (let j = 0; j < casa.children.length; j++) {
                 let nivel = casa.children[j];
                 let paredes = nivel.getObjectByName("Paredes");
@@ -766,11 +808,21 @@ class Morfologia extends Component {
                     this.paredes.push(pared);
                     this.allObjects.push(pared);
                 }
+                let pisos = nivel.getObjectByName("Pisos");
+                for (let k = 0; k < pisos.children.length; k++) {
+                    let piso = pisos.children[k];
+                    aporteInterno += BalanceEnergetico.aporteInterno(ocupantes, piso.userData.superficie, horasIluminacion);
+                }
+                perdidaPorVentilacion += BalanceEnergetico.perdidasVentilacion(nivel.userData.volumen, aireRenovado, this.gradoDias);
             }
+            casa.userData.aporteInterno = aporteInterno;
+            casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
+            console.log(casa);
             this.escena.add(casa);
         }
-        this.calcularGammaParedes(this.paredes);
-        this.props.onParedesChanged(this.paredes);
+        //calcularGammaParedes(this.paredes);
+        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+        //this.props.onParedesChanged(this.paredes);
     }
 
     agregarPared() {
@@ -830,10 +882,13 @@ class Morfologia extends Component {
             }
         }else{
             this.escena.add(pared);
-            pared.tipo =  Morfologia.tipos.PARED;
-            this.paredes.push(pared);
-            this.allObjects.push(pared);
         }
+
+        pared.tipo =  Morfologia.tipos.PARED;
+        this.paredes.push(pared);
+        this.allObjects.push(pared);
+        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+        //this.props.onParedesChanged(this.paredes);
 
     }
 
@@ -1031,36 +1086,6 @@ class Morfologia extends Component {
 
 
         }*/
-    }
-
-    calcularGammaParedes(paredes) {
-        for (let pared of paredes) {
-            var orientacionRaycaster = new THREE.Raycaster();
-            orientacionRaycaster.set(new THREE.Vector3(), pared.orientacion);
-            var inter = orientacionRaycaster.intersectObject(this.cardinalPointsCircle);
-            let interPoint = inter[0].point.add(inter[1].point);
-            interPoint = interPoint.multiplyScalar(0.5);
-            // var hex = 0xffff;
-            // var arrowHelper = new THREE.ArrowHelper( inter[11].point, new THREE.Vector3(), 10, hex );
-            // this.escena.add(arrowHelper);
-            let closestDistance = 99;
-            let closestPoint = {};
-            let i = 0;
-            let index = 0;
-            for (let point of this.circlePoints) {
-                let circlePoint = new THREE.Vector3(point.x, 0.001, point.y);
-                let temp = circlePoint.distanceTo(interPoint);
-                if (temp < closestDistance) {
-                    closestDistance = temp;
-                    closestPoint = circlePoint;
-                    index = i;
-                }
-                i++;
-            }
-            pared.gamma = this.transformDegreeToGamma(index);
-            console.log("gamma", pared.gamma);
-            console.log("degree", index);
-        }
     }
 
     transformDegreeToGamma(degree) {
