@@ -25,8 +25,6 @@ class Main extends Component {
         this.state = {
             comuna: "",
             grade: "",
-            ventanas: null,
-            rb: null,
             sunPosition: null,
         };
         this.onComunaChanged = this.onComunaChanged.bind(this);
@@ -57,6 +55,7 @@ class Main extends Component {
     onParedesChanged(paredes) {
         console.log("calculando angulos paredes");
         for (let pared of paredes) {
+            console.log("pared:", pared.id);
             let angulos = this.calcularAngulos(pared.gamma, 90);
             console.log(angulos);
             let sun = SunCalc.getPosition(this.hourAngleToDate(angulos.omega), this.state.latitud, this.state.longitud);
@@ -72,22 +71,24 @@ class Main extends Component {
             console.log("omegas", omegas);
             let omegasDate = {
                 wm: {
-                    desde: this.hourAngleToDate(omegas.wm[0]),
-                    hasta: this.hourAngleToDate(omegas.wt[0])
+                    desde: omegas.wm[0] >= angulos.w1 && omegas.wm[0] <= angulos.w2 ?
+                        this.hourAngleToDate(omegas.wm[0]) : null,
+                    hasta: omegas.wt[0] >= angulos.w1 && omegas.wt[0] <= angulos.w2 ?
+                        this.hourAngleToDate(omegas.wt[0]) : null
                 },
                 wt: {
-                    desde: this.hourAngleToDate(omegas.wm[1]),
-                    hasta: this.hourAngleToDate(omegas.wt[1])
+                    desde: omegas.wm[1] >= angulos.w1 && omegas.wm[1] <= angulos.w2 ?
+                        this.hourAngleToDate(omegas.wm[1]): null,
+                    hasta: omegas.wt[1] >= angulos.w1 && omegas.wt[1] <= angulos.w2 ?
+                        this.hourAngleToDate(omegas.wt[1]): null
                 }
             };
 
             let Rb = this.calcularRB(angulos, pared, omegas);
-            this.setState({
-                omegas: omegasDate,
-                rb: Rb
-            })
+            pared.omegas = omegasDate;
+            pared.rb = Rb;
         }
-
+        this.setState({paredes: paredes});
     }
 
     onGradeChanged(grade) {
@@ -160,11 +161,11 @@ class Main extends Component {
             gamma1: 0,
             gamma2: 0
         };
-        if (90 < gamma && gamma <= 180) {       // Cuadrante 2
+        if (90 < gamma && gamma <= 180) {       // Cuadrante 1
             gammas.gamma1 = -270 + gamma;
             gammas.gamma2 = gamma - 90;
         }
-        if (-180 < gamma && gamma <= -90) { // Cuadrante 1
+        if (-180 <= gamma && gamma <= -90) { // Cuadrante 2
             gammas.gamma1 = gamma + 90;
             gammas.gamma2 = 270 + gamma;
         }
@@ -184,7 +185,7 @@ class Main extends Component {
         let omega_m = -180;
         let gamma_m = 0;
         while (Math.abs(dif) > 0.1) {
-            omega_m += 0.01;
+            dif = gamma - gamma_m;
             // let costhetaz = Math.cos(this.toRadians(phi)) * Math.cos(this.toRadians(delta)) * Math.cos(this.toRadians(omega_m))
             //                 + Math.sin(this.toRadians(phi)) * Math.sin(this.toRadians(delta));
             // let thetaz = Math.acos(costhetaz);
@@ -192,20 +193,20 @@ class Main extends Component {
             //               - Math.sin(this.toRadians(delta))) / (Math.sin(this.toRadians(thetaz)) * Math.cos(this.toRadians(phi))))));
             let sun = SunCalc.getPosition(this.hourAngleToDate(omega_m), this.state.latitud, this.state.longitud);
             gamma_m = sun.azimuth * 180 / Math.PI;
-            dif = gamma - gamma_m;
+            omega_m += 0.07;
+
         }
         return omega_m;
-        //return {omega: omega_m, gamma: gamma_m};
     }
 
     calcularHoraIncidencia(gamma, w1, w2, omega_m, omega_t) {
         let wm = [0, 0]; // hora de incidencia en la mañana
         let wt = [0, 0]; // hora de incidencia en la tarde
-        if ((90 < gamma && gamma <= 180) || (-180 < gamma && gamma <= -90)) {
+        if ((90 < gamma && gamma <= 180) || (-180 <= gamma && gamma <= -90)) {  //primer y segundo cuadrante
             wm = [Math.max(w1, omega_m)];
             wt = [Math.min(w2, omega_t)];
         }
-        else {
+        else { // tercer y cuarto cuadrante
             if (omega_m > w1) {
                 wm[0] = w1;
                 wt[0] = omega_m;
@@ -223,17 +224,18 @@ class Main extends Component {
                 wt[1] = 180;
             }
         }
+
         return {wm: wm, wt: wt}
     }
 
     calcularRB(angulos, pared, omegas) {
-        let a_Rb = [0, 0];
-        let b_Rb = [0, 0];
-        let R_ave = [0, 0];
-        for (let i = 0; i < 2; i++) {
+        let a_Rb = [];
+        let b_Rb = [];
+        let R_ave = [];
+        for (let i = 0; i < omegas.wm.length; i++) {
             let w1 = omegas.wm[i];
             let w2 = omegas.wt[i];
-            a_Rb[i] = (Math.sin(this.toRadians(angulos.delta)) * Math.sin(this.toRadians(angulos.phi))
+            a_Rb.push( (Math.sin(this.toRadians(angulos.delta)) * Math.sin(this.toRadians(angulos.phi))
                 * Math.cos(this.toRadians(90)) - Math.sin(this.toRadians(angulos.delta))
                 * Math.cos(this.toRadians(angulos.phi)) * Math.sin(this.toRadians(90))
                 * Math.cos(this.toRadians(pared.gamma))) * (w2 - w1) * (Math.PI / 180)
@@ -242,17 +244,17 @@ class Main extends Component {
                     * Math.sin(this.toRadians(angulos.phi)) * Math.sin(this.toRadians(90))
                     * Math.cos(this.toRadians(pared.gamma))) * (Math.sin(this.toRadians(w2)) - Math.sin(this.toRadians(w1)))
                 - Math.cos(this.toRadians(angulos.delta)) * Math.sin(this.toRadians(90))
-                * Math.sin(this.toRadians(pared.gamma)) * (Math.cos(this.toRadians(w2)) - Math.cos(this.toRadians(w1)));
-            b_Rb[i] = Math.cos(this.toRadians(angulos.phi)) * Math.cos(this.toRadians(angulos.delta))
+                * Math.sin(this.toRadians(pared.gamma)) * (Math.cos(this.toRadians(w2)) - Math.cos(this.toRadians(w1))) );
+            b_Rb.push( Math.cos(this.toRadians(angulos.phi)) * Math.cos(this.toRadians(angulos.delta))
                 * (Math.sin(this.toRadians(w2)) - Math.sin(this.toRadians(w1)))
                 + Math.sin(this.toRadians(angulos.delta)) * Math.sin(this.toRadians(angulos.phi))
-                * (w2 - w1) * (Math.PI / 180);
-            R_ave[i] = a_Rb[i] / b_Rb[i];
+                * (w2 - w1) * (Math.PI / 180) );
+            R_ave.push( b_Rb[i] !== 0 ? a_Rb[i] / b_Rb[i] : 0 );
             console.log("a_Rb", a_Rb);
             console.log("b_Rb", b_Rb);
             console.log("R_ave", R_ave);
         }
-        if (R_ave[1]) {
+        if (R_ave.length === 2) {
             return (R_ave[0] + R_ave[1]) / 2;
         }
         else {
@@ -284,6 +286,7 @@ class Main extends Component {
                             onParedesChanged={this.onParedesChanged}
                             sunPosition={sunPosition}
                             camara={camara}
+                            paredes={this.state.paredes}
                         />
                     </Grid>
                     <Grid item xs={4}>
@@ -300,8 +303,6 @@ class Main extends Component {
                             <GeoInfoPanel
                                 comuna={this.state.comuna}
                                 width={this.state.width}
-                                omegas={this.state.omegas}
-                                rb={this.state.rb}
                             />
                         </div>
                     </Grid>

@@ -64,16 +64,6 @@ class GeoInfoPanel extends Component{
   }
 
   componentWillReceiveProps(nextProps){
-    if (nextProps.omegas != null ){
-      this.setState({
-        omegas:nextProps.omegas,
-      })
-    }
-    if(nextProps.rb != null){
-      this.setState({
-        rb: nextProps.rb
-      })
-    }
     if(nextProps.comuna.nombre != this.state.comuna.nombre){
       let pointer = this;
       axios.all([this.getTemperaturesById(nextProps.comuna.id), this.getGlobalRadiationById(nextProps.comuna.id)])
@@ -246,19 +236,19 @@ class GeoInfoPanel extends Component{
                   />
                 </TabContainer>
               }
-              {this.state.omegas != null  &&
-                <Typography>
-                  La pared recibe sol desde: {this.state.omegas.wm.desde.getHours()}:{this.state.omegas.wm.desde.getMinutes()}
-                  <br></br>
-                  Hasta: {this.state.omegas.wm.hasta.getHours()}:{this.state.omegas.wm.hasta.getMinutes()}
-                  <br></br>
-                  Y desde: {this.state.omegas.wt.desde.getHours()}:{this.state.omegas.wt.desde.getMinutes()}
-                  <br></br>
-                  Hasta {this.state.omegas.wt.hasta.getHours()}:{this.state.omegas.wt.hasta.getMinutes()}
-                  <br></br>
-                  Radiación de la pared: {this.state.rb}
-                </Typography>
-              }
+              {/*{this.state.omegas != null  &&*/}
+                {/*<Typography>*/}
+                  {/*La pared recibe sol desde: {this.state.omegas.wm.desde.getHours()}:{this.state.omegas.wm.desde.getMinutes()}*/}
+                  {/*<br></br>*/}
+                  {/*Hasta: {this.state.omegas.wm.hasta.getHours()}:{this.state.omegas.wm.hasta.getMinutes()}*/}
+                  {/*<br></br>*/}
+                  {/*Y desde: {this.state.omegas.wt.desde.getHours()}:{this.state.omegas.wt.desde.getMinutes()}*/}
+                  {/*<br></br>*/}
+                  {/*Hasta {this.state.omegas.wt.hasta.getHours()}:{this.state.omegas.wt.hasta.getMinutes()}*/}
+                  {/*<br></br>*/}
+                  {/*Radiación de la pared: {this.state.rb}*/}
+                {/*</Typography>*/}
+              {/*}*/}
 
 
             </CardContent>

@@ -36,6 +36,9 @@ class Morfologia extends Component {
         if (this.props.click2D !== prevProps.click2D) {
             this.onPerspectiveChanged();
         }
+        if(this.paredes !== this.props.paredes && this.props.paredes != null){
+            this.paredes = this.props.paredes;
+        }
     }
 
     onSunpositionChanged() {
@@ -1035,13 +1038,14 @@ class Morfologia extends Component {
 
     calcularGammaParedes(paredes) {
         for (let pared of paredes) {
+            console.log("pared: ", pared.id);
             var orientacionRaycaster = new THREE.Raycaster();
-            orientacionRaycaster.set(new THREE.Vector3(), pared.orientacion);
+            orientacionRaycaster.set(new THREE.Vector3(), pared.userData.orientacion);
             var inter = orientacionRaycaster.intersectObject(this.cardinalPointsCircle);
             let interPoint = inter[0].point.add(inter[1].point);
             interPoint = interPoint.multiplyScalar(0.5);
             // var hex = 0xffff;
-            // var arrowHelper = new THREE.ArrowHelper( inter[11].point, new THREE.Vector3(), 10, hex );
+            // var arrowHelper = new THREE.ArrowHelper( interPoint, new THREE.Vector3(pared.position.x, pared.position.y + 2, pared.position.z), 10, hex );
             // this.escena.add(arrowHelper);
             let closestDistance = 99;
             let closestPoint = {};

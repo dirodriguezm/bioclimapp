@@ -204,25 +204,6 @@ class TabPanel extends Component {
     render() {
         const {classes, theme, sunPosition} = this.props;
         const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf} = this.state;
-        if(this.state.ventanas != null){
-            console.log("ventanas",this.state.ventanas);
-            // var ventanasPapers = this.state.ventanas.map(function(ventana){
-            //     var obstruccionesVentana = ventana.obstrucciones.map(function(obstruccion){
-            //         return <Paper className={classes.paper}>
-            //             <h6>FAR obstruccion: {obstruccion.far}</h6>
-            //             <h6>A: {obstruccion.aDistance}</h6>
-            //             <h6>B: {obstruccion.bDistance}</h6>
-            //             <h6>beta: {obstruccion.betaAngle[0]}, {obstruccion.betaAngle[1]}</h6>
-            //         </Paper>
-            //     });
-            //     return <Paper className={classes.paper}>
-            //         <h3>Posicion ventana: {ventana.pos.x}, {-ventana.pos.z}</h3>
-            //         <h3>Orientacion ventana: {ventana.orientacion.x}, {-ventana.orientacion.z}</h3>
-            //         <h3>FAR ventana: {ventana.far}</h3>
-            //         {obstruccionesVentana}
-            //     </Paper>;
-            // });
-        }
 
         return (
 
@@ -294,6 +275,7 @@ class TabPanel extends Component {
                                     seleccionando={seleccionandoMorf}
                                     borrando={borrandoMorf}
                                     onVentanasChanged={this.onVentanasChanged}
+                                    paredes={this.props.paredes}
                                 />
                                 <Paper className={classNames(classes.paper, classes.contentBarra, {
                                     [classes.contentShift]: openMorf,
