@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 import Graph from '../Utils/Graph';
 import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 import axios from "axios";
+import ManagerCasas from "../Utils/ManagerCasas";
 
 class Morfologia extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -127,6 +128,8 @@ class Morfologia extends Component {
         let escena = new THREE.Scene();
         escena.background = new THREE.Color(0xf0f0f0);
         this.escena = escena;
+
+        this.managerCasas = new ManagerCasas(escena);
 
         //Camaras
 
@@ -1178,6 +1181,8 @@ Morfologia.propTypes = {
 };
 
 Morfologia.tipos = {PARED : 0, VENTANA : 1, PUERTA : 2, TECHO : 3, PISO : 4,};
+Morfologia.separacion = {EXTERIOR : 0, PAREADA : 1};
+Morfologia.aislacionPiso = {CORRIENTE: 0, MEDIO : 1, AISLADO : 2};
 Morfologia.tipos_texto = {
     0 : 'Pared',
     1 : 'Ventana',
