@@ -23,8 +23,7 @@ class Morfologia extends Component {
         this.onChangeCamera = this.onChangeCamera.bind(this);
         this.crearIndicadores = this.crearIndicadores.bind(this);
 
-        this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0,0];
-        this.temperaturaConfort = 19;
+
 
         this.state = {
             height: props.height,
@@ -59,7 +58,7 @@ class Morfologia extends Component {
         for (let i = 0; i < data.length; i++) {
             this.temperaturasMes[i] = data[i].valor;
         }
-        this.gradoDias = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort)
+        this.managerCasas.setGradosDias(BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort));
     }
 
     onSunpositionChanged() {
@@ -699,7 +698,20 @@ class Morfologia extends Component {
     }
 
     crearMeshPared(width, height) {
-        let geometria = this.crearGeometriaPared(width, height);
+        let geometria = new THREE.Geometry();
+
+        let x1 = width / -2, x2 = width / 2, y1 = 0, y2 = height;
+
+        geometria.vertices.push(new THREE.Vector3(x1, y1, 0));
+        geometria.vertices.push(new THREE.Vector3(x1, y2, 0));
+        geometria.vertices.push(new THREE.Vector3(x2, y1, 0));
+        geometria.vertices.push(new THREE.Vector3(x2, y2, 0));
+
+        geometria.faces.push(new THREE.Face3(0, 2, 1));
+        geometria.faces.push(new THREE.Face3(1, 2, 3));
+
+        geometria.computeFaceNormals();
+        geometria.computeVertexNormals();
 
         return new THREE.Mesh(geometria, this.materialParedConstruccion.clone());
     }
@@ -913,10 +925,17 @@ class Morfologia extends Component {
                 let intersects = this.raycaster.intersectObjects(this.objetos);
                 if (intersects.length > 0) {
                     let intersect = intersects[0];
+                    let startHabitacion = (intersect.point).add(intersect.face.normal).clone();
+                    startHabitacion = startHabitacion.round();
+
+                    this.managerCasas.setStartHabitacion(startHabitacion);
+
+
+                    /*let intersect = intersects[0];
                     this.startNewPared = (intersect.point).add(intersect.face.normal).clone();
                     this.paredConstruccion.geometry = this.crearGeometriaPared(0, this.heightWall);
                     this.startNewPared.round();
-                    this.paredConstruccion.visible = true;
+                    this.paredConstruccion.visible = true;*/
                 }
             }
         }
@@ -1016,7 +1035,11 @@ class Morfologia extends Component {
                         if (this.construyendo) {
                             var nextPosition = (intersect.point).add(intersect.face.normal).clone();
                             nextPosition.round();
-                            var dir = nextPosition.clone().sub(this.startNewPared);
+                            this.managerCasas.crecerHabitacion(nextPosition);
+
+
+
+                            /*var dir = nextPosition.clone().sub(this.startNewPared);
                             var widthPared = this.startNewPared.distanceTo(nextPosition);
                             this.paredConstruccion.geometry = this.crearGeometriaPared(widthPared, this.heightWall);
                             var len = dir.length();
@@ -1025,7 +1048,7 @@ class Morfologia extends Component {
                             this.paredConstruccion.position.copy(pos);
                             var angleRadians = Math.atan2(nextPosition.z - this.startNewPared.z, nextPosition.x - this.startNewPared.x);
                             this.paredConstruccion.rotation.y = -angleRadians;
-                            this.paredConstruccion.position.y = 0;
+                            this.paredConstruccion.position.y = 0;*/
                         }
                     } else {
                         this.indicador_dibujado.position.y = 0;
