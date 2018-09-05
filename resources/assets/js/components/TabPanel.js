@@ -276,6 +276,7 @@ class TabPanel extends Component {
                                     borrando={borrandoMorf}
                                     onVentanasChanged={this.onVentanasChanged}
                                     paredes={this.props.paredes}
+                                    comuna={this.props.comuna}
                                 />
                                 <Paper className={classNames(classes.paper, classes.contentBarra, {
                                     [classes.contentShift]: openMorf,

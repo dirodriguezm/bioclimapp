@@ -282,6 +282,7 @@ class Main extends Component {
 
                     <Grid item xs={8}>
                         <TabPanel
+                            comuna={this.state.comuna}
                             onComunaChanged={this.onComunaChanged}
                             onParedesChanged={this.onParedesChanged}
                             sunPosition={sunPosition}
