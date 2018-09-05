@@ -53,6 +53,8 @@ class InformacionEstructura extends Component {
 
                 <InformacionVentana
                     seleccionado={seleccionado}
+                    comuna={this.props.comuna}
+                    onAporteSolarChanged={this.props.onAporteSolarChanged}
                 />
             </div>
         );

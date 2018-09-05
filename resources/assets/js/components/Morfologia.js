@@ -824,8 +824,8 @@ class Morfologia extends Component {
             this.escena.add(casa);
         }
         //calcularGammaParedes(this.paredes);
-        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
-        //this.props.onParedesChanged(this.paredes);
+        BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+        this.props.onParedesChanged(this.paredes);
     }
 
     agregarPared() {
@@ -890,8 +890,8 @@ class Morfologia extends Component {
         pared.tipo =  Morfologia.tipos.PARED;
         this.paredes.push(pared);
         this.allObjects.push(pared);
-        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
-        //this.props.onParedesChanged(this.paredes);
+        BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+        this.props.onParedesChanged(this.paredes);
 
     }
 
@@ -1133,6 +1133,10 @@ class Morfologia extends Component {
             ventana.pos = new THREE.Vector3();
             ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
             ventana.tipo =  Morfologia.tipos.VENTANA;
+            ventana.fs = 0.87;
+            ventana.fm = 0.95;
+            ventana.um = 2.6;
+            ventana.geometry.computeBoundingBox();
             this.paredDeVentana.add(ventana);
             this.paredDeVentana.worldToLocal(ventana.position);
             this.ventanas.push(ventana);

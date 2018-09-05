@@ -34,5 +34,8 @@ Route::get('marcos','MarcoController@getAll');
 Route::get('/propiedades_marco/{marco}', 'MarcoController@getPropiedades');
 Route::get('/tipos_marco/{marco}', 'MarcoController@getTipos');
 Route::get('/info_marcos', 'MarcoController@getInfoMarcos');
+Route::get('/radiaciones/{id}/{tipo}/{mes}', 'ComunaController@getRadiationsFiltered');
+Route::get('/radiaciones_difusa/{id}', 'ComunaController@getDirectRadiationById');
+Route::get('/radiaciones_directa/{id}', 'ComunaController@getDifuseRadiationById');
 
 

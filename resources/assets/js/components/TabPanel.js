@@ -20,6 +20,8 @@ import InformacionEstructura from './InformacionEstructura'
 import Tooltip from "@material-ui/core/Tooltip";
 import Undo from '@material-ui/icons/Undo';
 import Redo from '@material-ui/icons/Redo';
+import DetalleBalance from "./DetalleBalance";
+import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 
 function TabContainer(props) {
     return (
@@ -108,6 +110,7 @@ class TabPanel extends Component {
         this.handleDrawerClose = this.handleDrawerClose.bind(this);
         this.onSeleccionadoMorfChanged = this.onSeleccionadoMorfChanged.bind(this);
         this.onVentanasChanged = this.onVentanasChanged.bind(this);
+        this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
     }
 
     handleDrawerOpen() {
@@ -149,6 +152,10 @@ class TabPanel extends Component {
         this.props.onComunaChanged(comuna);
     }
 
+    onRadiationsChanged(global, direct, difuse){
+        this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
+    }
+
     onParedesChanged(paredes) {
         this.props.onParedesChanged(paredes);
     }
@@ -170,6 +177,8 @@ class TabPanel extends Component {
     }
 
     onFarChanged(ventanas) {
+        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa, this.state.radiaciones.directa);
+        this.onAporteSolarChanged(aporte_solar);
         this.setState({ventanas: ventanas});
     }
 
@@ -201,6 +210,12 @@ class TabPanel extends Component {
         this.handleDrawerClose();
     }
 
+    onAporteSolarChanged(aporte_solar){
+        this.setState({
+           aporte_solar: aporte_solar
+        });
+    }
+
     render() {
         const {classes, theme, sunPosition} = this.props;
         const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf} = this.state;
@@ -214,6 +229,7 @@ class TabPanel extends Component {
                     <Tabs value={value} onChange={this.handleChange} fullWidth>
                         <Tab label="Contexto"/>
                         <Tab label="Morfología"/>
+                        <Tab label="Balance Energético"/>
                     </Tabs>
                 </AppBar>
                 <SwipeableViews
@@ -259,6 +275,9 @@ class TabPanel extends Component {
 
                                 <InformacionEstructura
                                     seleccionado={seleccionadoMorf}
+                                    comuna={this.props.comuna}
+                                    ventanas={this.state.ventanas}
+                                    onAporteSolarChanged={this.onAporteSolarChanged}
                                 />
 
                             </Drawer>
@@ -295,6 +314,17 @@ class TabPanel extends Component {
                                 </Paper>
                             </main>
                         </div>
+                    </TabContainer>
+                    <TabContainer dir={theme.direction}>
+                        <DetalleBalance
+                            width={this.state.width}
+                            height={this.state.height}
+                            aporte_solar={this.state.aporte_solar}
+                            aportes_solares={10}
+                            aportes_internos={10}
+                            perdidas_conduccion={-10}
+                            perdidas_ventilacion={-10}
+                        />
                     </TabContainer>
                 </SwipeableViews>
                 {/*<Paper>*/}

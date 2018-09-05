@@ -43,6 +43,31 @@ class ComunaController extends Controller
       }
       return response($globals);
     }
+    public function getDifuseRadiationById($id){
+        $rads = Comuna::find($id)->radiaciones;
+        $globals = array();
+        foreach ($rads as $rad){
+            if($rad['tipo'] == 2){
+                array_push($globals,$rad);
+            }
+        }
+        return response($globals);
+    }
+    public function getDirectRadiationById($id){
+        $rads = Comuna::find($id)->radiaciones;
+        $globals = array();
+        foreach ($rads as $rad){
+            if($rad['tipo'] == 3){
+                array_push($globals,$rad);
+            }
+        }
+        return response($globals);
+    }
+    public function getRadiationsFiltered($id_comuna,$id_tipo,$id_mes){
+        $all = Comuna::find($id_comuna)->radiaciones;
+        $filtered = $all->where('tipo','=',$id_tipo)->where('mes','=',$id_mes)->first();
+        return response($filtered);
+    }
 
 
 

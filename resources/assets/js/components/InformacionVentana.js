@@ -15,6 +15,7 @@ import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from '@material-ui/core/FormControl'
 import Grid from "@material-ui/core/Grid";
+import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 
 const ITEM_HEIGHT = 48;
 
@@ -65,8 +66,17 @@ class InformacionVentana extends Component {
             .then(response => this.getJson(response));
         axios.get("http://127.0.0.1:8000/api/info_marcos")
             .then(response => this.getJsonMarcos(response));
+        this.difusa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,2,new Date().getMonth() + 1) : null;
+        this.directa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,3,new Date().getMonth() + 1) : null;
         this.handleChange = this.handleChange.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
+    }
+
+    componentDidUpdate(prevProps,prevState,snapShot){
+        if(this.props.comuna !== prevProps.comuna){
+            this.getFilteredRadiation(this.props.comuna.id,2,new Date().getMonth()+1);
+            this.getFilteredRadiation(this.props.comuna.id,3,new Date().getMonth()+1);
+        }
     }
 
     getJson(response) {
@@ -98,6 +108,14 @@ class InformacionVentana extends Component {
         }
     }
 
+    getFilteredRadiation(comuna,tipo,mes){
+        axios.get("http://127.0.0.1:8000/api/radiaciones/"+comuna+"/"+tipo+"/"+mes)
+            .then(response => {
+                tipo === 2 ? this.difusa = response.data.valor : null;
+                tipo === 3 ? this.directa = response.data.valor : null;
+            });
+    }
+
 
     handleChange(event) {
         this.setState({
@@ -107,11 +125,6 @@ class InformacionVentana extends Component {
     }
 
     handleClickAgregar() {
-        console.log(this.state);
-        this.calcularF();
-    }
-
-    calcularF(){
         let FM = this.info_marcos[this.state.marco].hasOwnProperty('tipos') ?
             this.info_marcos[this.state.marco].tipos[this.state.tipo_marco].propiedad.FS :
             this.info_marcos[this.state.marco].propiedades[0].FS;
@@ -119,12 +132,14 @@ class InformacionVentana extends Component {
         let Um = this.info_marcos[this.state.marco].hasOwnProperty('tipos') ?
             this.info_marcos[this.state.marco].tipos[this.state.tipo_marco].propiedad.U :
             this.info_marcos[this.state.marco].propiedades[0].U;
-        return this.props.seleccionado.far * ((1-FM) * FS + (FM * 0.04 * Um * 0.35));
+        this.props.seleccionado.fm = FM;
+        this.props.seleccionado.fs = FS;
+        this.props.um = Um;
+        let aporte_solar = BalanceEnergetico.calcularAporteSolar(this.props.ventanas,this.difusa,this.directa);
+        this.props.onAporteSolarChanged(aporte_solar);
     }
 
-    calcularIgb(){
 
-    }
 
     render() {
         const {classes, seleccionado} = this.props;
