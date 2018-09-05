@@ -1,8 +1,10 @@
 import * as THREE from 'three'
 import * as BalanceEnergetico from "./BalanceEnergetico";
+import axios from "axios";
+import Morfologia from "../components/Morfologia";
 
 class ManagerCasas {
-    constructor(escena, paredes, allObjects, aporteInterno, ocupantes, horasIluminacion, aireRenovado, perdidaPorVentilacion){
+    constructor(escena, paredes, allObjects, ocupantes, horasIluminacion, aireRenovado){
         this.escena = escena;
         this.paredes = paredes;
         this.allObjects = allObjects;
@@ -12,6 +14,14 @@ class ManagerCasas {
         this.aireRenovado = aireRenovado;
         this.gradoDias = 0;
 
+        this.info_ventana = [];
+        this.info_material = [];
+
+        axios.get("http://127.0.0.1:8000/api/info_materiales")
+            .then(response => this.getJsonMateriales(response));
+
+        axios.get("http://127.0.0.1:8000/api/info_ventanas")
+            .then(response => this.getJsonVentanas(response));
 
         this.crearCasaVacia();
 
@@ -65,11 +75,41 @@ class ManagerCasas {
         });
 
         //habitacion que dibuja nuevas habitaciones
-        this.habitacionConstruccion = this.crearHabitacion(0, 0, 0);
+        this.habitacionConstruccion = this.crearHabitacion(0, 1, 0, 1).clone();
         this.habitacionConstruccion.visible = false;
         escena.add(this.habitacionConstruccion);
 
 
+    }
+
+    getJsonMateriales(response) {
+        this.info_material = response.data.slice();
+        for (let i = 0; i < this.info_material.length; i++) {
+            this.info_material[i].index = i;
+            if (this.info_material[i].hasOwnProperty('tipos')) {
+                for (let j = 0; j < this.info_material[i].tipos.length; j++) {
+                    this.info_material[i].tipos[j].index = j;
+                }
+            } else {
+                for (let k = 0; k < this.info_material[i].propiedades.length; k++) {
+                    this.info_material[i].propiedades[k].index = k;
+                }
+            }
+        }
+    }
+
+    getJsonVentanas(response) {
+        this.info_ventana = response.data.slice();
+        for(let i = 0; i < this.info_ventana.length; i++){
+            this.info_ventana[i].index = i;
+            for(let j = 0; j < this.info_ventana[i].tipos.length ; j++){
+                this.info_ventana[i].tipos[j].index = j;
+                //PARA cuando las ventanas tengan mas propiedades
+                /*for (let k = 0; k < this.info_material[i].tipos[j].propiedad.length; k++) {
+                    this.info_material[i].tipos[j].propiedad[k].index = k;
+                }*/
+            }
+        }
     }
 
     setGradosDias(gradoDias){
@@ -84,20 +124,43 @@ class ManagerCasas {
     agregarHabitacionDibujada(){
 
         var habitacion = this.habitacionConstruccion.clone();
+        let transmitanciaSuperficies = 0;
 
-        //Se borra la habitacion de dibujo
-        this.habitacionConstruccion = this.crearHabitacion(0, 0, 0);
-        this.habitacionConstruccion.visible = false;
-
-        let paredes = this.habitacionConstruccion.getObjectByName("Paredes");
+        let paredes = habitacion.getObjectByName("Paredes");
 
         //Se agregan las paredes al arreglo de paredes y al de objetos
+
         for (let i = 0; i < paredes.children.length; i++){
             let pared = paredes.children[i];
             pared.material = this.materialParedConstruida.clone();
             pared.castShadow = true;
             pared.receiveShadow = false;
+            pared.userData.superficie = pared.userData.width * pared.userData.height;
+
+            //TODO: DETERMINAR CUALES SON EXTERIORES, TANTO PARA PAREDES COMO PARA PISO TECHO VENTANA Y PUERTAS.
+            pared.userData.separacion = Morfologia.separacion.EXTERIOR;
+
             pared.userData.tipo =  Morfologia.tipos.PARED;
+            pared.userData.capas =
+                [
+                    {
+                        material : 1,
+                        tipo : null,
+                        propiedad : 0,
+                        conductividad : this.info_material[1].propiedades[0].conductividad,
+                        espesor : 0.1
+                    },
+                    {
+                        material : 3,
+                        tipo : null,
+                        propiedad : 0,
+                        conductividad : this.info_material[3].propiedades[0].conductividad,
+                        espesor : 0.2
+                    }
+                ];
+            BalanceEnergetico.transmitanciaSuperficie(pared);
+
+            transmitanciaSuperficies += pared.userData.transSup;
 
             this.paredes.push(pared);
             this.allObjects.push(pared);
@@ -105,24 +168,57 @@ class ManagerCasas {
         let piso = habitacion.getObjectByName("Piso");
         piso.userData.tipo = Morfologia.tipos.PISO;
         piso.userData.aislacion = Morfologia.aislacionPiso.CORRIENTE;
+        piso.userData.superficie = piso.userData.width * piso.userData.depth;
+        piso.userData.perimetro = piso.userData.width * 2 + piso.userData.depth * 2;
+        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
+
+        let puenteTermico = piso.userData.puenteTermico;
 
         let techo = habitacion.getObjectByName("Techo");
         techo.userData.tipo = Morfologia.tipos.TECHO;
+        techo.userData.superficie = techo.userData.width * techo.userData.depth;
+        techo.userData.separacion = Morfologia.separacion.EXTERIOR;
+        techo.userData.capas =
+            [
+                {
+                    material : 2,
+                    tipo : null,
+                    propiedad : 0,
+                    conductividad : this.info_material[2].propiedades[0].conductividad,
+                    espesor : 0.1
+                },
+                {
+                    material : 11,
+                    tipo : 2,
+                    propiedad : 0,
+                    conductividad : this.info_material[11].tipos[2].propiedad.conductividad,
+                    espesor : 0.2
+                }
+            ];
+        BalanceEnergetico.transmitanciaSuperficie(techo);
+        transmitanciaSuperficies += techo.userData.transSup;
 
         let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion);
+
         let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
+        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, puenteTermico);
+
+        habitacion.userData.puenteTermico = puenteTermico;
+        habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
+        habitacion.userData.aporteIntero = aporteInterno;
+        habitacion.userData.perdidaPorVentilacion = perdidaPorVentilacion;
+        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
 
         let nivel = this.casa.children[habitacion.userData.nivel - 1];
         nivel.add(habitacion);
 
-
         this.casa.userData.aporteInterno += aporteInterno;
         this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
 
-        //TODO: determinar paredes externas
-        //console.log(casa);
-        //this.escena.add(casas);
+        //Se borra la habitacion de dibujo
+        this.habitacionConstruccion.visible = false;
 
+        console.log(habitacion);
 
     }
 
@@ -150,9 +246,12 @@ class ManagerCasas {
             let pared = paredes.children[i];
 
             pared.geometry = this.crearGeometriaPared(widths[i], height);
+            pared.userData.width = widths[i];
+            pared.userData.height = height;
             switch (i) {
                 case 0:
                     pared.position.z = - depth/2;
+
                     break;
                 case 1:
                     pared.position.x = - width/2;
@@ -168,10 +267,15 @@ class ManagerCasas {
 
         let piso = this.habitacionConstruccion.getObjectByName("Piso");
         piso.geometry = this.crearGeometriaPiso(width, depth);
+        piso.userData.width = width;
+        piso.userData.depth = depth;
 
         let techo = this.habitacionConstruccion.getObjectByName("Techo");
         techo.geometry = this.crearGeometriaTecho(width, depth, height);
+        techo.userData.width = width;
+        techo.userData.depth = depth;
 
+        this.habitacionConstruccion.userData.volumen = width * height * depth;
     }
 
     crearCasaVacia() {
@@ -189,7 +293,7 @@ class ManagerCasas {
     crearHabitacion(width, height, depth, nivel){
         var habitacion = new THREE.Group();
 
-        nivel.position.y = (nivel - 1) * height;
+        habitacion.position.y = (nivel - 1) * height;
 
         var paredes = new THREE.Group();
         paredes.name = "Paredes";
@@ -199,33 +303,45 @@ class ManagerCasas {
         var pared1 = this.crearMeshPared(width, height);
         pared1.position.z = pared1.position.z + halfWidth;
         pared1.userData.orientacion = new THREE.Vector3(0,0,1);
+        pared1.userData.width = width;
+        pared1.userData.height = height;
 
         var pared2 = this.crearMeshPared(width, height);
         pared2.rotation.y = Math.PI / 2;
         pared2.position.x = pared2.position.x + halfWidth;
         pared2.userData.orientacion = new THREE.Vector3(1,0,0);
+        pared2.userData.width = width;
+        pared2.userData.height = height;
 
         var pared3 = this.crearMeshPared(width, height);
         pared3.rotation.y = Math.PI;
         pared3.position.z = pared3.position.z - halfWidth;
         pared3.userData.orientacion = new THREE.Vector3(0,0,-1);
+        pared3.userData.width = width;
+        pared3.userData.height = height;
 
         var pared4 = this.crearMeshPared(width, height);
         pared4.rotation.y = -Math.PI / 2;
         pared4.position.x = pared4.position.x - halfWidth;
         pared4.userData.orientacion = new THREE.Vector3(-1,0,0);
+        pared4.userData.width = width;
+        pared4.userData.height = height;
 
         var piso = this.crearMeshPiso(width, depth);
         piso.name = "Piso";
+        piso.userData.width = width;
+        piso.userData.depth = depth;
 
         var techo = this.crearMeshTecho(width, depth, height);
+        techo.userData.width = width;
+        techo.userData.depth = depth;
+        techo.userData.height = height;
+
         techo.name = "Techo";
         paredes.add(pared1);
         paredes.add(pared2);
         paredes.add(pared3);
         paredes.add(pared4);
-
-        piso.userData.superficie = width * depth;
 
         habitacion.add(paredes);
         habitacion.add(piso);

@@ -34,15 +34,15 @@ function gradosDias(temperaturasMes, temperaturaConfort){
     return gd;
 }
 
-function transmitanciaSuperficie(transmitanciaSuperficies, elementoNuevo) {
+function transmitanciaSuperficie(elemento) {
     let transmitancia = 0;
-    for(let capa of elementoNuevo.userData.capas){
+    for(let capa of elemento.userData.capas){
         transmitancia += capa.espesor / capa.conductividad;
     }
-    transmitancia += resistenciasTermicasSuperficie[elementoNuevo.userData.tipo][elementoNuevo.userData.separacion];
+    transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
     let u = 1 / transmitancia;
-    elementoNuevo.userData.tramitancia = u * elementoNuevo.userData.superficie;
-    return transmitanciaSuperficies + elementoNuevo.userData.tramitancia;
+    elemento.userData.transmitancia = u;
+    elemento.userData.transSup = u * elemento.userData.superficie;
 }
 
 function cambioTransmitanciaSuperficie(tramitanciaSuperficie, elementoCambio) {
@@ -52,7 +52,7 @@ function cambioTransmitanciaSuperficie(tramitanciaSuperficie, elementoCambio) {
 }
 
 function puenteTermico(piso){
-    return piso.perimetro * transmitanciaLineal[piso.userData.aislacionPiso];
+    return piso.userData.perimetro * transmitanciaLineal[piso.userData.aislacion];
 }
 
 function perdidasVentilacion(volumenInterno, volmenAire, gradosDias) {

@@ -23,7 +23,8 @@ class Morfologia extends Component {
         this.onChangeCamera = this.onChangeCamera.bind(this);
         this.crearIndicadores = this.crearIndicadores.bind(this);
 
-
+        this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
+        this.temperaturaConfort = 19;
 
         this.state = {
             height: props.height,
@@ -48,6 +49,7 @@ class Morfologia extends Component {
     }
 
     onComunaChanged() {
+        console.log(this.props.comuna.id);
         axios.get("http://127.0.0.1:8000/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
 
@@ -58,7 +60,8 @@ class Morfologia extends Component {
         for (let i = 0; i < data.length; i++) {
             this.temperaturasMes[i] = data[i].valor;
         }
-        this.managerCasas.setGradosDias(BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort));
+        let gradoDias = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
+        this.managerCasas.setGradosDias(gradoDias);
     }
 
     onSunpositionChanged() {
@@ -128,7 +131,11 @@ class Morfologia extends Component {
         escena.background = new THREE.Color(0xf0f0f0);
         this.escena = escena;
 
-        this.managerCasas = new ManagerCasas(escena);
+        this.ocupantes = 4;
+        this.horasIluminacion = 5;
+        this.aireRenovado = 5;
+
+        this.managerCasas = new ManagerCasas(escena, this.paredes, this.allObjects, this.ocupantes, this.horasIluminacion, this.aireRenovado);
 
         //Camaras
 
@@ -927,7 +934,6 @@ class Morfologia extends Component {
                     let intersect = intersects[0];
                     let startHabitacion = (intersect.point).add(intersect.face.normal).clone();
                     startHabitacion = startHabitacion.round();
-
                     this.managerCasas.setStartHabitacion(startHabitacion);
 
 
@@ -952,7 +958,8 @@ class Morfologia extends Component {
         if (this.props.dibujando == 4) {
             //click derecho
             if (event.button === 0) {
-                this.agregarPared();
+                this.managerCasas.agregarHabitacionDibujada();
+                this.construyendo = false;
 
             }
         }
