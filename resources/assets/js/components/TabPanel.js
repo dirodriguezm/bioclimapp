@@ -152,10 +152,6 @@ class TabPanel extends Component {
         this.props.onComunaChanged(comuna);
     }
 
-    onRadiationsChanged(global, direct, difuse){
-        this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
-    }
-
     onParedesChanged(paredes) {
         this.props.onParedesChanged(paredes);
     }
@@ -177,7 +173,8 @@ class TabPanel extends Component {
     }
 
     onFarChanged(ventanas) {
-        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa, this.state.radiaciones.directa);
+        let month = new Date().getMonth();
+        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.props.radiaciones.difusa[month].valor, this.props.radiaciones.directa[month].valor);
         this.onAporteSolarChanged(aporte_solar);
         this.setState({ventanas: ventanas});
     }

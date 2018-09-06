@@ -66,6 +66,7 @@ class GeoInfoPanel extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.comuna.nombre != this.state.comuna.nombre) {
             let pointer = this;
+            let props = this.props;
             axios.all([this.getTemperaturesById(nextProps.comuna.id), this.getGlobalRadiationById(nextProps.comuna.id),
                 this.getDirectRadiationById(nextProps.comuna.id), this.getDifuseRadiationById(nextProps.comuna.id)])
                 .then(axios.spread(function (temps, global, direct, difuse) {
@@ -77,7 +78,7 @@ class GeoInfoPanel extends Component {
                         difusa: difuse.data,
                         width: nextProps.width,
                     });
-                    this.props.onRadiationsChanged(global.data,direct.data,difuse.data);
+                    props.onRadiationsChanged(global.data,direct.data,difuse.data);
                 }));
         }
 

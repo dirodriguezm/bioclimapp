@@ -30,6 +30,7 @@ class Main extends Component {
         };
         this.onComunaChanged = this.onComunaChanged.bind(this);
         this.onParedesChanged = this.onParedesChanged.bind(this);
+        this.onRadiationsChanged = this.onRadiationsChanged.bind(this);
     }
 
     /*componentDidMount() is a lifecycle method
@@ -98,6 +99,10 @@ class Main extends Component {
         });
     }
 
+    onRadiationsChanged(global, direct, difuse){
+        this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
+    }
+
 
 
     render() {
@@ -112,6 +117,7 @@ class Main extends Component {
                     <Grid item xs={8}>
                         <TabPanel
                             comuna={this.state.comuna}
+                            radiaciones={this.state.radiaciones}
                             onComunaChanged={this.onComunaChanged}
                             onParedesChanged={this.onParedesChanged}
                             sunPosition={sunPosition}
@@ -133,6 +139,7 @@ class Main extends Component {
                             <GeoInfoPanel
                                 comuna={this.state.comuna}
                                 width={this.state.width}
+                                onRadiationsChanged={this.onRadiationsChanged}
                             />
                         </div>
                     </Grid>

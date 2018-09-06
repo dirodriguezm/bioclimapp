@@ -110,9 +110,10 @@ class Context extends Component {
         }
         if(nextProps.ventanas != null && this.ventanas !== nextProps.ventanas){
             console.log("en contexto ventanas != nuevas ventanas");
-            this.ventanas = nextProps.ventanas;
+            this.ventanas = nextProps.ventanas.slice();
             this.calcularFAR(this.ventanas);
         }
+        console.log("CONTEXTO VENTANAS", this.ventanas, "PROPS VENTANAS", nextProps.ventanas);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot){
