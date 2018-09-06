@@ -1079,15 +1079,18 @@ class Morfologia extends Component {
                     intersect = intersects[0];
                     let pared = intersect.object;
                     let pos = intersect.point.clone();
-                    pared.worldToLocal(pos);
+                    this.managerCasas.moverVentanaConstruccion(pared, pos, intersect.point);
+                    /*pared.worldToLocal(pos);
                     pos.round();
                     if (pos.x < 2) {
                         this.paredDeVentana = pared;
                         this.indicador_dibujado.setRotationFromEuler(pared.rotation);
                         this.indicador_dibujado.position.copy(intersect.point).round();
-                        this.indicador_dibujado.position.y = pared.piso * this.heightWall;
-                    }
+                        this.indicador_dibujado.position.y = pared.parent.parent.nivel * pared.parent.parent.height;
+                    }*/
 
+                }else{
+                    this.managerCasas.ocultarVentanaConstruccion();
                 }
             }
 

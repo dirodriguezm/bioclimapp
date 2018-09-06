@@ -48,7 +48,7 @@ class ManagerCasas {
         });
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
-            color: '#00ff00',
+            color: '#810005',
             opacity: 0.7,
             transparent: true,
             side : THREE.DoubleSide,
@@ -77,7 +77,12 @@ class ManagerCasas {
         //habitacion que dibuja nuevas habitaciones
         this.habitacionConstruccion = this.crearHabitacion(0, 1, 0, 1).clone();
         this.habitacionConstruccion.visible = false;
+        //Ventana que dibuja nuevas ventanas
+        this.ventanaConstruccion = this.crearMeshVentana(1,0.5);
+        this.ventanaConstruccion.visible = false;
+
         escena.add(this.habitacionConstruccion);
+        escena.add(this.ventanaConstruccion);
 
 
     }
@@ -223,6 +228,29 @@ class ManagerCasas {
 
     }
 
+    ocultarVentanaConstruccion(){
+        this.ventanaConstruccion.visible = false;
+    }
+
+    moverVentanaConstruccion(pared, point){
+
+        let pos = point.clone();
+        pared.worldToLocal(pos);
+        console.log(pared);
+        console.log(pos);
+        console.log(point);
+
+        if(pos.x < 2){
+            this.ventanaConstruccion.visible = true;
+            this.ventanaConstruccion.userData.pared = pared;
+            this.ventanaConstruccion.setRotationFromEuler(pared.rotation);
+            this.ventanaConstruccion.position.copy(point).round();
+            this.ventanaConstruccion.position.y = (pared.parent.parent.userData.nivel) * pared.parent.parent.userData.height - pared.parent.parent.userData.height/2 - pared.parent.parent.userData.height/4  ;
+        }
+
+
+    }
+
     modificarParedHabitacion(pared, width, height){
         let oldWidth = pared.userData.width;
         let oldHeight = pared.userData.height;
@@ -268,27 +296,167 @@ class ManagerCasas {
             this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
         }
         if(oldWidth !== width){
+
             let paredes = habitacion.getObjectByName("Paredes");
-            console.log(pared);
-            let orientacion = new THREE.Vector3(
-                pared.userData.orientacion.x,
-                pared.userData.orientacion.y,
-                pared.userData.orientacion.z
-            );
+
             let index = paredes.children.indexOf(pared);
-            for (let i = 0; i < paredes.children.length; i++) {
-                let pared = paredes.children[i];
-                if(index === i){
-                    pared.geometry = this.crearGeometriaPared(width, height);
+
+            let end;
+            let start = new THREE.Vector3(
+                habitacion.userData.start.x,
+                habitacion.userData.start.y,
+                habitacion.userData.start.z
+            );
+
+            if(index % 2 === 0){
+                let x1 = start.x + width;
+                let x2 = start.x - width;
+
+                let dif = Math.abs(habitacion.userData.end.x - x1);
+
+                let x;
+
+                if (dif === 1){
+                    x = x1;
                 }else{
-                    let auxOrientacion = orientacion.clone();
-                    auxOrientacion.add(pared.userData.orientacion);
-                    if(auxOrientacion.x === 0 && auxOrientacion.y === 0 && auxOrientacion.z === 0){
-                        pared.geometry = this.crearGeometriaPared(width, height);
-                    }
+                    x = x2;
+
                 }
+                end = new THREE.Vector3(
+                    x,
+                    habitacion.userData.end.y,
+                    habitacion.userData.end.z
+                );
+            }else{
+                let z1 = start.z + width;
+                let z2 = start.z - width;
+
+                let dif = Math.abs(habitacion.userData.end.z - z1);
+
+                let z;
+
+                if (dif === 1){
+                    z = z1;
+                }else{
+                    z = z2;
+                }
+                end = new THREE.Vector3(
+                    habitacion.userData.end.x,
+                    habitacion.userData.end.y,
+                    z
+                );
+
+            }
+
+            this.crecerHabitacionDibujada(habitacion, end, start);
+
+
+        }
+    }
+
+    crecerHabitacionDibujada(habitacion, end, start){
+        var dir = end.clone().sub(start);
+        var len = dir.length();
+        dir = dir.normalize().multiplyScalar(len * 0.5);
+        let pos = start.clone().add(dir);
+
+        habitacion.position.copy(pos);
+        habitacion.position.y = 0;
+        habitacion.userData.end = end.clone();
+        habitacion.userData.start = start.clone();
+
+        //modificar geometrias paredes, piso y techo
+        let paredes = habitacion.getObjectByName("Paredes");
+
+        let width = Math.abs(start.x - end.x), depth = Math.abs(start.z - end.z);
+        let widths = [ width, depth, width, depth ];
+        let height = habitacion.userData.height;
+
+        habitacion.userData.volumen = width * height * depth;
+        habitacion.userData.height = height;
+        habitacion.userData.width = width;
+        habitacion.userData.depth = depth;
+
+        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+
+        for (let i = 0; i < paredes.children.length; i++){
+            let pared = paredes.children[i];
+
+            pared.geometry = this.crearGeometriaPared(widths[i], height);
+            pared.userData.width = widths[i];
+            pared.userData.height = height;
+            pared.userData.superficie = widths[i] * height;
+
+            transmitanciaSuperficies -= pared.userData.transSup;
+            BalanceEnergetico.transmitanciaSuperficie(pared);
+            transmitanciaSuperficies += pared.userData.transSup;
+
+            switch (i) {
+                case 0:
+                    pared.position.z = - depth/2;
+
+                    break;
+                case 1:
+                    pared.position.x = - width/2;
+                    break;
+                case 2:
+                    pared.position.z =  + depth/2;
+                    break;
+                case 3:
+                    pared.position.x = + width/2;
+                    break;
             }
         }
+
+        let piso = habitacion.getObjectByName("Piso");
+        piso.geometry = this.crearGeometriaPiso(width, depth);
+        piso.userData.width = width;
+        piso.userData.depth = depth;
+        piso.userData.superficie = piso.userData.width * piso.userData.depth;
+        piso.userData.perimetro = piso.userData.width * 2 + piso.userData.depth * 2;
+        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
+
+        let puenteTermico = piso.userData.puenteTermico;
+
+        let techo = habitacion.getObjectByName("Techo");
+        techo.geometry = this.crearGeometriaTecho(width, depth, height);
+        techo.userData.width = width;
+        techo.userData.depth = depth;
+        techo.userData.superficie = width * depth;
+
+        transmitanciaSuperficies -= techo.userData.transSup;
+        BalanceEnergetico.transmitanciaSuperficie(techo);
+        transmitanciaSuperficies += techo.userData.transSup;
+
+        let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(
+            habitacion.userData.volumen,
+            this.aireRenovado,
+            this.gradoDias);
+        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+            transmitanciaSuperficies,
+            this.gradoDias,
+            puenteTermico);
+
+        let aporteInterno = BalanceEnergetico.aporteInterno(
+            this.ocupantes,
+            piso.userData.superficie,
+            this.horasIluminacion);
+
+        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+        this.casa.userData.aporteInterno -= habitacion.userData.aporteInterno;
+        this.casa.userData.perdidaPorVentilacion -= habitacion.userData.perdidaPorVentilacion;
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+
+        habitacion.userData.puenteTermico = puenteTermico;
+        habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
+        habitacion.userData.aporteIntero = aporteInterno;
+        habitacion.userData.perdidaPorVentilacion = perdidaPorVentilacion;
+        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
+
+        this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
+        this.casa.userData.aporteInterno += aporteInterno;
+        this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
+        this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
     }
 
     crecerHabitacion(nextPosition){
@@ -485,6 +653,35 @@ class ManagerCasas {
         return geometria;
     }
 
+    crearGeometriaVentana(width, height){
+        let geometria = new THREE.Geometry();
+
+        let x1 = 0, x2 = width, y1 = 0, y2 = height;
+        let z_offset = 0.01;
+
+        geometria.vertices.push(new THREE.Vector3(x1, y1, z_offset));
+        geometria.vertices.push(new THREE.Vector3(x1, y2, z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2, y1, z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2, y2, z_offset));
+
+        geometria.vertices.push(new THREE.Vector3(x1, y1, -z_offset));
+        geometria.vertices.push(new THREE.Vector3(x1, y2, -z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2, y1, -z_offset));
+        geometria.vertices.push(new THREE.Vector3(x2, y2, -z_offset));
+
+        let face = new THREE.Face3(0, 2, 1);
+        let face2 = new THREE.Face3(1, 2, 3);
+        let face3 = new THREE.Face3(4, 6, 5);
+        let face4 = new THREE.Face3(5, 6, 7);
+
+        geometria.faces.push(face);
+        geometria.faces.push(face2);
+        geometria.faces.push(face3);
+        geometria.faces.push(face4);
+
+        return geometria;
+    }
+
     crearMeshPared(width, height) {
         let geometria = this.crearGeometriaPared(width, height);
 
@@ -502,6 +699,12 @@ class ManagerCasas {
         let geometria = this.crearGeometriaTecho(width, depth, heigth);
 
         return new THREE.Mesh(geometria, this.materialTechoConstruccion);
+    }
+
+    crearMeshVentana(width, height){
+        let geometria = this.crearGeometriaVentana(width, height);
+
+        return new THREE.Mesh(geometria, this.materialVentanaConstruccion);
     }
 
 }
