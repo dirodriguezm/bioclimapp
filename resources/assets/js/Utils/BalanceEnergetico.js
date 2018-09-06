@@ -315,6 +315,6 @@ function calcularAporteSolar(ventanas, difusa, directa){
     };
 }
 
-export { calcularGammaParedes , aporteInterno , gradosDias, perdidasVentilacion, calcularF,
+export {perdidasConduccion, puenteTermico, cambioTransmitanciaSuperficie, transmitanciaSuperficie, calcularGammaParedes , aporteInterno , gradosDias, perdidasVentilacion, calcularF,
     calcularIgb, calcularAngulos, calcularHoraIncidencia, calcularOmegaPared, calcularRB,
     calcularGammasPared, hourAngleToDate, getHourAngle, calcularAporteSolar};

@@ -56,8 +56,9 @@ class InformacionPared extends Component {
 
     constructor(props) {
         super(props);
+
         this.state = {
-            materiales: [],
+            capas: [],
             single: null,
             material: 0,
             tipo: 0,
@@ -70,7 +71,28 @@ class InformacionPared extends Component {
             .then(response => this.getJson(response));
         this.handleChange = this.handleChange.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
+        this.handleClickBorrar = this.handleClickBorrar.bind(this);
+        this.handleChangeDimension = this.handleChangeDimension.bind(this);
     }
+
+    componentDidUpdate(prevProps) {
+        if (this.props.seleccionado !== prevProps.seleccionado) {
+            if (this.props !== null) {
+                let capas = this.props.seleccionado.userData.capas;
+                for (let i = 0; i < capas.length; i++) {
+                    capas[i].index = i;
+                }
+
+                this.setState({
+                    capas: capas,
+                    height: this.props.seleccionado.userData.height,
+                    width: this.props.seleccionado.userData.width,
+                });
+
+            }
+        }
+    }
+
 
     getJson(response) {
         this.info_material = response.data.slice();
@@ -95,26 +117,64 @@ class InformacionPared extends Component {
         })
     }
 
-    handleClickAgregar() {
-        let materiales = this.state.materiales;
-        materiales.push({
-            material: this.state.material,
-            tipo: this.state.tipo,
-            espesor: this.state.espesor,
-            propiedad: this.state.propiedad
-        });
+    handleChangeDimension(event) {
+        let pared = this.props.seleccionado;
+        let height, width;
+        if(event.target.name === 'altura'){
+            height = parseInt(event.target.value);
+            width = this.props.seleccionado.userData.width;
+            this.props.onDimensionChanged(pared , width, height);
+        }else{
+            height = this.props.seleccionado.userData.height ;
+            width = parseInt(event.target.value);
+            this.props.onDimensionChanged(pared, width, height );
+        }
         this.setState({
-            materiales: materiales,
+            height: height,
+            width: width,
+        });
+    }
+
+    handleClickBorrar(event) {
+        let capas = this.state.capas;
+        capas.splice(event.target.value, 1);
+        this.setState({
+            capas: capas,
+        })
+    }
+
+    handleClickAgregar() {
+        let capas = this.state.capas;
+        if (this.info_material[this.state.material].hasOwnProperty('tipos')) {
+            capas.push({
+                material: this.state.material,
+                tipo: this.state.tipo,
+                espesor: this.state.espesor / 1000,
+                propiedad: this.state.propiedad,
+                conductividad: this.info_material[this.state.material].tipos[this.state.tipo].propiedad.conductividad,
+            });
+        } else {
+            capas.push({
+                material: this.state.material,
+                tipo: null,
+                espesor: this.state.espesor / 1000,
+                propiedad: this.state.propiedad,
+                conductividad: this.info_material[this.state.material].propiedades[this.state.propiedad].conductividad,
+            });
+        }
+
+        this.setState({
+            capas: capas,
         })
 
     }
 
     render() {
         const {classes, seleccionado} = this.props;
-        const {material, tipo, espesor, propiedad, materiales} = this.state;
+        const {material, tipo, espesor, propiedad, capas, height, width} = this.state;
         let hasTipos;
 
-        if (seleccionado !== null && this.info_material.length > 0 && seleccionado.tipo === Morfologia.tipos.PARED) {
+        if (seleccionado !== null && this.info_material.length > 0 && seleccionado.userData.tipo === Morfologia.tipos.PARED) {
             hasTipos = this.info_material[material].hasOwnProperty('tipos');
         } else {
             hasTipos = null;
@@ -122,7 +182,7 @@ class InformacionPared extends Component {
 
         return (
             <div>
-                {seleccionado !== null && seleccionado.tipo === Morfologia.tipos.PARED ?
+                {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.PARED ?
                     <div className={classes.root}>
                         <Typography
                             variant={"title"}
@@ -137,7 +197,7 @@ class InformacionPared extends Component {
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
                                     <Grid item xs={12}>
-                                        {materiales.length === 0 ?
+                                        {capas.length === 0 ?
                                             <Typography
                                                 variant={"subheading"}
                                             >
@@ -145,21 +205,21 @@ class InformacionPared extends Component {
                                             </Typography>
                                             :
                                             <List>
-                                                {materiales.map(material => (
+                                                {capas.map(capa => (
                                                     <ListItem>
                                                         <ExpansionPanel>
                                                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                                                 <Typography className={classes.heading}>
-                                                                    {this.info_material[material.material].material}
+                                                                    {this.info_material[capa.material].material}
                                                                 </Typography>
                                                             </ExpansionPanelSummary>
                                                             <ExpansionPanelDetails>
                                                                 <Grid container spacing={8}>
-                                                                    {this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    {this.info_material[capa.material].hasOwnProperty('tipos') ?
                                                                         <Grid item xs={12}>
                                                                             <TextField
                                                                                 label="Tipo"
-                                                                                defaultValue={this.info_material[material.material].tipos[material.tipo].nombre}
+                                                                                defaultValue={this.info_material[capa.material].tipos[capa.tipo].nombre}
                                                                                 className={classes.textField}
                                                                                 margin="normal"
                                                                                 InputProps={{
@@ -170,11 +230,11 @@ class InformacionPared extends Component {
                                                                         :
                                                                         <div/>
                                                                     }
-                                                                    {this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    {this.info_material[capa.material].hasOwnProperty('tipos') ?
                                                                         <Grid item xs={12}>
                                                                             <TextField
                                                                                 label="Densidad"
-                                                                                defaultValue={this.info_material[material.material].tipos[material.tipo].propiedad.densidad}
+                                                                                defaultValue={this.info_material[capa.material].tipos[capa.tipo].propiedad.densidad}
                                                                                 className={classes.textField}
                                                                                 margin="normal"
                                                                                 InputProps={{
@@ -185,11 +245,11 @@ class InformacionPared extends Component {
                                                                         :
                                                                         <div/>
                                                                     }
-                                                                    {this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    {this.info_material[capa.material].hasOwnProperty('tipos') ?
                                                                         <Grid item xs={12}>
                                                                             <TextField
                                                                                 label="Conductividad"
-                                                                                defaultValue={this.info_material[material.material].tipos[material.tipo].propiedad.conductividad}
+                                                                                defaultValue={this.info_material[capa.material].tipos[capa.tipo].propiedad.conductividad}
                                                                                 className={classes.textField}
                                                                                 margin="normal"
                                                                                 InputProps={{
@@ -200,11 +260,11 @@ class InformacionPared extends Component {
                                                                         :
                                                                         <div/>
                                                                     }
-                                                                    {!this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    {!this.info_material[capa.material].hasOwnProperty('tipos') ?
                                                                         <Grid item xs={12}>
                                                                             <TextField
                                                                                 label="Densidad"
-                                                                                defaultValue={this.info_material[material.material].propiedades[material.propiedad].densidad}
+                                                                                defaultValue={this.info_material[capa.material].propiedades[capa.propiedad].densidad}
                                                                                 className={classes.textField}
                                                                                 margin="normal"
                                                                                 InputProps={{
@@ -215,11 +275,11 @@ class InformacionPared extends Component {
                                                                         :
                                                                         <div/>
                                                                     }
-                                                                    {!this.info_material[material.material].hasOwnProperty('tipos') ?
+                                                                    {!this.info_material[capa.material].hasOwnProperty('tipos') ?
                                                                         <Grid item xs={12}>
                                                                             <TextField
                                                                                 label="Conductividad"
-                                                                                defaultValue={this.info_material[material.material].propiedades[material.propiedad].conductividad}
+                                                                                defaultValue={this.info_material[capa.material].propiedades[capa.propiedad].conductividad}
                                                                                 className={classes.textField}
                                                                                 margin="normal"
                                                                                 InputProps={{
@@ -233,7 +293,7 @@ class InformacionPared extends Component {
                                                                     <Grid item xs={12}>
                                                                         <TextField
                                                                             label="Espesor (mm)"
-                                                                            defaultValue={material.espesor}
+                                                                            defaultValue={capa.espesor * 1000}
                                                                             className={classes.textField}
                                                                             margin="normal"
                                                                             InputProps={{
@@ -245,7 +305,12 @@ class InformacionPared extends Component {
 
                                                             </ExpansionPanelDetails>
                                                             <ExpansionPanelActions>
-                                                                <Button size="small" color="primary">
+                                                                <Button className={classes.button}
+                                                                        aria-label="BorrarCapa"
+                                                                        value={capa.index}
+                                                                        size="small"
+                                                                        color="primary"
+                                                                        onClick={this.handleClickBorrar}>
                                                                     Borrar
                                                                 </Button>
                                                             </ExpansionPanelActions>
@@ -398,9 +463,39 @@ class InformacionPared extends Component {
                                 <Typography className={classes.heading}>Dimensiones</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <Typography>
-                                    dimensiones
-                                </Typography>
+                                <Grid container spacing={8}>
+
+                                    <Grid item xs={12}>
+                                        <FormControl className={classes.formControl}>
+                                            <TextField
+                                                label="Altura (m)"
+                                                name="altura"
+                                                value={height}
+                                                type="number"
+                                                onChange={this.handleChangeDimension}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                margin="normal"
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        <FormControl className={classes.formControl}>
+                                            <TextField
+                                                label="Ancho (m)"
+                                                name="ancho"
+                                                value={width}
+                                                type="number"
+                                                onChange={this.handleChangeDimension}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                                margin="normal"
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
@@ -414,7 +509,7 @@ class InformacionPared extends Component {
                                     desde: {seleccionado.omegas.wm.desde.getHours()}:{seleccionado.omegas.wm.desde.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
                             }
-                            {seleccionado.omegas.wm.hasta!= null ?
+                            {seleccionado.omegas.wm.hasta != null ?
                                 <ExpansionPanelDetails>
                                     Hasta: {seleccionado.omegas.wm.hasta.getHours()}:{seleccionado.omegas.wm.hasta.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
@@ -425,7 +520,7 @@ class InformacionPared extends Component {
                                     desde: {seleccionado.omegas.wt.desde.getHours()}:{seleccionado.omegas.wt.desde.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
                             }
-                            {seleccionado.omegas.wt.hasta!= null ?
+                            {seleccionado.omegas.wt.hasta != null ?
                                 <ExpansionPanelDetails>
                                     Hasta: {seleccionado.omegas.wt.hasta.getHours()}:{seleccionado.omegas.wt.hasta.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
@@ -451,6 +546,7 @@ class InformacionPared extends Component {
 InformacionPared.propTypes = {
     classes: PropTypes.object.isRequired,
     seleccionado: PropTypes.object,
+    onDimensionChanged: PropTypes.func,
 };
 
 export default withStyles(styles)(InformacionPared);
