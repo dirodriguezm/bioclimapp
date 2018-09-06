@@ -49,10 +49,13 @@ class Morfologia extends Component {
         if(this.props.comuna !== prevProps.comuna){
             this.onComunaChanged();
         }
+
+        if(this.props.dimensionesPared !== prevProps.dimensionesPared && this.props.dimensionesPared != null){
+            this.managerCasas.modificarParedHabitacion(this.props.dimensionesPared.pared, this.props.dimensionesPared.width, this.props.dimensionesPared.height );
+        }
     }
 
     onComunaChanged() {
-        console.log(this.props.comuna.id);
         axios.get("http://127.0.0.1:8000/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
 
@@ -138,7 +141,7 @@ class Morfologia extends Component {
         this.horasIluminacion = 5;
         this.aireRenovado = 5;
 
-        this.managerCasas = new ManagerCasas(escena, this.paredes, this.allObjects, this.ocupantes, this.horasIluminacion, this.aireRenovado);
+        this.managerCasas = new ManagerCasas(this.escena, this.paredes, this.allObjects, this.ocupantes, this.horasIluminacion, this.aireRenovado);
 
         //Camaras
 
@@ -962,6 +965,8 @@ class Morfologia extends Component {
             //click derecho
             if (event.button === 0) {
                 this.managerCasas.agregarHabitacionDibujada();
+                BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+                this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
 
             }
@@ -978,11 +983,12 @@ class Morfologia extends Component {
         //Si se está seleccionado
         if(this.props.seleccionando){
             let intersects = this.raycaster.intersectObjects(this.allObjects);
+
             if(intersects.length > 0){
                 let intersect = intersects[0].object;
                 if(this.objetoSeleccionado != intersect && this.objetoSeleccionado != null){
 
-                    switch (this.objetoSeleccionado.tipo) {
+                    switch (this.objetoSeleccionado.userData.tipo) {
                         case  Morfologia.tipos.PARED:
                             this.objetoSeleccionado.material = this.materialParedConstruida.clone();
                             break;
@@ -993,7 +999,7 @@ class Morfologia extends Component {
                     }
                 }
                 this.objetoSeleccionado = intersect;
-                switch (this.objetoSeleccionado.tipo) {
+                switch (this.objetoSeleccionado.userData.tipo) {
                     case  Morfologia.tipos.PARED:
                         this.objetoSeleccionado.material = this.materialSeleccionado.clone();
                         break;
@@ -1005,7 +1011,7 @@ class Morfologia extends Component {
 
             }else{
                 if(this.objetoSeleccionado != null){
-                    switch (this.objetoSeleccionado.tipo) {
+                    switch (this.objetoSeleccionado.userData.tipo) {
                         case  Morfologia.tipos.PARED:
                             this.objetoSeleccionado.material = this.materialParedConstruida.clone();
                             break;
@@ -1147,7 +1153,6 @@ class Morfologia extends Component {
         }
 
         if(this.props.seleccionando){
-            console.log(this.props.dibujando);
             this.handleSeleccionado();
         }
     }
@@ -1214,11 +1219,12 @@ Morfologia.propTypes = {
     borrando: PropTypes.bool,
     seleccionando: PropTypes.bool,
     onSeleccionadoChanged: PropTypes.func,
+    dimensionesPared: PropTypes.object,
 
 };
 
 Morfologia.tipos = {PARED : 0, VENTANA : 1, PUERTA : 2, TECHO : 3, PISO : 4,};
-Morfologia.separacion = {EXTERIOR : 0, PAREADA : 1};
+Morfologia.separacion = {EXTERIOR : 0, PAREADA : 1, INTERIOR : 2};
 Morfologia.aislacionPiso = {CORRIENTE: 0, MEDIO : 1, AISLADO : 2};
 Morfologia.tipos_texto = {
     0 : 'Pared',

@@ -94,6 +94,7 @@ class TabPanel extends Component {
             sunPosition: props.sunPosition,
             seleccionadoMorf: null,
             openMorf: false,
+            dimensionesPared: null,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -111,6 +112,7 @@ class TabPanel extends Component {
         this.onSeleccionadoMorfChanged = this.onSeleccionadoMorfChanged.bind(this);
         this.onVentanasChanged = this.onVentanasChanged.bind(this);
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
+        this.onDimensionChanged = this.onDimensionChanged.bind(this);
     }
 
     handleDrawerOpen() {
@@ -210,6 +212,16 @@ class TabPanel extends Component {
         this.handleDrawerClose();
     }
 
+    onDimensionChanged(pared, width, height){
+        this.setState({
+            dimensionesPared: {
+                pared: pared,
+                width: width,
+                height: height
+            }
+        });
+    }
+
     onAporteSolarChanged(aporte_solar){
         this.setState({
            aporte_solar: aporte_solar
@@ -218,7 +230,7 @@ class TabPanel extends Component {
 
     render() {
         const {classes, theme, sunPosition} = this.props;
-        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf} = this.state;
+        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensionesPared} = this.state;
 
         return (
 
@@ -278,6 +290,7 @@ class TabPanel extends Component {
                                     comuna={this.props.comuna}
                                     ventanas={this.state.ventanas}
                                     onAporteSolarChanged={this.onAporteSolarChanged}
+                                    onDimensionChanged={this.onDimensionChanged}
                                 />
 
                             </Drawer>
@@ -294,6 +307,7 @@ class TabPanel extends Component {
                                     seleccionando={seleccionandoMorf}
                                     borrando={borrandoMorf}
                                     onVentanasChanged={this.onVentanasChanged}
+                                    dimensionesPared={dimensionesPared}
                                     paredes={this.props.paredes}
                                     comuna={this.props.comuna}
                                 />
