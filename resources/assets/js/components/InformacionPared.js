@@ -22,6 +22,7 @@ import FormControl from '@material-ui/core/FormControl'
 import Clear from '@material-ui/icons/Clear';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
+import CardContent from "@material-ui/core/CardContent/CardContent";
 
 const ITEM_HEIGHT = 48;
 
@@ -398,11 +399,41 @@ class InformacionPared extends Component {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Typography>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus
-                                    ex,
-                                    sit amet blandit leo lobortis eget.
+                                    dimensiones
                                 </Typography>
                             </ExpansionPanelDetails>
+                        </ExpansionPanel>
+
+                        <ExpansionPanel>
+                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                <Typography className={classes.heading}>Dimensiones</Typography>
+                            </ExpansionPanelSummary>
+                            {seleccionado.omegas.wm.desde != null ?
+                                <ExpansionPanelDetails>
+                                    La pared recibe sol
+                                    desde: {seleccionado.omegas.wm.desde.getHours()}:{seleccionado.omegas.wm.desde.getMinutes()}
+                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
+                            }
+                            {seleccionado.omegas.wm.hasta!= null ?
+                                <ExpansionPanelDetails>
+                                    Hasta: {seleccionado.omegas.wm.hasta.getHours()}:{seleccionado.omegas.wm.hasta.getMinutes()}
+                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
+                            }
+                            {seleccionado.omegas.wt.desde != null ?
+                                <ExpansionPanelDetails>
+                                    Y
+                                    desde: {seleccionado.omegas.wt.desde.getHours()}:{seleccionado.omegas.wt.desde.getMinutes()}
+                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
+                            }
+                            {seleccionado.omegas.wt.hasta!= null ?
+                                <ExpansionPanelDetails>
+                                    Hasta: {seleccionado.omegas.wt.hasta.getHours()}:{seleccionado.omegas.wt.hasta.getMinutes()}
+                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
+                            }
+                            <ExpansionPanelDetails>
+                                RB: {seleccionado.rb}
+                            </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
+
                         </ExpansionPanel>
 
                         <Button variant="contained" color="secondary" className={classes.button}>
