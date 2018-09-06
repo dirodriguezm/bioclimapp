@@ -10,11 +10,11 @@ class DetalleBalance extends Component{
         super(props);
         this.state = {
             clicked: null,
-            aporte_solar:{'Aporte Solar': 0},
-            aporte_interno:{'Aporte Interno': 0},
-            perdida_conduccion:{'Perdida Conduccion': 0},
-            perdida_ventilacion:{'Perdida Ventilacion': 0},
         };
+        this.aporte_solar = 0;
+        this.aporte_interno = 0;
+        this.perdida_conduccion = 0;
+        this.perdida_ventilacion = 0;
         this.componentes_aporte_solar = [];
         this.values = [];
         this.handleClick = this.handleClick.bind(this);
@@ -22,45 +22,25 @@ class DetalleBalance extends Component{
 
     handleClick(e){
         if(e[0]._index === 0){
-            this.setState({clicked: this.state.aporte_solar})
+            this.setState({clicked: this.aporte_solar})
         }
         if(e[0]._index === 1){
-            this.setState({clicked: this.state.aporte_interno})
+            this.setState({clicked: this.aporte_interno})
         }
         if(e[0]._index === 2){
-            this.setState({clicked: this.state.perdida_conduccion})
+            this.setState({clicked: this.perdida_conduccion})
         }
         if(e[0]._index === 3){
-            this.setState({clicked: this.state.perdida_ventilacion})
+            this.setState({clicked: this.perdida_ventilacion})
         }
 
     }
 
-    componentDidUpdate(prevProps,prevState,snapShot){
-        if(this.props.aporte_solar !== this.state.aporte_solar && this.props.aporte_solar != null){
-            this.setState({
-                aporte_solar: this.props.aporte_solar,
-            });
+    componentDidUpdate(prevProps){
+        if(this.props.aporte_interno != null && this.props.aporte_interno !== prevProps.aporte_interno){
+            this.aporte_interno = this.props.aporte_interno;
         }
-        if(this.props.aporte_interno != null && this.props.aporte_interno !== this.state.aporte_interno){
-            this.setState({
-                aporte_interno: this.props.aporte_interno,
-            });
-        }
-        if(this.props.perdida_conduccion != null && this.props.perdida_conduccion !== this.state.perdida_conduccion){
-            this.setState({
-                perdida_conduccion: this.props.perdida_conduccion,
-            });
-        }
-        if(this.props.perdida_ventilacion != null && this.props.perdida_ventilacion !== this.state.perdida_ventilacion){
-            this.setState({
-                perdida_ventilacion: this.props.perdida_ventilacion,
-            });
-        }
-    }
-
-    render(){
-        const data = {
+        this.data = {
             labels: ['Aportes Solares','Aportes Internos','Pérdidas por Conducción','Pérdidas por Ventilación'],
             datasets: [
                 {
@@ -70,12 +50,12 @@ class DetalleBalance extends Component{
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(48,63,159,0.8)',
                     hoverBorderColor: 'rgba(48,63,159,1)',
-                    data: [this.state.aporte_solar['Aporte Solar'], this.state.aporte_interno['Aporte Interno'],
-                        this.state.perdida_conduccion['Perdida Conduccion'], this.state.perdida_ventilacion['Perdida Ventilacion']]
+                    data: [this.aporte_solar, this.aporte_interno,
+                        this.perdida_conduccion, this.perdida_ventilacion]
                 },
             ]
         };
-        const optionsTemp = {
+        this.options = {
             maintainAspectRatio: false,
             responsive: false,
             scales:{
@@ -93,6 +73,10 @@ class DetalleBalance extends Component{
                 }],
             }
         };
+    }
+
+    render(){
+
 
         // if(this.props.aporte_solar != null){
         //     let i = 0;
@@ -117,8 +101,8 @@ class DetalleBalance extends Component{
                     <Bar
                         height={this.props.height/2}
                         width={this.props.width}
-                        data={data}
-                        options={optionsTemp}
+                        data={this.data}
+                        options={this.options}
                         onElementsClick={this.handleClick}
                     />
                 </Paper>

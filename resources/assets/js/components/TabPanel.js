@@ -113,6 +113,7 @@ class TabPanel extends Component {
         this.onVentanasChanged = this.onVentanasChanged.bind(this);
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
         this.onDimensionChanged = this.onDimensionChanged.bind(this);
+        this.onCasaChanged = this.onCasaChanged.bind(this);
     }
 
     handleDrawerOpen() {
@@ -160,6 +161,10 @@ class TabPanel extends Component {
 
     onVentanasChanged(ventanas){
         this.setState({ventanas: ventanas});
+    }
+
+    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
+        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion});
     }
 
     agregarContexto() {
@@ -307,6 +312,7 @@ class TabPanel extends Component {
                                     dimensionesPared={dimensionesPared}
                                     paredes={this.props.paredes}
                                     comuna={this.props.comuna}
+                                    onCasaChanged={this.onCasaChanged}
                                 />
                                 <Paper className={classNames(classes.paper, classes.contentBarra, {
                                     [classes.contentShift]: openMorf,
@@ -331,10 +337,9 @@ class TabPanel extends Component {
                             width={this.state.width}
                             height={this.state.height}
                             aporte_solar={this.state.aporte_solar}
-                            aportes_solares={10}
-                            aportes_internos={10}
-                            perdidas_conduccion={-10}
-                            perdidas_ventilacion={-10}
+                            aporte_interno={this.state.aporte_interno}
+                            perdida_conduccion={this.state.perdida_conduccion}
+                            perdida_ventilacion={this.state.perdida_ventilacion}
                         />
                     </TabContainer>
                 </SwipeableViews>
