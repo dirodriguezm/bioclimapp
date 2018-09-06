@@ -3,6 +3,13 @@ var SunCalc = require('suncalc');
 
 const diasMeses = [31,28,31,30,31,30,31,31,30,31,30,31];
 const uso = 1407.12;
+const resistenciasTermicasSuperficie = [
+    [0.17 , 0.24] ,
+    [0.17 , 0.24] ,
+    [0.17 , 0.24] ,
+    [0.14 , 0.10] ,
+    [0.22 , 0.34] ];
+const transmitanciaLineal = [1.4 , 1.2 , 1.0];
 
 //se simplifico el calculo del uso ya que es constante el multiplicar el perfilde uso con el coeficiente de usuario
 function aporteInterno(ocupantes, superficie, horasIluminacion) {
@@ -28,8 +35,33 @@ function gradosDias(temperaturasMes, temperaturaConfort){
     return gd;
 }
 
+function transmitanciaSuperficie(elemento) {
+    let transmitancia = 0;
+    for(let capa of elemento.userData.capas){
+        transmitancia += capa.espesor / capa.conductividad;
+    }
+    transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
+    let u = 1 / transmitancia;
+    elemento.userData.transmitancia = u;
+    elemento.userData.transSup = u * elemento.userData.superficie;
+}
+
+function cambioTransmitanciaSuperficie(tramitanciaSuperficie, elementoCambio) {
+    tramitanciaSuperficie -= elementoCambio.userData.tramitancia;
+    return tramitanciaSuperficie(tramitanciaSuperficie, elementoCambio);
+
+}
+
+function puenteTermico(piso){
+    return piso.userData.perimetro * transmitanciaLineal[piso.userData.aislacion];
+}
+
 function perdidasVentilacion(volumenInterno, volmenAire, gradosDias) {
     return 24 * (0.34 * volmenAire * gradosDias * volumenInterno);
+}
+
+function perdidasConduccion(transmitanciaSuperficies, gradosDias, puenteTermico){
+    return 24 * ((transmitanciaSuperficies + puenteTermico) * gradosDias );
 }
 
 function calcularGammaParedes(paredes, cardinalPointsCircle, circlePoints) {

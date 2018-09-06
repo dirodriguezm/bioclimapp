@@ -6,6 +6,7 @@ import PropTypes from "prop-types";
 import Graph from '../Utils/Graph';
 import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 import axios from "axios";
+import ManagerCasas from "../Utils/ManagerCasas";
 
 class Morfologia extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -22,7 +23,7 @@ class Morfologia extends Component {
         this.onChangeCamera = this.onChangeCamera.bind(this);
         this.crearIndicadores = this.crearIndicadores.bind(this);
 
-        this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0,0];
+        this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
         this.temperaturaConfort = 19;
 
         this.state = {
@@ -51,6 +52,7 @@ class Morfologia extends Component {
     }
 
     onComunaChanged() {
+        console.log(this.props.comuna.id);
         axios.get("http://127.0.0.1:8000/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
 
@@ -61,7 +63,8 @@ class Morfologia extends Component {
         for (let i = 0; i < data.length; i++) {
             this.temperaturasMes[i] = data[i].valor;
         }
-        this.gradoDias = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort)
+        let gradoDias = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
+        this.managerCasas.setGradosDias(gradoDias);
     }
 
     onSunpositionChanged() {
@@ -130,6 +133,12 @@ class Morfologia extends Component {
         let escena = new THREE.Scene();
         escena.background = new THREE.Color(0xf0f0f0);
         this.escena = escena;
+
+        this.ocupantes = 4;
+        this.horasIluminacion = 5;
+        this.aireRenovado = 5;
+
+        this.managerCasas = new ManagerCasas(escena, this.paredes, this.allObjects, this.ocupantes, this.horasIluminacion, this.aireRenovado);
 
         //Camaras
 
@@ -699,7 +708,20 @@ class Morfologia extends Component {
     }
 
     crearMeshPared(width, height) {
-        let geometria = this.crearGeometriaPared(width, height);
+        let geometria = new THREE.Geometry();
+
+        let x1 = width / -2, x2 = width / 2, y1 = 0, y2 = height;
+
+        geometria.vertices.push(new THREE.Vector3(x1, y1, 0));
+        geometria.vertices.push(new THREE.Vector3(x1, y2, 0));
+        geometria.vertices.push(new THREE.Vector3(x2, y1, 0));
+        geometria.vertices.push(new THREE.Vector3(x2, y2, 0));
+
+        geometria.faces.push(new THREE.Face3(0, 2, 1));
+        geometria.faces.push(new THREE.Face3(1, 2, 3));
+
+        geometria.computeFaceNormals();
+        geometria.computeVertexNormals();
 
         return new THREE.Mesh(geometria, this.materialParedConstruccion.clone());
     }
@@ -913,10 +935,16 @@ class Morfologia extends Component {
                 let intersects = this.raycaster.intersectObjects(this.objetos);
                 if (intersects.length > 0) {
                     let intersect = intersects[0];
+                    let startHabitacion = (intersect.point).add(intersect.face.normal).clone();
+                    startHabitacion = startHabitacion.round();
+                    this.managerCasas.setStartHabitacion(startHabitacion);
+
+
+                    /*let intersect = intersects[0];
                     this.startNewPared = (intersect.point).add(intersect.face.normal).clone();
                     this.paredConstruccion.geometry = this.crearGeometriaPared(0, this.heightWall);
                     this.startNewPared.round();
-                    this.paredConstruccion.visible = true;
+                    this.paredConstruccion.visible = true;*/
                 }
             }
         }
@@ -933,7 +961,8 @@ class Morfologia extends Component {
         if (this.props.dibujando == 4) {
             //click derecho
             if (event.button === 0) {
-                this.agregarPared();
+                this.managerCasas.agregarHabitacionDibujada();
+                this.construyendo = false;
 
             }
         }
@@ -1016,7 +1045,11 @@ class Morfologia extends Component {
                         if (this.construyendo) {
                             var nextPosition = (intersect.point).add(intersect.face.normal).clone();
                             nextPosition.round();
-                            var dir = nextPosition.clone().sub(this.startNewPared);
+                            this.managerCasas.crecerHabitacion(nextPosition);
+
+
+
+                            /*var dir = nextPosition.clone().sub(this.startNewPared);
                             var widthPared = this.startNewPared.distanceTo(nextPosition);
                             this.paredConstruccion.geometry = this.crearGeometriaPared(widthPared, this.heightWall);
                             var len = dir.length();
@@ -1025,7 +1058,7 @@ class Morfologia extends Component {
                             this.paredConstruccion.position.copy(pos);
                             var angleRadians = Math.atan2(nextPosition.z - this.startNewPared.z, nextPosition.x - this.startNewPared.x);
                             this.paredConstruccion.rotation.y = -angleRadians;
-                            this.paredConstruccion.position.y = 0;
+                            this.paredConstruccion.position.y = 0;*/
                         }
                     } else {
                         this.indicador_dibujado.position.y = 0;
@@ -1185,6 +1218,8 @@ Morfologia.propTypes = {
 };
 
 Morfologia.tipos = {PARED : 0, VENTANA : 1, PUERTA : 2, TECHO : 3, PISO : 4,};
+Morfologia.separacion = {EXTERIOR : 0, PAREADA : 1};
+Morfologia.aislacionPiso = {CORRIENTE: 0, MEDIO : 1, AISLADO : 2};
 Morfologia.tipos_texto = {
     0 : 'Pared',
     1 : 'Ventana',
