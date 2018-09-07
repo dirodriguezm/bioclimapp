@@ -48,6 +48,15 @@ function transmitanciaSuperficie(elemento) {
             elemento.userData.transmitancia = u;
             elemento.userData.transSup = u * elemento.userData.superficie;
             break;
+        case Morfologia.tipos.TECHO:
+            for(let capa of elemento.userData.capas){
+                transmitancia += capa.espesor / capa.conductividad;
+            }
+            transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
+            u = 1 / transmitancia;
+            elemento.userData.transmitancia = u;
+            elemento.userData.transSup = u * elemento.userData.superficie;
+            break;
         case Morfologia.tipos.VENTANA:
             elemento.userData.transSup = elemento.userData.info_material.u * elemento.userData.superficie;
             break;
@@ -60,6 +69,7 @@ function transmitanciaSuperficie(elemento) {
 
             elemento.userData.transmitancia = u;
             elemento.userData.transSup = u * elemento.userData.superficie;
+            break;
     }
 
 }
@@ -301,7 +311,6 @@ function toDegrees(angle) {
 }
 
 function calcularF(ventana){
-    console.log(ventana);
     let fm = ventana.userData.info_marco.fs;
     let fs = ventana.userData.info_material.fs;
     let um = ventana.userData.info_marco.u;
