@@ -4,9 +4,11 @@ import axios from "axios";
 import Morfologia from "../components/Morfologia";
 
 class ManagerCasas {
-    constructor(escena, paredes, allObjects, ocupantes, horasIluminacion, aireRenovado){
+    constructor(escena, paredes, ventanas, puertas, allObjects, ocupantes, horasIluminacion, aireRenovado){
         this.escena = escena;
         this.paredes = paredes;
+        this.ventanas = ventanas;
+        this.puertas = puertas;
         this.allObjects = allObjects;
 
         this.ocupantes = ocupantes;
@@ -16,12 +18,16 @@ class ManagerCasas {
 
         this.info_ventana = [];
         this.info_material = [];
+        this.info_marcos = [];
 
         axios.get("http://127.0.0.1:8000/api/info_materiales")
             .then(response => this.getJsonMateriales(response));
 
         axios.get("http://127.0.0.1:8000/api/info_ventanas")
             .then(response => this.getJsonVentanas(response));
+
+        axios.get("http://127.0.0.1:8000/api/info_marcos")
+            .then(response => this.getJsonMarcos(response));
 
         this.crearCasaVacia();
 
@@ -48,7 +54,14 @@ class ManagerCasas {
         });
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
-            color: '#810005',
+            color: '#62bf00',
+            opacity: 0.7,
+            transparent: true,
+            side : THREE.DoubleSide,
+        });
+
+        this.materialPuertaConstruccion = new THREE.MeshBasicMaterial({
+            color: '#bfaf00',
             opacity: 0.7,
             transparent: true,
             side : THREE.DoubleSide,
@@ -61,9 +74,12 @@ class ManagerCasas {
         });
 
         this.materialVentanaConstruida = new THREE.MeshLambertMaterial({
-            color: '#00ff00',
-            opacity: 0.7,
-            transparent: true,
+            color: '#3d7b00',
+            side : THREE.DoubleSide,
+        });
+
+        this.materialPuertaConstruida = new THREE.MeshLambertMaterial({
+            color: '#908100',
             side : THREE.DoubleSide,
         });
 
@@ -80,11 +96,31 @@ class ManagerCasas {
         //Ventana que dibuja nuevas ventanas
         this.ventanaConstruccion = this.crearMeshVentana(1,0.5);
         this.ventanaConstruccion.visible = false;
+        //Puerta que dibuja nuevas puertas
+        this.puertaConstruccion = this.crearMeshPuerta(0.6,0.8);
+        this.puertaConstruccion.visible = false;
 
         escena.add(this.habitacionConstruccion);
         escena.add(this.ventanaConstruccion);
+        escena.add(this.puertaConstruccion);
 
 
+    }
+
+    getJsonMarcos(response) {
+        this.info_marcos = response.data.slice();
+        for (let i = 0; i < this.info_material.length; i++) {
+            this.info_marcos[i].index = i;
+            if (this.info_marcos[i].hasOwnProperty('tipos')) {
+                for (let j = 0; j < this.info_marcos[i].tipos.length; j++) {
+                    this.info_marcos[i].tipos[j].index = j;
+                }
+            } else {
+                for (let k = 0; k < this.info_marcos[i].propiedades.length; k++) {
+                    this.info_marcos[i].propiedades[k].index = k;
+                }
+            }
+        }
     }
 
     getJsonMateriales(response) {
@@ -232,13 +268,105 @@ class ManagerCasas {
         this.ventanaConstruccion.visible = false;
     }
 
-    moverVentanaConstruccion(pared, point){
+    ocultarPuertaConstruccion(){
+        this.puertaConstruccion.visible = false;
+    }
 
+    agregarPuerta(){
+        let pared = this.puertaConstruccion.userData.pared;
+        if(pared !== null){
+            let puerta = this.puertaConstruccion.clone();
+            let habitacion = pared.parent.parent;
+            let orientacion = pared.userData.orientacion;
+            puerta.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
+            pared.add(puerta);
+            pared.worldToLocal(puerta.position);
+            puerta.material = this.materialPuertaConstruida.clone();
+            puerta.userData.superficie = puerta.userData.width * puerta.userData.height;
+
+            puerta.userData.tipo = Morfologia.tipos.PUERTA;
+
+            puerta.userData.info_material = {
+                material : 1,
+                tipo : null,
+                propiedad : 0,
+                conductividad : this.info_material[1].propiedades[0].conductividad,
+                espesor : 0.02,
+            };
+            //Por ahora el calculo se hace sin marco
+
+            this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+
+            BalanceEnergetico.transmitanciaSuperficie(puerta);
+            habitacion.transmitanciaSuperficies += puerta.userData.transSup;
+            habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+                habitacion.transmitanciaSuperficies ,
+                this.gradoDias,
+                habitacion.puenteTermico
+            );
+
+            this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+
+            this.puertas.push(puerta);
+            this.allObjects.push(puerta);
+        }
+    }
+
+    agregarVentana(){
+        let pared = this.ventanaConstruccion.userData.pared;
+        if(pared !== null){
+            let ventana = this.ventanaConstruccion.clone();
+            let habitacion = pared.parent.parent;
+            let orientacion = pared.userData.orientacion;
+            ventana.userData.orientacion = new THREE.Vector3(orientacion.x, orientacion.y, orientacion.z);
+            ventana.userData.pos = new THREE.Vector3();
+            ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
+            ventana.material = this.materialVentanaConstruida.clone();
+            ventana.geometry.computeBoundingBox();
+            ventana.userData.superficie = ventana.userData.width * ventana.userData.height;
+
+            pared.add(ventana);
+            pared.worldToLocal(ventana.position);
+
+
+
+            ventana.userData.tipo = Morfologia.tipos.VENTANA;
+            ventana.userData.info_material = {
+                material : 0,
+                tipo : 0,
+                fs : this.info_ventana[0].tipos[0].propiedad.FS,
+                u : this.info_ventana[0].tipos[0].propiedad.U,
+
+            };
+            ventana.userData.info_marco = {
+                material : 0,
+                tipo : null,
+                propiedad : 0,
+                fs : this.info_marcos[0].propiedades[0].FS,
+                u : this.info_marcos[0].propiedades[0].U,
+            };
+            //Por ahora el calculo se hace sin marco
+
+            this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+
+            BalanceEnergetico.transmitanciaSuperficie(ventana);
+            habitacion.transmitanciaSuperficies += ventana.userData.transSup;
+            habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+                habitacion.transmitanciaSuperficies ,
+                this.gradoDias,
+                habitacion.puenteTermico
+            );
+
+            this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+
+            this.ventanas.push(ventana);
+            this.allObjects.push(ventana);
+        }
+    }
+
+    moverVentanaConstruccion(pared, point){
         let pos = point.clone();
         pared.worldToLocal(pos);
-        console.log(pared);
-        console.log(pos);
-        console.log(point);
 
         if(pos.x < 2){
             this.ventanaConstruccion.visible = true;
@@ -247,8 +375,19 @@ class ManagerCasas {
             this.ventanaConstruccion.position.copy(point).round();
             this.ventanaConstruccion.position.y = (pared.parent.parent.userData.nivel) * pared.parent.parent.userData.height - pared.parent.parent.userData.height/2 - pared.parent.parent.userData.height/4  ;
         }
+    }
 
+    moverPuertaConstruccion(pared, point){
+        let pos = point.clone();
+        pared.worldToLocal(pos);
 
+        if(pos.x < 2){
+            this.puertaConstruccion.visible = true;
+            this.puertaConstruccion.userData.pared = pared;
+            this.puertaConstruccion.setRotationFromEuler(pared.rotation);
+            this.puertaConstruccion.position.copy(point).round();
+            this.puertaConstruccion.position.y = (pared.parent.parent.userData.nivel - 1) * pared.parent.parent.userData.height  ;
+        }
     }
 
     modificarParedHabitacion(pared, width, height){
@@ -349,8 +488,6 @@ class ManagerCasas {
             }
 
             this.crecerHabitacionDibujada(habitacion, end, start);
-
-
         }
     }
 
@@ -704,7 +841,22 @@ class ManagerCasas {
     crearMeshVentana(width, height){
         let geometria = this.crearGeometriaVentana(width, height);
 
-        return new THREE.Mesh(geometria, this.materialVentanaConstruccion);
+        let ventana = new THREE.Mesh(geometria, this.materialVentanaConstruccion);
+        ventana.userData.width = width;
+        ventana.userData.height = height;
+
+        return ventana;
+    }
+
+    crearMeshPuerta(width, height){
+        //Como son cuadrados, se utiliza la misma para el caso de la pared.
+        let geometria = this.crearGeometriaVentana(width, height);
+
+        let puerta = new THREE.Mesh(geometria, this.materialPuertaConstruccion);
+        puerta.userData.width = width;
+        puerta.userData.height = height;
+
+        return puerta;
     }
 
 }

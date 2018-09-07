@@ -408,11 +408,11 @@ class Context extends Component {
         for (let ventana of ventanas) {
             let axisY = new THREE.Vector3(0, 1, 0);
             let raycasterFAR = new THREE.Raycaster();
-            let angleLeft = ventana.orientacion.clone().applyAxisAngle(axisY, Math.PI / 4);
+            let angleLeft = ventana.userData.orientacion.clone().applyAxisAngle(axisY, Math.PI / 4);
             let angle = angleLeft.clone();
             let obstruccionesVentana = [];
             let current = {startPoint: null, betaAngle: 0, bDistance: 0, aDistance: 0, betaIndex: -1};
-            if (ventana.obstrucciones != null) {
+            if (ventana.userData.obstrucciones != null) {
                 for (let obs of ventana.obstrucciones) {
                     obs.betaIndex = null;
                     obs.betaAngle = null;
@@ -420,15 +420,15 @@ class Context extends Component {
             }
             for (let x = 0; x < 90; x++) {
                 angle = angle.normalize();
-                raycasterFAR.set(ventana.pos, angle);
+                raycasterFAR.set(ventana.userData.pos, angle);
                 let intersections = raycasterFAR.intersectObjects(this.obstrucciones);
                 let masAlto = {object: {aDistance: 0}};
                 //console.log(intersections.length);
                 //para cada obstruccion en el angulo actual se obtiene su aDistance y su bDistance, además se almacena el más alto
                 for (let i = 0; i < intersections.length; i++) {
                     if(intersections[i].distance > 50){intersections[i].object.fuera = true}
-                    intersections[i].object.aDistance = intersections[i].object.geometry.parameters.height - ventana.pos.y;
-                    let auxPoint = new THREE.Vector3(intersections[i].object.position.x, ventana.pos.y, ventana.pos.z);
+                    intersections[i].object.aDistance = intersections[i].object.geometry.parameters.height - ventana.userData.pos.y;
+                    let auxPoint = new THREE.Vector3(intersections[i].object.position.x, ventana.userData.pos.y, ventana.userData.pos.z);
                     intersections[i].object.bDistance = auxPoint.distanceTo(intersections[i].object.position);
                     intersections[i].object.far = Math.pow(0.2996,(intersections[i].object.aDistance / intersections[i].object.bDistance));
                     if (intersections[i].object.aDistance > masAlto.object.aDistance) {
@@ -465,19 +465,19 @@ class Context extends Component {
                 if (!obstruccionesVentana.includes(current)) {
                     obstruccionesVentana.push(current);
                 }
-                let arrowHelper = new THREE.ArrowHelper(angle, ventana.pos, 50, 0x00ff00);
+                let arrowHelper = new THREE.ArrowHelper(angle, ventana.userData.pos, 50, 0x00ff00);
                 this.escena.add(arrowHelper);
                 //pasamos al siguiente angulo
                 angle.applyAxisAngle(axisY, -Math.PI / 180);
             }
             //se calcula el far de la ventana en base a la formula
-            ventana.obstrucciones = obstruccionesVentana;
+            ventana.userData.obstrucciones = obstruccionesVentana;
             let f1 = 1;
             let f2 = 0;
-            for(let obs of ventana.obstrucciones){
+            for(let obs of ventana.userData.obstrucciones){
                 // Si la obstrucción está fuera del rango y tiene FAR > 0.95 no se considera
                 if(obs.far > 0.95 && obs.fuera){
-                    ventana.obstrucciones.splice( ventana.obstrucciones.indexOf(obs), 1 );
+                    ventana.userData.obstrucciones.splice( ventana.userData.obstrucciones.indexOf(obs), 1 );
                     obs.startPoint = null;
                     continue;
                 }
@@ -490,7 +490,7 @@ class Context extends Component {
                     f2 += obs.far * beta/90;
                 }
             }
-            ventana.far = f1 + f2;
+            ventana.userData.far = f1 + f2;
         }
         this.props.onFarChanged(ventanas);
     }

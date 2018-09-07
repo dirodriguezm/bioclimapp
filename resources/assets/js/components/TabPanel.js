@@ -154,8 +154,10 @@ class TabPanel extends Component {
         this.props.onComunaChanged(comuna);
     }
 
-    onRadiationsChanged(global, direct, difuse){
-        this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
+    componentDidUpdate(prevProps){
+        if(this.props.radiaciones !== prevProps.radiaciones){
+            this.setState({radiaciones: this.props.radiaciones});
+        }
     }
 
     onParedesChanged(paredes) {
