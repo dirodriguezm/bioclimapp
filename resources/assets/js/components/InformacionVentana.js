@@ -144,7 +144,6 @@ class InformacionVentana extends Component {
     render() {
         const {classes, seleccionado} = this.props;
         const {material, tipo, U, FS, marco, tipo_marco, U_marco, FM} = this.state;
-        console.log(this.info_marcos);
 
         return (
             <div>
