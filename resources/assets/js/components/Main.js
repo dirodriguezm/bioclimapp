@@ -30,6 +30,8 @@ class Main extends Component {
         };
         this.onComunaChanged = this.onComunaChanged.bind(this);
         this.onParedesChanged = this.onParedesChanged.bind(this);
+        this.onRadiationsChanged = this.onRadiationsChanged.bind(this);
+        this.onCasaChanged = this.onCasaChanged.bind(this);
     }
 
     /*componentDidMount() is a lifecycle method
@@ -37,7 +39,8 @@ class Main extends Component {
      */
     componentDidMount() {
         this.setState({
-            width: this.col.clientWidth
+            width: this.col.clientWidth,
+            height: this.col.clientHeight,
         });
         //console.log(this.col);
     }
@@ -98,6 +101,26 @@ class Main extends Component {
         });
     }
 
+    onRadiationsChanged(global, direct, difuse){
+        this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
+    }
+
+    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
+        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion});
+        // if(aporte_interno != null && aporte_interno !== this.state.aporte_interno){
+        //     this.setState({aporte_interno: aporte_interno});
+        // }
+        // if(perdida_conduccion != null && perdida_conduccion !== this.state.perdida_conduccion){
+        //     this.setState({perdida_conduccion: perdida_conduccion});
+        // }
+        // if(perdida_ventilacion != null && perdida_ventilacion !== this.state.perdida_ventilacion){
+        //     this.setState({perdida_ventilacion: perdida_ventilacion});
+        // }
+        // this.aporte_interno = aporte_interno;
+        // this.perdida_ventilacion = perdida_ventilacion;
+        // this.perdida_conduccion = perdida_conduccion;
+    }
+
 
 
     render() {
@@ -112,8 +135,10 @@ class Main extends Component {
                     <Grid item xs={8}>
                         <TabPanel
                             comuna={this.state.comuna}
+                            radiaciones={this.state.radiaciones}
                             onComunaChanged={this.onComunaChanged}
                             onParedesChanged={this.onParedesChanged}
+                            onCasaChanged={this.onCasaChanged}
                             sunPosition={sunPosition}
                             camara={camara}
                             paredes={this.state.paredes}
@@ -133,6 +158,11 @@ class Main extends Component {
                             <GeoInfoPanel
                                 comuna={this.state.comuna}
                                 width={this.state.width}
+                                height={this.state.height}
+                                onRadiationsChanged={this.onRadiationsChanged}
+                                aporte_interno={this.state.aporte_interno}
+                                perdida_conduccion={this.state.perdida_conduccion}
+                                perdida_ventilacion={this.state.perdida_ventilacion}
                             />
                         </div>
                     </Grid>

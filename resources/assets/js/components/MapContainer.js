@@ -21,10 +21,23 @@ export default class MapContainer extends Component {
         this.handleLocationFound = this.handleLocationFound.bind(this);
     }
 
-    getElevationOfPoint(latlng, callback) {
-        axios.get('https://api.open-elevation.com/api/v1/lookup\?locations\=' + latlng.lat + "," + latlng.lng)
-            .then(response => callback(response.data.results));
+    componentWillMount(){
+        axios.get("http://127.0.0.1:8000/api/comuna/" + this.state.lat + "/" + this.state.lng)
+            .then(response => {
+                    this.setState({
+                        lat: this.state.lat,
+                        lng: this.state.lng,
+                        comuna: response.data[0],
+                        sunPosition: this.getSunPosition(this.state.lat, this.state.lng),
+                        sunTimes: this.getSolarTimes(this.state.lat, this.state.lng),
+
+                    });
+                    this.createMarker(this.state.lat, this.state.lng);
+                    this.props.onComunaChanged(this.state);
+                }
+            );
     }
+
 
     getSunPosition(lat, lng, date = new Date()) {
         let sun = SunCalc.getPosition(/*Date*/ date, /*Number*/ lat, /*Number*/ lng);

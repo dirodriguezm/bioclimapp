@@ -329,10 +329,10 @@ function calcularAporteSolar(ventanas, difusa, directa){
     }
 
     return {
-        aporte_solar:aporte_solar,
-        igb: igb_suma,
-        area_ventana: area_ventanas_suma,
-        f_suma: f_suma
+        'Aporte Solar':aporte_solar,
+        'Radiacion Solar': igb_suma,
+        'Area de Ventanas': area_ventanas_suma,
+        'Factor de Asoleamiento': f_suma
     };
 }
 

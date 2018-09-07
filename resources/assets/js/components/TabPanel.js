@@ -113,6 +113,7 @@ class TabPanel extends Component {
         this.onVentanasChanged = this.onVentanasChanged.bind(this);
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
         this.onDimensionChanged = this.onDimensionChanged.bind(this);
+        this.onCasaChanged = this.onCasaChanged.bind(this);
     }
 
     handleDrawerOpen() {
@@ -154,10 +155,8 @@ class TabPanel extends Component {
         this.props.onComunaChanged(comuna);
     }
 
-    componentDidUpdate(prevProps){
-        if(this.props.radiaciones !== prevProps.radiaciones){
-            this.setState({radiaciones: this.props.radiaciones});
-        }
+    onRadiationsChanged(global, direct, difuse){
+        this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
     }
 
     onParedesChanged(paredes) {
@@ -166,6 +165,10 @@ class TabPanel extends Component {
 
     onVentanasChanged(ventanas){
         this.setState({ventanas: ventanas});
+    }
+
+    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
+        this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
     }
 
     agregarContexto() {
@@ -181,7 +184,8 @@ class TabPanel extends Component {
     }
 
     onFarChanged(ventanas) {
-        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa, this.state.radiaciones.directa);
+        let month = new Date().getMonth();
+        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.props.radiaciones.difusa[month].valor, this.props.radiaciones.directa[month].valor);
         this.onAporteSolarChanged(aporte_solar);
         this.setState({ventanas: ventanas});
     }
@@ -243,7 +247,6 @@ class TabPanel extends Component {
                     <Tabs value={value} onChange={this.handleChange} fullWidth>
                         <Tab label="Contexto"/>
                         <Tab label="Morfología"/>
-                        <Tab label="Balance Energético"/>
                     </Tabs>
                 </AppBar>
                 <SwipeableViews
@@ -312,6 +315,7 @@ class TabPanel extends Component {
                                     dimensionesPared={dimensionesPared}
                                     paredes={this.props.paredes}
                                     comuna={this.props.comuna}
+                                    onCasaChanged={this.onCasaChanged}
                                 />
                                 <Paper className={classNames(classes.paper, classes.contentBarra, {
                                     [classes.contentShift]: openMorf,
@@ -330,17 +334,6 @@ class TabPanel extends Component {
                                 </Paper>
                             </main>
                         </div>
-                    </TabContainer>
-                    <TabContainer dir={theme.direction}>
-                        <DetalleBalance
-                            width={this.state.width}
-                            height={this.state.height}
-                            aporte_solar={this.state.aporte_solar}
-                            aportes_solares={10}
-                            aportes_internos={10}
-                            perdidas_conduccion={-10}
-                            perdidas_ventilacion={-10}
-                        />
                     </TabContainer>
                 </SwipeableViews>
                 {/*<Paper>*/}

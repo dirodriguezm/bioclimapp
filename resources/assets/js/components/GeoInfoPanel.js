@@ -12,6 +12,9 @@ import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Tabs from '@material-ui/core/Tabs';
 import Tab from '@material-ui/core/Tab';
+import DetalleBalance from "./DetalleBalance";
+import SwipeableViews from "react-swipeable-views";
+import AppBar from "@material-ui/core/AppBar/AppBar";
 
 function TabContainer(props) {
     return (
@@ -25,29 +28,51 @@ TabContainer.propTypes = {
     children: PropTypes.node.isRequired,
 };
 
-const styles = {
-    card: {
-        minWidth: 275,
+const styles = theme => ({
+    root: {
+        flexGrow: 1,
     },
-    bullet: {
-        display: 'inline-block',
-        margin: '0px',
-        transform: 'scale(0.8)',
+    contentBarra: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.default,
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
     },
-    title: {
-        marginBottom: 16,
-        fontSize: 12,
+    content: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.default,
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
     },
-    pos: {
-        marginBottom: 12,
+    contentLeft: {
     },
-};
+    contentShift: {
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
+    contentShiftLeft: {
+    },
+    appFrame: {
+        zIndex: 1,
+        overflow: 'hidden',
+        position: 'relative',
+        display: 'flex',
+        width: '100%',
+    },
+});
 
 class GeoInfoPanel extends Component {
 
     constructor(props) {
         super(props);
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeIndex = this.handleChangeIndex.bind(this);
         this.state = {
             comuna: props.comuna,
             selected: 0,
@@ -58,6 +83,9 @@ class GeoInfoPanel extends Component {
     handleChange(event, value) {
         this.setState({selected: value});
     };
+    handleChangeIndex(index) {
+        this.setState({value: index});
+    };
 
     componentDidMount() {
 
@@ -66,6 +94,7 @@ class GeoInfoPanel extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.comuna.nombre != this.state.comuna.nombre) {
             let pointer = this;
+            let props = this.props;
             axios.all([this.getTemperaturesById(nextProps.comuna.id), this.getGlobalRadiationById(nextProps.comuna.id),
                 this.getDirectRadiationById(nextProps.comuna.id), this.getDifuseRadiationById(nextProps.comuna.id)])
                 .then(axios.spread(function (temps, global, direct, difuse) {
@@ -77,7 +106,7 @@ class GeoInfoPanel extends Component {
                         difusa: difuse.data,
                         width: nextProps.width,
                     });
-                    this.props.onRadiationsChanged(global.data,direct.data,difuse.data);
+                    props.onRadiationsChanged(global.data,direct.data,difuse.data);
                 }));
         }
 
@@ -99,6 +128,7 @@ class GeoInfoPanel extends Component {
 
 
     render() {
+        const {classes, theme} = this.props;
         let tempAnual = null;
         let radAnual = null;
         if (this.state.temps) {
@@ -202,8 +232,6 @@ class GeoInfoPanel extends Component {
             }
         }
 
-
-        const {classes} = this.props;
         return (
             <div>
                 <Card className={classes.card}>
@@ -215,53 +243,58 @@ class GeoInfoPanel extends Component {
                                     <Typography variant="subheading" color="textSecondary">
                                         {"Comuna: " + this.state.comuna.nombre}
                                     </Typography>
-                                    <Paper>
-                                        <Tabs
-                                            value={this.state.selected}
-                                            indicatorColor="primary"
-                                            textColor="primary"
-                                            onChange={this.handleChange}
-                                            fullWidth
-                                        >
+                                    {/*<Paper>*/}
+                                        {/*<Tabs*/}
+                                            {/*value={this.state.selected}*/}
+                                            {/*indicatorColor="primary"*/}
+                                            {/*textColor="primary"*/}
+                                            {/*onChange={this.handleChange}*/}
+                                            {/*fullWidth*/}
+                                        {/*>*/}
+                                            {/*<Tab label="Temperatura"/>*/}
+                                            {/*<Tab label="Radiación"/>*/}
+                                            {/*<Tab label="Balance Energético"/>*/}
+                                        {/*</Tabs>*/}
+                                    {/*</Paper>*/}
+                                    <AppBar position="static">
+                                        <Tabs value={this.state.selected} onChange={this.handleChange} fullWidth>
                                             <Tab label="Temperatura"/>
                                             <Tab label="Radiación"/>
+                                            <Tab label="Balance Energético"/>
                                         </Tabs>
-                                    </Paper>
-                                    {this.state.selected == 0 &&
-                                    <TabContainer>
-                                        <Bar
-                                            height={230}
-                                            width={this.state.width - 50}
-                                            data={dataTemp}
-                                            options={optionsTemp}
-                                        />
-                                    </TabContainer>
-                                    }
-                                    {this.state.selected == 1 &&
-                                    <TabContainer>
-                                        <Bar
-                                            height={230}
-                                            width={this.state.width - 50}
-                                            data={dataRad}
-                                            options={optionsRad}
-                                        />
-                                    </TabContainer>
-                                    }
-                                    {/*{this.state.omegas != null  &&*/}
-                                    {/*<Typography>*/}
-                                    {/*La pared recibe sol desde: {this.state.omegas.wm.desde.getHours()}:{this.state.omegas.wm.desde.getMinutes()}*/}
-                                    {/*<br></br>*/}
-                                    {/*Hasta: {this.state.omegas.wm.hasta.getHours()}:{this.state.omegas.wm.hasta.getMinutes()}*/}
-                                    {/*<br></br>*/}
-                                    {/*Y desde: {this.state.omegas.wt.desde.getHours()}:{this.state.omegas.wt.desde.getMinutes()}*/}
-                                    {/*<br></br>*/}
-                                    {/*Hasta {this.state.omegas.wt.hasta.getHours()}:{this.state.omegas.wt.hasta.getMinutes()}*/}
-                                    {/*<br></br>*/}
-                                    {/*Radiación de la pared: {this.state.rb}*/}
-                                    {/*</Typography>*/}
-                                    {/*}*/}
-
-
+                                    </AppBar>
+                                    <SwipeableViews
+                                        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
+                                        index={this.state.selected}
+                                        onChangeIndex={this.handleChangeIndex}
+                                    >
+                                        <TabContainer dir={theme.direction}>
+                                            <Bar
+                                                height={230}
+                                                width={this.state.width - 50}
+                                                data={dataTemp}
+                                                options={optionsTemp}
+                                            />
+                                        </TabContainer>
+                                        <TabContainer dir={theme.direction}>
+                                            <Bar
+                                                height={230}
+                                                width={this.state.width - 50}
+                                                data={dataRad}
+                                                options={optionsRad}
+                                            />
+                                        </TabContainer>
+                                        <TabContainer dir={theme.direction}>
+                                            <DetalleBalance
+                                                width={this.props.width}
+                                                height={230}
+                                                //aporte_solar={this.state.aporte_solar}
+                                                aporte_interno={this.props.aporte_interno}
+                                                perdida_conduccion={this.props.perdida_conduccion}
+                                                perdida_ventilacion={this.props.perdida_ventilacion}
+                                            />
+                                        </TabContainer>
+                                    </SwipeableViews>
                                 </CardContent>
 
                             </div>
@@ -277,8 +310,11 @@ class GeoInfoPanel extends Component {
             </div>
         );
     }
-
-
 }
 
-export default withStyles(styles)(GeoInfoPanel)
+GeoInfoPanel.propTypes = {
+    classes: PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired,
+};
+
+export default withStyles(styles, {withTheme: true})(GeoInfoPanel)

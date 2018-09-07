@@ -8,11 +8,67 @@ import Paper from '@material-ui/core/Paper';
 class DetalleBalance extends Component{
     constructor(props){
         super(props);
+        this.state = {
+            clicked: null,
+            aporte_solar : 0,
+            aporte_interno : 0,
+            perdida_conduccion : 0,
+            perdida_ventilacion : 0,
+        };
+
+        this.data_componentes = [];
         this.handleClick = this.handleClick.bind(this);
     }
 
     handleClick(e){
-        console.log(e);
+        if(e[0]._index === 0){
+            this.setState({clicked: this.aporte_solar})
+        }
+        if(e[0]._index === 1){
+            this.setState({clicked: this.aporte_interno})
+        }
+        if(e[0]._index === 2){
+            this.setState({clicked: this.perdida_conduccion})
+        }
+        if(e[0]._index === 3){
+            this.setState({clicked: this.perdida_ventilacion})
+        }
+
+    }
+
+    componentDidMount(){
+
+    }
+
+    componentDidUpdate(prevProps){
+        if(this.props.aporte_interno != null && this.props.aporte_interno !== this.state.aporte_interno){
+            this.setState({aporte_interno: this.props.aporte_interno});
+        }
+        if(this.props.perdida_conduccion != null && this.props.perdida_conduccion !== this.state.perdida_conduccion){
+            this.setState({perdida_conduccion: this.props.perdida_conduccion});
+        }
+        if(this.props.perdida_ventilacion != null && this.props.perdida_ventilacion !== this.state.perdida_ventilacion){
+            this.setState({perdida_ventilacion: this.props.perdida_ventilacion});
+        }
+
+        // this.options = {
+        //     maintainAspectRatio: false,
+        //     responsive: false,
+        //     scales:{
+        //         yAxes: [{
+        //             scaleLabel: {
+        //                 display: true,
+        //                 labelString: '°C'
+        //             },
+        //             ticks:{
+        //                 beginAtZero:false,
+        //                 stepSize: 5,
+        //                 // min: Math.min(this.props.perdidas_conduccion,this.props.perdidas_ventilacion) - 5,
+        //                 // max: Math.max(this.props.aportes_solares,this.props.aportes_internos) + 5
+        //             }
+        //         }],
+        //     }
+        // };
     }
 
     render(){
@@ -26,43 +82,54 @@ class DetalleBalance extends Component{
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(48,63,159,0.8)',
                     hoverBorderColor: 'rgba(48,63,159,1)',
-                    data: [this.props.aportes_solares, this.props.aportes_internos, this.props.perdidas_conduccion, this.props.perdidas_ventilacion]
+                    data: [this.state.aporte_solar, this.state.aporte_interno,
+                        -this.state.perdida_conduccion, -this.state.perdida_ventilacion]
                 },
             ]
         };
-        const optionsTemp = {
-            maintainAspectRatio: false,
-            responsive: false,
-            scales:{
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: '°C'
-                    },
-                    ticks:{
-                        beginAtZero:false,
-                        stepSize: 5,
-                        min: Math.min(this.props.perdidas_conduccion,this.props.perdidas_ventilacion) - 5,
-                        max: Math.max(this.props.aportes_solares,this.props.aportes_internos) + 5
-                    }
-                }],
-            }
-        };
+
+        // if(this.props.aporte_solar != null){
+        //     let i = 0;
+        //     for(let key in this.props.aporte_solar){
+        //         if(i === 0) {i++; continue};
+        //         this.componentes_aporte_solar.push(key);
+        //         this.values.push(this.props.aporte_solar[key]);
+        //         i++;
+        //     }
+        // }
+        //
+        // const data_aportes_solares = {
+        //     labels: componentes_aporte_solar,
+        //     datasets: [{
+        //         data: values,
+        //     }]
+        // };
 
         return(
             <div>
                 <Paper>
                     <Bar
-                        height={300}
+                        height={this.props.height}
                         width={this.props.width}
                         data={data}
-                        options={optionsTemp}
-                        onClick={this.handleClick}
+                        options={this.options}
+                        onElementsClick={this.handleClick}
                     />
                 </Paper>
-                <Paper>
+                {/*<Paper>*/}
+                    {/*{*/}
+                        {/*this.state.clicked != null &&*/}
+                        {/*<div>*/}
+                            {/*<Typography>{Object.keys(this.state.clicked)[0]}</Typography>*/}
+                            {/*<Doughnut*/}
+                            {/*data={this.data_componentes}*/}
+                            {/*height={this.props.height/2}*/}
+                            {/*width={this.props.width}*/}
+                            {/*/>*/}
+                        {/*</div>*/}
+                    {/*}*/}
 
-                </Paper>
+                {/*</Paper>*/}
             </div>
         );
     }

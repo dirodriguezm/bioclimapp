@@ -43,7 +43,7 @@ class Morfologia extends Component {
             this.onPerspectiveChanged();
         }
         if(this.paredes !== this.props.paredes && this.props.paredes != null){
-            this.paredes = this.props.paredes;
+            this.paredes = this.props.paredes.slice();
         }
 
         if(this.props.comuna !== prevProps.comuna){
@@ -52,6 +52,11 @@ class Morfologia extends Component {
 
         if(this.props.dimensionesPared !== prevProps.dimensionesPared && this.props.dimensionesPared != null){
             this.managerCasas.modificarParedHabitacion(this.props.dimensionesPared.pared, this.props.dimensionesPared.width, this.props.dimensionesPared.height );
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
         }
     }
 
@@ -975,6 +980,11 @@ class Morfologia extends Component {
             //click derecho
             if (event.button === 0) {
                 this.managerCasas.agregarHabitacionDibujada();
+                let casa = this.managerCasas.getCasa();
+                let aporte_interno = casa.userData.aporteInterno;
+                let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+                let perdida_conduccion = casa.userData.perdidaPorConduccion;
+                this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
                 BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
