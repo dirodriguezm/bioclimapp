@@ -164,7 +164,7 @@ class TabPanel extends Component {
     }
 
     onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
-        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion});
+        this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
     }
 
     agregarContexto() {
@@ -243,7 +243,6 @@ class TabPanel extends Component {
                     <Tabs value={value} onChange={this.handleChange} fullWidth>
                         <Tab label="Contexto"/>
                         <Tab label="Morfología"/>
-                        <Tab label="Balance Energético"/>
                     </Tabs>
                 </AppBar>
                 <SwipeableViews
@@ -331,16 +330,6 @@ class TabPanel extends Component {
                                 </Paper>
                             </main>
                         </div>
-                    </TabContainer>
-                    <TabContainer dir={theme.direction}>
-                        <DetalleBalance
-                            width={this.state.width}
-                            height={this.state.height}
-                            aporte_solar={this.state.aporte_solar}
-                            aporte_interno={this.state.aporte_interno}
-                            perdida_conduccion={this.state.perdida_conduccion}
-                            perdida_ventilacion={this.state.perdida_ventilacion}
-                        />
                     </TabContainer>
                 </SwipeableViews>
                 {/*<Paper>*/}

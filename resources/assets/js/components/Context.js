@@ -36,7 +36,7 @@ class Context extends Component {
         this.dibujando = false;
         this.seleccionando = false;
         this.borrando = false;
-        this.ventanas = this.props.ventanas;
+        this.ventanas = [];
         let PW_N = new Map(); // p/w orientacion norte para calculo de FAV2
         this.PW_N = PW_N;
         PW_N.set(0, [1,1,1,1,1,1,1,1,1,1]);
@@ -82,12 +82,13 @@ class Context extends Component {
         this.DH = [0.2,0.5,1]; // d/h para calculo de FAV1
     }
 
-    componentWillReceiveProps(nextProps) {
-        // if (nextProps.ventanas !== this.ventanas) {
-        //     this.ventanas = nextProps.ventanas;
-        //     this.calcularFAR(nextProps.ventanas);
-        // }
-        if (nextProps.agregarContexto) {
+
+    componentDidUpdate(prevProps, prevState, snapshot){
+        //Si se cerró el popper y se modificó alguna obstrucción entonces se debe volver a calcular el FAR
+        if(prevState.open === true && this.state.open === false && this.ventanas != null){
+            this.calcularFAR(this.ventanas);
+        }
+        if (this.props.agregarContexto) {
             this.agregarContexto = true;
             this.seleccionando = false;
             this.borrando = false;
@@ -98,27 +99,18 @@ class Context extends Component {
             this.escena.add(obstruccionFantasma);
             this.obstruccionFantasma = obstruccionFantasma;
         }
-        if (nextProps.seleccionar) {
+        if (this.props.seleccionar) {
             this.seleccionando = true;
             this.agregarContexto = false;
             this.borrando = false;
         }
-        if (nextProps.borrarContexto) {
+        if (this.props.borrarContexto) {
             this.seleccionando = true;
             this.agregarContexto = false;
             this.borrando = true;
         }
-        if(nextProps.ventanas != null && this.ventanas !== nextProps.ventanas){
-            console.log("en contexto ventanas != nuevas ventanas");
-            this.ventanas = nextProps.ventanas.slice();
-            this.calcularFAR(this.ventanas);
-        }
-        console.log("CONTEXTO VENTANAS", this.ventanas, "PROPS VENTANAS", nextProps.ventanas);
-    }
-
-    componentDidUpdate(prevProps, prevState, snapshot){
-        //Si se cerró el popper y se modificó alguna obstrucción entonces se debe volver a calcular el FAR
-        if(prevState.open === true && this.state.open === false ){
+        if(this.props.ventanas != null && this.ventanas !== this.props.ventanas){
+            this.ventanas = this.props.ventanas.slice();
             this.calcularFAR(this.ventanas);
         }
     }

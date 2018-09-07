@@ -10,13 +10,13 @@ class DetalleBalance extends Component{
         super(props);
         this.state = {
             clicked: null,
+            aporte_solar : 0,
+            aporte_interno : 0,
+            perdida_conduccion : 0,
+            perdida_ventilacion : 0,
         };
-        this.aporte_solar = 0;
-        this.aporte_interno = 0;
-        this.perdida_conduccion = 0;
-        this.perdida_ventilacion = 0;
-        this.componentes_aporte_solar = [];
-        this.values = [];
+
+        this.data_componentes = [];
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -36,11 +36,43 @@ class DetalleBalance extends Component{
 
     }
 
+    componentDidMount(){
+
+    }
+
     componentDidUpdate(prevProps){
-        if(this.props.aporte_interno != null && this.props.aporte_interno !== prevProps.aporte_interno){
-            this.aporte_interno = this.props.aporte_interno;
+        if(this.props.aporte_interno != null && this.props.aporte_interno !== this.state.aporte_interno){
+            this.setState({aporte_interno: this.props.aporte_interno});
         }
-        this.data = {
+        if(this.props.perdida_conduccion != null && this.props.perdida_conduccion !== this.state.perdida_conduccion){
+            this.setState({perdida_conduccion: this.props.perdida_conduccion});
+        }
+        if(this.props.perdida_ventilacion != null && this.props.perdida_ventilacion !== this.state.perdida_ventilacion){
+            this.setState({perdida_ventilacion: this.props.perdida_ventilacion});
+        }
+
+        // this.options = {
+        //     maintainAspectRatio: false,
+        //     responsive: false,
+        //     scales:{
+        //         yAxes: [{
+        //             scaleLabel: {
+        //                 display: true,
+        //                 labelString: '°C'
+        //             },
+        //             ticks:{
+        //                 beginAtZero:false,
+        //                 stepSize: 5,
+        //                 // min: Math.min(this.props.perdidas_conduccion,this.props.perdidas_ventilacion) - 5,
+        //                 // max: Math.max(this.props.aportes_solares,this.props.aportes_internos) + 5
+        //             }
+        //         }],
+        //     }
+        // };
+    }
+
+    render(){
+        const data = {
             labels: ['Aportes Solares','Aportes Internos','Pérdidas por Conducción','Pérdidas por Ventilación'],
             datasets: [
                 {
@@ -50,33 +82,11 @@ class DetalleBalance extends Component{
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(48,63,159,0.8)',
                     hoverBorderColor: 'rgba(48,63,159,1)',
-                    data: [this.aporte_solar, this.aporte_interno,
-                        this.perdida_conduccion, this.perdida_ventilacion]
+                    data: [this.state.aporte_solar, this.state.aporte_interno,
+                        -this.state.perdida_conduccion, -this.state.perdida_ventilacion]
                 },
             ]
         };
-        this.options = {
-            maintainAspectRatio: false,
-            responsive: false,
-            scales:{
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: '°C'
-                    },
-                    ticks:{
-                        beginAtZero:false,
-                        stepSize: 5,
-                        // min: Math.min(this.props.perdidas_conduccion,this.props.perdidas_ventilacion) - 5,
-                        // max: Math.max(this.props.aportes_solares,this.props.aportes_internos) + 5
-                    }
-                }],
-            }
-        };
-    }
-
-    render(){
-
 
         // if(this.props.aporte_solar != null){
         //     let i = 0;
@@ -99,27 +109,27 @@ class DetalleBalance extends Component{
             <div>
                 <Paper>
                     <Bar
-                        height={this.props.height/2}
+                        height={this.props.height}
                         width={this.props.width}
-                        data={this.data}
+                        data={data}
                         options={this.options}
                         onElementsClick={this.handleClick}
                     />
                 </Paper>
-                <Paper>
-                    {
-                        this.state.clicked != null &&
-                        <div>
-                            <Typography>{Object.keys(this.state.clicked)[0]}</Typography>
+                {/*<Paper>*/}
+                    {/*{*/}
+                        {/*this.state.clicked != null &&*/}
+                        {/*<div>*/}
+                            {/*<Typography>{Object.keys(this.state.clicked)[0]}</Typography>*/}
                             {/*<Doughnut*/}
-                            {/*data={data_aportes_solares}*/}
+                            {/*data={this.data_componentes}*/}
                             {/*height={this.props.height/2}*/}
                             {/*width={this.props.width}*/}
                             {/*/>*/}
-                        </div>
-                    }
+                        {/*</div>*/}
+                    {/*}*/}
 
-                </Paper>
+                {/*</Paper>*/}
             </div>
         );
     }

@@ -52,6 +52,11 @@ class Morfologia extends Component {
 
         if(this.props.dimensionesPared !== prevProps.dimensionesPared && this.props.dimensionesPared != null){
             this.managerCasas.modificarParedHabitacion(this.props.dimensionesPared.pared, this.props.dimensionesPared.width, this.props.dimensionesPared.height );
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
         }
     }
 
