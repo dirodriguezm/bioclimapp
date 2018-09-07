@@ -33,14 +33,14 @@ class ManagerCasas {
 
         //Materiales
         this.materialParedConstruccion = new THREE.MeshBasicMaterial({
-            color: '#433F81',
+            color: '#eaedc7',
             opacity: 0.7,
             transparent: true,
             side : THREE.DoubleSide,
         });
 
         this.materialPisoConstruccion = new THREE.MeshBasicMaterial({
-            color: '#392481',
+            color: '#eee3c5',
             opacity: 0.7,
             transparent: true,
             side : THREE.DoubleSide,
@@ -55,31 +55,31 @@ class ManagerCasas {
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
             color: '#62bf00',
-            opacity: 0.7,
+            opacity: 0,
             transparent: true,
             side : THREE.DoubleSide,
         });
 
         this.materialPuertaConstruccion = new THREE.MeshBasicMaterial({
-            color: '#bfaf00',
+            color: '#4b2400',
             opacity: 0.7,
             transparent: true,
             side : THREE.DoubleSide,
         });
 
         this.materialParedConstruida = new THREE.MeshLambertMaterial({
-            color: '#433F81',
+            color: '#eaedc7',
             side : THREE.DoubleSide,
 
         });
 
         this.materialVentanaConstruida = new THREE.MeshLambertMaterial({
-            color: '#3d7b00',
+            color: '#33ebed',
             side : THREE.DoubleSide,
         });
 
         this.materialPuertaConstruida = new THREE.MeshLambertMaterial({
-            color: '#908100',
+            color: '#6b3403',
             side : THREE.DoubleSide,
         });
 

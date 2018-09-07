@@ -47,7 +47,6 @@ class InformacionEstructura extends Component {
 
         return (
             <div>
-
                 <InformacionPared
                     seleccionado={seleccionado}
                     onDimensionChanged={onDimensionChanged}

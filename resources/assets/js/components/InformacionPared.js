@@ -76,7 +76,7 @@ class InformacionPared extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.seleccionado !== prevProps.seleccionado) {
+        if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.PARED) {
             if (this.props !== null) {
                 let capas = this.props.seleccionado.userData.capas;
                 for (let i = 0; i < capas.length; i++) {
