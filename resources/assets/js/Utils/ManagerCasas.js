@@ -241,6 +241,8 @@ class ManagerCasas {
         BalanceEnergetico.transmitanciaSuperficie(techo);
         transmitanciaSuperficies += techo.userData.transSup;
 
+        console.log(techo.userData.transSup);
+
         let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion);
 
         let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
@@ -248,9 +250,9 @@ class ManagerCasas {
 
         habitacion.userData.puenteTermico = puenteTermico;
         habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
-        habitacion.userData.aporteIntero = aporteInterno;
+        habitacion.userData.aporteInterno = aporteInterno;
         habitacion.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
+        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion
 
         let nivel = this.casa.children[habitacion.userData.nivel - 1];
         nivel.add(habitacion);
@@ -593,7 +595,7 @@ class ManagerCasas {
         this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
         this.casa.userData.aporteInterno += aporteInterno;
 
-        console.log(this.casa.userData.aporteInterno);
+
         this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
         this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
     }
