@@ -32,6 +32,7 @@ class Main extends Component {
         this.onParedesChanged = this.onParedesChanged.bind(this);
         this.onRadiationsChanged = this.onRadiationsChanged.bind(this);
         this.onCasaChanged = this.onCasaChanged.bind(this);
+        this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
     }
 
     /*componentDidMount() is a lifecycle method
@@ -121,6 +122,12 @@ class Main extends Component {
         // this.perdida_conduccion = perdida_conduccion;
     }
 
+    onAporteSolarChanged(aporte_solar){
+        this.setState({
+            aporte_solar: aporte_solar
+        });
+    }
+
 
 
     render() {
@@ -139,6 +146,7 @@ class Main extends Component {
                             onComunaChanged={this.onComunaChanged}
                             onParedesChanged={this.onParedesChanged}
                             onCasaChanged={this.onCasaChanged}
+                            onAporteSolarChanged={this.onAporteSolarChanged}
                             sunPosition={sunPosition}
                             camara={camara}
                             paredes={this.state.paredes}

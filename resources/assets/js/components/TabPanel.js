@@ -111,7 +111,6 @@ class TabPanel extends Component {
         this.handleDrawerClose = this.handleDrawerClose.bind(this);
         this.onSeleccionadoMorfChanged = this.onSeleccionadoMorfChanged.bind(this);
         this.onVentanasChanged = this.onVentanasChanged.bind(this);
-        this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
         this.onDimensionChanged = this.onDimensionChanged.bind(this);
         this.onCasaChanged = this.onCasaChanged.bind(this);
     }
@@ -182,7 +181,7 @@ class TabPanel extends Component {
     onFarChanged(ventanas) {
         let month = new Date().getMonth();
         let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.props.radiaciones.difusa[month].valor, this.props.radiaciones.directa[month].valor);
-        this.onAporteSolarChanged(aporte_solar);
+        this.props.onAporteSolarChanged(aporte_solar);
         this.setState({ventanas: ventanas});
     }
 
@@ -221,12 +220,6 @@ class TabPanel extends Component {
                 width: width,
                 height: height
             }
-        });
-    }
-
-    onAporteSolarChanged(aporte_solar){
-        this.setState({
-           aporte_solar: aporte_solar
         });
     }
 
@@ -290,7 +283,7 @@ class TabPanel extends Component {
                                     seleccionado={seleccionadoMorf}
                                     comuna={this.props.comuna}
                                     ventanas={this.state.ventanas}
-                                    onAporteSolarChanged={this.onAporteSolarChanged}
+                                    onAporteSolarChanged={this.props.onAporteSolarChanged}
                                     onDimensionChanged={this.onDimensionChanged}
                                 />
 

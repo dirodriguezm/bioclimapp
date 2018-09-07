@@ -288,7 +288,7 @@ class GeoInfoPanel extends Component {
                                             <DetalleBalance
                                                 width={this.props.width}
                                                 height={230}
-                                                //aporte_solar={this.state.aporte_solar}
+                                                aporte_solar={this.props.aporte_solar}
                                                 aporte_interno={this.props.aporte_interno}
                                                 perdida_conduccion={this.props.perdida_conduccion}
                                                 perdida_ventilacion={this.props.perdida_ventilacion}
