@@ -328,13 +328,14 @@ function calcularAporteSolar(ventanas, difusa, directa){
         area_ventanas_suma += area_ventana;
         aporte_solar += Igb * area_ventana * f;
     }
+    return aporte_solar;
 
-    return {
-        'Aporte Solar':aporte_solar,
-        'Radiacion Solar': igb_suma,
-        'Area de Ventanas': area_ventanas_suma,
-        'Factor de Asoleamiento': f_suma
-    };
+    // return {
+    //     'Aporte Solar':aporte_solar,
+    //     'Radiacion Solar': igb_suma,
+    //     'Area de Ventanas': area_ventanas_suma,
+    //     'Factor de Asoleamiento': f_suma
+    // };
 }
 
 export {perdidasConduccion, puenteTermico, cambioTransmitanciaSuperficie, transmitanciaSuperficie, calcularGammaParedes , aporteInterno , gradosDias, perdidasVentilacion, calcularF,

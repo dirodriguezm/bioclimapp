@@ -162,6 +162,7 @@ class Main extends Component {
                                 width={this.state.width}
                                 height={this.state.height}
                                 onRadiationsChanged={this.onRadiationsChanged}
+                                aporte_solar={this.state.aporte_solar}
                                 aporte_interno={this.state.aporte_interno}
                                 perdida_conduccion={this.state.perdida_conduccion}
                                 perdida_ventilacion={this.state.perdida_ventilacion}

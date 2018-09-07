@@ -74,7 +74,7 @@ class DetalleBalance extends Component{
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(48,63,159,0.8)',
                     hoverBorderColor: 'rgba(48,63,159,1)',
-                    data: [this.props.aporte_solar, this.props.aporte_interno,
+                    data: [this.props.aporte_solar*100000, this.props.aporte_interno,
                         -this.props.perdida_conduccion, -this.props.perdida_ventilacion]
                 },
             ]
@@ -100,18 +100,18 @@ class DetalleBalance extends Component{
         return(
             <div>
                 <Paper>
-                    {/*<Bar*/}
-                        {/*height={this.props.height}*/}
-                        {/*width={this.props.width}*/}
-                        {/*data={data}*/}
-                        {/*options={this.options}*/}
-                        {/*onElementsClick={this.handleClick}*/}
-                    {/*/>*/}
-                    <Doughnut
-                        data={data}
+                    <Bar
                         height={this.props.height}
                         width={this.props.width}
+                        data={data}
+                        options={this.options}
+                        onElementsClick={this.handleClick}
                     />
+                    {/*<Doughnut*/}
+                        {/*data={data}*/}
+                        {/*height={this.props.height}*/}
+                        {/*width={this.props.width}*/}
+                    {/*/>*/}
                 </Paper>
                 {/*<Paper>*/}
                     {/*{*/}
