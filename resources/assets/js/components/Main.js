@@ -57,22 +57,15 @@ class Main extends Component {
     }
 
     onParedesChanged(paredes) {
-        console.log("calculando angulos paredes");
         for (let pared of paredes) {
-            console.log("pared:", pared.id);
             let angulos = BalanceEnergetico.calcularAngulos(pared.gamma, 90, this.state.latitud, this.state.sunTimes);
-            console.log(angulos);
             let sun = SunCalc.getPosition(BalanceEnergetico.hourAngleToDate(angulos.omega, this.state.latitud, this.state.longitud), this.state.latitud, this.state.longitud);
             let azimuth = sun.azimuth * 180 / Math.PI;
-            console.log("AZIMUTH", azimuth);
             let gammas = BalanceEnergetico.calcularGammasPared(pared.gamma);
-            console.log("Gammas", gammas);
             let omega_mna = BalanceEnergetico.calcularOmegaPared(angulos.phi, angulos.delta, gammas.gamma1, this.state.latitud, this.state.longitud);
             let omega_tde = BalanceEnergetico.calcularOmegaPared(angulos.phi, angulos.delta, gammas.gamma2, this.state.latitud, this.state.longitud);
-            console.log("Omega Mañana", omega_mna);
-            console.log("Omega Tarde", omega_tde);
             let omegas = BalanceEnergetico.calcularHoraIncidencia(pared.gamma, angulos.w1, angulos.w2, omega_mna, omega_tde);
-            console.log("omegas", omegas);
+
             let omegasDate = {
                 wm: {
                     desde: omegas.wm[0] >= angulos.w1 && omegas.wm[0] <= angulos.w2 ?
@@ -106,6 +99,7 @@ class Main extends Component {
     }
 
     onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
+        console.log("dasdsa");
         this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion});
         // if(aporte_interno != null && aporte_interno !== this.state.aporte_interno){
         //     this.setState({aporte_interno: aporte_interno});

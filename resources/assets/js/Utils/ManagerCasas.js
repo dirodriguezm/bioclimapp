@@ -592,6 +592,8 @@ class ManagerCasas {
 
         this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
         this.casa.userData.aporteInterno += aporteInterno;
+
+        console.log(this.casa.userData.aporteInterno);
         this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
         this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
     }

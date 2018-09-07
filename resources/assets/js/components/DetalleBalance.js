@@ -41,15 +41,6 @@ class DetalleBalance extends Component{
     }
 
     componentDidUpdate(prevProps){
-        if(this.props.aporte_interno != null && this.props.aporte_interno !== this.state.aporte_interno){
-            this.setState({aporte_interno: this.props.aporte_interno});
-        }
-        if(this.props.perdida_conduccion != null && this.props.perdida_conduccion !== this.state.perdida_conduccion){
-            this.setState({perdida_conduccion: this.props.perdida_conduccion});
-        }
-        if(this.props.perdida_ventilacion != null && this.props.perdida_ventilacion !== this.state.perdida_ventilacion){
-            this.setState({perdida_ventilacion: this.props.perdida_ventilacion});
-        }
 
         // this.options = {
         //     maintainAspectRatio: false,
@@ -82,8 +73,8 @@ class DetalleBalance extends Component{
                     borderWidth: 1,
                     hoverBackgroundColor: 'rgba(48,63,159,0.8)',
                     hoverBorderColor: 'rgba(48,63,159,1)',
-                    data: [this.state.aporte_solar, this.state.aporte_interno,
-                        -this.state.perdida_conduccion, -this.state.perdida_ventilacion]
+                    data: [this.props.aporte_solar, this.props.aporte_interno,
+                        -this.props.perdida_conduccion, -this.props.perdida_ventilacion]
                 },
             ]
         };

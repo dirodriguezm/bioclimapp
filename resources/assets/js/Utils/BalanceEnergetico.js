@@ -301,9 +301,10 @@ function toDegrees(angle) {
 }
 
 function calcularF(ventana){
+    console.log(ventana);
     let fm = ventana.userData.info_marco.fs;
     let fs = ventana.userData.info_material.fs;
-    let um = ventana-userData.info_marco.u;
+    let um = ventana.userData.info_marco.u;
     return ventana.userData.far * ((1-fm) * fs + (fm * 0.04 * um * 0.35));
 }
 

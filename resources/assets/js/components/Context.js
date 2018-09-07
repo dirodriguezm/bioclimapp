@@ -406,7 +406,7 @@ class Context extends Component {
             let obstruccionesVentana = [];
             let current = {startPoint: null, betaAngle: 0, bDistance: 0, aDistance: 0, betaIndex: -1};
             if (ventana.userData.obstrucciones != null) {
-                for (let obs of ventana.obstrucciones) {
+                for (let obs of ventana.userData.obstrucciones) {
                     obs.betaIndex = null;
                     obs.betaAngle = null;
                 }

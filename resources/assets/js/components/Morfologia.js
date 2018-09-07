@@ -984,7 +984,9 @@ class Morfologia extends Component {
                 let aporte_interno = casa.userData.aporteInterno;
                 let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
                 let perdida_conduccion = casa.userData.perdidaPorConduccion;
+
                 this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
+
                 BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
