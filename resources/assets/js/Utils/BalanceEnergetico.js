@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import Morfologia from "../components/Morfologia";
 var SunCalc = require('suncalc');
 
 const diasMeses = [31,28,31,30,31,30,31,31,30,31,30,31];
@@ -36,14 +37,31 @@ function gradosDias(temperaturasMes, temperaturaConfort){
 }
 
 function transmitanciaSuperficie(elemento) {
-    let transmitancia = 0;
-    for(let capa of elemento.userData.capas){
-        transmitancia += capa.espesor / capa.conductividad;
+    let transmitancia = 0,u;
+    switch (elemento.userData.tipo) {
+        case Morfologia.tipos.PARED:
+            for(let capa of elemento.userData.capas){
+                transmitancia += capa.espesor / capa.conductividad;
+            }
+            transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
+            u = 1 / transmitancia;
+            elemento.userData.transmitancia = u;
+            elemento.userData.transSup = u * elemento.userData.superficie;
+            break;
+        case Morfologia.tipos.VENTANA:
+            elemento.userData.transSup = elemento.userData.info_material.u * elemento.userData.superficie;
+            break;
+
+        case Morfologia.tipos.PUERTA:
+            transmitancia += elemento.userData.info_material.espesor / elemento.userData.info_material.conductividad;
+            transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.parent.userData.separacion];
+
+            u = 1 / transmitancia;
+
+            elemento.userData.transmitancia = u;
+            elemento.userData.transSup = u * elemento.userData.superficie;
     }
-    transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
-    let u = 1 / transmitancia;
-    elemento.userData.transmitancia = u;
-    elemento.userData.transSup = u * elemento.userData.superficie;
+
 }
 
 function cambioTransmitanciaSuperficie(tramitanciaSuperficie, elementoCambio) {
@@ -283,7 +301,10 @@ function toDegrees(angle) {
 }
 
 function calcularF(ventana){
-    return ventana.far * ((1-ventana.fm) * ventana.fs + (ventana.fm * 0.04 * ventana.um * 0.35));
+    let fm = ventana.userData.info_marco.fs;
+    let fs = ventana.userData.info_material.fs;
+    let um = ventana-userData.info_marco.u;
+    return ventana.userData.far * ((1-fm) * fs + (fm * 0.04 * um * 0.35));
 }
 
 function calcularIgb(difusa, directa, rb){

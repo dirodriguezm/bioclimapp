@@ -125,6 +125,7 @@ class Morfologia extends Component {
 
         this.paredes = [];
         this.ventanas = [];
+        this.puertas = [];
         this.objetoSeleccionado = null;
         this.objetoClick = null;
         this.paredDeVentana = null;
@@ -146,7 +147,16 @@ class Morfologia extends Component {
         this.horasIluminacion = 5;
         this.aireRenovado = 5;
 
-        this.managerCasas = new ManagerCasas(this.escena, this.paredes, this.allObjects, this.ocupantes, this.horasIluminacion, this.aireRenovado);
+        this.managerCasas = new ManagerCasas(
+            this.escena,
+            this.paredes,
+            this.ventanas,
+            this.puertas,
+            this.allObjects,
+            this.ocupantes,
+            this.horasIluminacion,
+            this.aireRenovado
+        );
 
         //Camaras
 
@@ -1036,7 +1046,7 @@ class Morfologia extends Component {
         }
 
         //Si se está dibujando
-        if (this.props.dibujando !== -1 && this.props.dibujando < 6) {
+        if (this.props.dibujando !== -1 && this.props.dibujando < 7) {
             //se actualiza el indicador dependiendo que se esté dibujando
             let index = parseInt(this.props.dibujando);
             if (this.indicador_dibujado !== this.indicadores[index]) {
@@ -1090,21 +1100,25 @@ class Morfologia extends Component {
                     let pared = intersect.object;
                     let pos = intersect.point.clone();
                     this.managerCasas.moverVentanaConstruccion(pared, pos, intersect.point);
-                    /*pared.worldToLocal(pos);
-                    pos.round();
-                    if (pos.x < 2) {
-                        this.paredDeVentana = pared;
-                        this.indicador_dibujado.setRotationFromEuler(pared.rotation);
-                        this.indicador_dibujado.position.copy(intersect.point).round();
-                        this.indicador_dibujado.position.y = pared.parent.parent.nivel * pared.parent.parent.height;
-                    }*/
 
                 }else{
                     this.managerCasas.ocultarVentanaConstruccion();
                 }
             }
+            else if(this.props.dibujando == 6 ){
+                let intersects = this.raycaster.intersectObjects(this.paredes);
+                if (intersects.length > 0) {
+                    intersect = intersects[0];
+                    let pared = intersect.object;
+                    let pos = intersect.point.clone();
+                    this.managerCasas.moverPuertaConstruccion(pared, pos, intersect.point);
 
-        }else{
+                }else{
+                    this.managerCasas.ocultarPuertaConstruccion();
+                }
+            }
+        }
+        else{
             if(this.indicador_dibujado != null){
                 this.indicador_dibujado.visible = false;
                 this.indicador_dibujado = null;
@@ -1157,12 +1171,17 @@ class Morfologia extends Component {
 
     onClick(event) {
         event.preventDefault();
-        if (this.props.dibujando < 4 && this.props.dibujando != -1) {
+        if (this.props.dibujando < 4 && this.props.dibujando !== -1) {
             this.agregarCasa();
         }
 
-        if (this.props.dibujando == 5 && this.props.dibujando != -1) {
-            this.agregarVentana();
+        if (this.props.dibujando === 5 && this.props.dibujando !== -1) {
+            this.managerCasas.agregarVentana();
+            this.props.onVentanasChanged(this.ventanas);
+        }
+
+        if (this.props.dibujando === 6 && this.props.dibujando !== -1) {
+            this.managerCasas.agregarPuerta();
         }
 
         if(this.props.seleccionando){
