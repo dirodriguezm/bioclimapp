@@ -109,7 +109,7 @@ class ManagerCasas {
 
     getJsonMarcos(response) {
         this.info_marcos = response.data.slice();
-        for (let i = 0; i < this.info_material.length; i++) {
+        for (let i = 0; i < this.info_marcos.length; i++) {
             this.info_marcos[i].index = i;
             if (this.info_marcos[i].hasOwnProperty('tipos')) {
                 for (let j = 0; j < this.info_marcos[i].tipos.length; j++) {

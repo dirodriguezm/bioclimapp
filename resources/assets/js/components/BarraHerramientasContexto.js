@@ -7,7 +7,8 @@ import IconButton from '@material-ui/core/IconButton';
 import Undo from '@material-ui/icons/Undo';
 import Redo from '@material-ui/icons/Redo';
 import Delete from '@material-ui/icons/Delete';
-import AddCircle from '@material-ui/icons/AddCircle'
+import AddCircle from '@material-ui/icons/AddCircle';
+import Map from '@material-ui/icons/Map';
 import SvgIcon from '@material-ui/core/SvgIcon';
 import Tooltip from '@material-ui/core/Tooltip';
 import MenuItem from '@material-ui/core/MenuItem';
@@ -53,6 +54,7 @@ class BarraHerramientasContexto extends Component {
         this.handleSeleccionar = this.handleSeleccionar.bind(this);
         this.handleAgregar = this.handleAgregar.bind(this);
         this.handleBorrar = this.handleBorrar.bind(this);
+        this.handleSeleccionarLocalidad = this.handleSeleccionarLocalidad.bind(this);
     }
 
     handleSeleccionar(event) {
@@ -70,10 +72,19 @@ class BarraHerramientasContexto extends Component {
         this.props.borrarContexto();
     }
 
+    handleSeleccionarLocalidad(){
+        this.props.onSeleccionarLocalidad();
+    }
+
     render() {
         const {classes} = this.props;
         return (
             <div className={classes.root} align="center">
+                <Tooltip title="Seleccionar localidad">
+                    <IconButton className={classes.button} aria-label="Undo" onClick={this.handleSeleccionarLocalidad}>
+                        <Map/>
+                    </IconButton>
+                </Tooltip>
                 <Tooltip title="Deshacer">
                     <IconButton className={classes.button} aria-label="Undo">
                         <Undo/>

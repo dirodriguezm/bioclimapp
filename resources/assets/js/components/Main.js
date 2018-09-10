@@ -28,9 +28,7 @@ class Main extends Component {
             grade: "",
             sunPosition: null,
         };
-        this.onComunaChanged = this.onComunaChanged.bind(this);
         this.onParedesChanged = this.onParedesChanged.bind(this);
-        this.onRadiationsChanged = this.onRadiationsChanged.bind(this);
         this.onCasaChanged = this.onCasaChanged.bind(this);
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
     }
@@ -39,23 +37,9 @@ class Main extends Component {
      * that gets called after the component is rendered
      */
     componentDidMount() {
-        this.setState({
-            width: this.col.clientWidth,
-            height: this.col.clientHeight,
-        });
         //console.log(this.col);
     }
 
-
-    onComunaChanged(mapState) {
-        this.setState({
-            comuna: mapState.comuna,
-            latitud: mapState.lat,
-            longitud: mapState.lng,
-            sunTimes: mapState.sunTimes,
-            sunPosition: mapState.sunPosition,
-        });
-    }
 
     onParedesChanged(paredes) {
         for (let pared of paredes) {
@@ -95,9 +79,7 @@ class Main extends Component {
         });
     }
 
-    onRadiationsChanged(global, direct, difuse){
-        this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
-    }
+
 
     onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
         console.log("dasdsa");
@@ -131,47 +113,15 @@ class Main extends Component {
 
         return (
             <div className={classes.root}>
-                <Grid container spacing={8}>
-
-                    <Grid item xs={8}>
-                        <TabPanel
-                            comuna={this.state.comuna}
-                            radiaciones={this.state.radiaciones}
-                            onComunaChanged={this.onComunaChanged}
-                            onParedesChanged={this.onParedesChanged}
-                            onCasaChanged={this.onCasaChanged}
-                            onAporteSolarChanged={this.onAporteSolarChanged}
-                            sunPosition={sunPosition}
-                            camara={camara}
-                            paredes={this.state.paredes}
-                        />
-                    </Grid>
-                    <Grid item xs={4}>
-                        <MapContainer
-                            lat={-36.82013519999999}
-                            lng={-73.0443904}
-                            zoom={12}
-                            markers={[]}
-                            onComunaChanged={this.onComunaChanged}
-                        />
-                        <div ref={(col) => {
-                            this.col = col
-                        }}>
-                            <GeoInfoPanel
-                                comuna={this.state.comuna}
-                                width={this.state.width}
-                                height={this.state.height}
-                                onRadiationsChanged={this.onRadiationsChanged}
-                                aporte_solar={this.state.aporte_solar}
-                                aporte_interno={this.state.aporte_interno}
-                                perdida_conduccion={this.state.perdida_conduccion}
-                                perdida_ventilacion={this.state.perdida_ventilacion}
-                            />
-                        </div>
-                    </Grid>
-
-                </Grid>
-
+                <TabPanel
+                    comuna={this.state.comuna}
+                    onParedesChanged={this.onParedesChanged}
+                    onCasaChanged={this.onCasaChanged}
+                    onAporteSolarChanged={this.onAporteSolarChanged}
+                    sunPosition={sunPosition}
+                    camara={camara}
+                    paredes={this.state.paredes}
+                />
             </div>
         );
     }

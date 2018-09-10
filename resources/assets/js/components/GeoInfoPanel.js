@@ -15,6 +15,7 @@ import Tab from '@material-ui/core/Tab';
 import DetalleBalance from "./DetalleBalance";
 import SwipeableViews from "react-swipeable-views";
 import AppBar from "@material-ui/core/AppBar/AppBar";
+import CardHeader from "@material-ui/core/CardHeader/CardHeader";
 
 function TabContainer(props) {
     return (
@@ -48,16 +49,14 @@ const styles = theme => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
     },
-    contentLeft: {
-    },
+    contentLeft: {},
     contentShift: {
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
     },
-    contentShiftLeft: {
-    },
+    contentShiftLeft: {},
     appFrame: {
         zIndex: 1,
         overflow: 'hidden',
@@ -71,45 +70,35 @@ class GeoInfoPanel extends Component {
 
     constructor(props) {
         super(props);
-        this.handleChange = this.handleChange.bind(this);
-        this.handleChangeIndex = this.handleChangeIndex.bind(this);
-        this.state = {
-            comuna: props.comuna,
-            selected: 0,
-            width: props.width
+        this.state = {};
+    }
+
+
+    static getDerivedStateFromProps(nextProps, prevState) {
+        if (nextProps.comuna != null && nextProps.comuna !== prevState.comuna) {
+            return {comuna: nextProps.comuna};
         }
+        else return null;
     }
 
-    handleChange(event, value) {
-        this.setState({selected: value});
-    };
-    handleChangeIndex(index) {
-        this.setState({value: index});
-    };
-
-    componentDidMount() {
-
-    }
-
-    componentWillReceiveProps(nextProps) {
-        if (nextProps.comuna.nombre != this.state.comuna.nombre) {
+    componentDidUpdate(prevProps, prevState){
+        if(prevProps.comuna !== this.props.comuna){
             let pointer = this;
             let props = this.props;
-            axios.all([this.getTemperaturesById(nextProps.comuna.id), this.getGlobalRadiationById(nextProps.comuna.id),
-                this.getDirectRadiationById(nextProps.comuna.id), this.getDifuseRadiationById(nextProps.comuna.id)])
+            axios.all([this.getTemperaturesById(this.props.comuna.id), this.getGlobalRadiationById(this.props.comuna.id),
+                this.getDirectRadiationById(this.props.comuna.id), this.getDifuseRadiationById(this.props.comuna.id)])
                 .then(axios.spread(function (temps, global, direct, difuse) {
                     pointer.setState({
-                        comuna: nextProps.comuna,
+                        comuna: props.comuna,
                         temps: temps.data,
                         global: global.data,
                         directa: direct.data,
                         difusa: difuse.data,
-                        width: nextProps.width,
+                        height: props.height,
                     });
-                    props.onRadiationsChanged(global.data,direct.data,difuse.data);
+                    props.onRadiationsChanged(global.data, direct.data, difuse.data);
                 }));
         }
-
     }
 
     getTemperaturesById(id) {
@@ -119,9 +108,11 @@ class GeoInfoPanel extends Component {
     getGlobalRadiationById(id) {
         return axios.get('http://127.0.0.1:8000/api/radiaciones/' + id);
     }
+
     getDirectRadiationById(id) {
         return axios.get('http://127.0.0.1:8000/api/radiaciones_directa/' + id);
     }
+
     getDifuseRadiationById(id) {
         return axios.get('http://127.0.0.1:8000/api/radiaciones_difusa/' + id);
     }
@@ -131,7 +122,7 @@ class GeoInfoPanel extends Component {
         const {classes, theme} = this.props;
         let tempAnual = null;
         let radAnual = null;
-        if (this.state.temps) {
+        if (this.state.temps != null) {
             let tempsCopy = Object.assign([], this.state.temps);
             let radsCopy = Object.assign([], this.state.global);
             tempAnual = tempsCopy.pop();
@@ -143,6 +134,7 @@ class GeoInfoPanel extends Component {
             datasets: [
                 {
                     label: 'Temperatura promedio mensual',
+                    yAxisID: 'temperatura',
                     backgroundColor: 'rgba(48,63,159,0.5)',
                     borderColor: 'rgba(48,63,159,1)',
                     borderWidth: 1,
@@ -154,6 +146,7 @@ class GeoInfoPanel extends Component {
                 },
                 {
                     label: 'Temperatura promedio anual',
+                    yAxisID: 'temperatura',
                     type: 'line',
                     data: Array(12).fill(tempAnual ? tempAnual.valor : null),
                     fill: false,
@@ -162,148 +155,97 @@ class GeoInfoPanel extends Component {
                     borderWidth: 1,
                     pointRadius: 0,
                     pointHoverRadius: 0
-                }
-            ]
-        };
-        const optionsTemp = {
-            maintainAspectRatio: false,
-            responsive: false,
-            scales: {
-                yAxes: [{
-                    scaleLabel: {
-                        display: true,
-                        labelString: '°C'
-                    },
-                    ticks: {
-                        beginAtZero: true,
-                        stepSize: 5,
-                        min: 0,
-                        max: 25
-                    }
-                }],
-            }
-        }
-
-        const dataRad = {
-            labels: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
-            datasets: [
+                },
                 {
                     label: 'Radiación global promedio mensual',
-                    backgroundColor: 'rgba(48,63,159,0.5)',
-                    borderColor: 'rgba(48,63,159,1)',
+                    yAxisID: 'radiacion',
+                    backgroundColor: 'rgba(161, 146, 48, 0.5)',
+                    borderColor: 'rgba(161, 146, 48, 1)',
                     borderWidth: 1,
-                    hoverBackgroundColor: 'rgba(48,63,159,0.8)',
-                    hoverBorderColor: 'rgba(48,63,159,1)',
+                    hoverBackgroundColor: 'rgba(161, 146, 48, 0.8)',
+                    hoverBorderColor: 'rgba(161, 146, 48, 1)',
                     data: this.state.global ? this.state.global.map(function (rad) {
                         return rad.valor;
                     }) : null
                 },
                 {
                     label: 'Radiación global promedio anual',
+                    yAxisID: 'radiacion',
                     type: 'line',
                     data: Array(12).fill(radAnual ? radAnual.valor / 12 : null),
                     fill: false,
-                    borderColor: '#c51162',
-                    backgroundColor: "#c51162",
+                    borderColor: '#30a159',
+                    backgroundColor: "#30a159",
                     borderWidth: 1,
                     pointRadius: 0,
                     pointHoverRadius: 0
                 }
             ]
-        }
-
-        const optionsRad = {
+        };
+        const optionsTemp = {
             maintainAspectRatio: false,
-            responsive: false,
+            responsive: true,
             scales: {
                 yAxes: [{
+                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                    display: true,
+                    position: 'left',
+                    id: 'temperatura',
+                    ticks:{
+                        beginAtZero:true,
+                        stepSize: 5,
+                        min:0,
+                        max:25
+                    },
                     scaleLabel: {
                         display: true,
-                        labelString: 'Kw/m^2',
+                        labelString: '°C'
                     },
-                    ticks: {
-                        beginAtZero: true,
-                        stepSize: 50,
-                        min: 0,
-                        max: 350
-                    }
+                }, {
+                    type: 'linear', // only linear but allow scale type registration. This allows extensions to exist solely for log scale for instance
+                    display: true,
+                    position: 'right',
+                    id: 'radiacion',
+                    gridLines: {
+                        drawOnChartArea: false
+                    },
+                    ticks:{
+                        beginAtZero:true,
+                        stepSize: 60,
+                        min:0,
+                        max:300
+                    },
+                    scaleLabel: {
+                        display: true,
+                        labelString: 'KW/m^2'
+                    },
                 }],
             }
         }
+
 
         return (
             <div>
                 <Card className={classes.card}>
                     {
-                        this.state.comuna.nombre ?
+                        this.state.comuna != null ?
                             <div>
+                                <CardHeader
+                                    title={"Comuna: " + this.state.comuna.nombre}
+                                />
                                 <CardContent>
-                                    <Typography variant="headline" component="h4">Información Geográfica</Typography>
-                                    <Typography variant="subheading" color="textSecondary">
-                                        {"Comuna: " + this.state.comuna.nombre}
-                                    </Typography>
-                                    {/*<Paper>*/}
-                                        {/*<Tabs*/}
-                                            {/*value={this.state.selected}*/}
-                                            {/*indicatorColor="primary"*/}
-                                            {/*textColor="primary"*/}
-                                            {/*onChange={this.handleChange}*/}
-                                            {/*fullWidth*/}
-                                        {/*>*/}
-                                            {/*<Tab label="Temperatura"/>*/}
-                                            {/*<Tab label="Radiación"/>*/}
-                                            {/*<Tab label="Balance Energético"/>*/}
-                                        {/*</Tabs>*/}
-                                    {/*</Paper>*/}
-                                    <AppBar position="static">
-                                        <Tabs value={this.state.selected} onChange={this.handleChange} fullWidth>
-                                            <Tab label="Temperatura"/>
-                                            <Tab label="Radiación"/>
-                                            <Tab label="Balance Energético"/>
-                                        </Tabs>
-                                    </AppBar>
-                                    <SwipeableViews
-                                        axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
-                                        index={this.state.selected}
-                                        onChangeIndex={this.handleChangeIndex}
-                                    >
-                                        <TabContainer dir={theme.direction}>
-                                            <Bar
-                                                height={230}
-                                                width={this.state.width - 50}
-                                                data={dataTemp}
-                                                options={optionsTemp}
-                                            />
-                                        </TabContainer>
-                                        <TabContainer dir={theme.direction}>
-                                            <Bar
-                                                height={230}
-                                                width={this.state.width - 50}
-                                                data={dataRad}
-                                                options={optionsRad}
-                                            />
-                                        </TabContainer>
-                                        <TabContainer dir={theme.direction}>
-                                            <DetalleBalance
-                                                width={this.props.width}
-                                                height={230}
-                                                aporte_solar={this.props.aporte_solar}
-                                                aporte_interno={this.props.aporte_interno}
-                                                perdida_conduccion={this.props.perdida_conduccion}
-                                                perdida_ventilacion={this.props.perdida_ventilacion}
-                                            />
-                                        </TabContainer>
-                                    </SwipeableViews>
+                                    <Bar
+                                        height={280}
+                                        //width={this.state.width - 50}
+                                        data={dataTemp}
+                                        options={optionsTemp}
+                                    />
                                 </CardContent>
 
                             </div>
                             :
                             <CardContent>
-                                <Typography variant="headline" component="h4">Información Geográfica</Typography>
-                                <Typography variant="subheading" color="textSecondary">
-                                    Selecciona una comuna
-                                </Typography>
+                                <Typography variant="headline" component="h4">Selecciona una comuna</Typography>
                             </CardContent>
                     }
                 </Card>
