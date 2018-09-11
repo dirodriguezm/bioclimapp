@@ -54,15 +54,6 @@ const styles = theme => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
     },
-    contentLeft: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        marginLeft: -drawerWidth,
-    },
     contentRight: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
@@ -78,9 +69,6 @@ const styles = theme => ({
             easing: theme.transitions.easing.easeOut,
             duration: theme.transitions.duration.enteringScreen,
         }),
-    },
-    contentShiftLeft: {
-        marginLeft: drawerWidth,
     },
     contentShiftRight: {
         marginRight: -drawerWidth,
@@ -332,9 +320,45 @@ class TabPanel extends Component {
 
                     <TabContainer dir={theme.direction}>
                         <div className={classes.appFrame}>
+                        <main className={classNames(classes.contentRight)}>
+                            {this.state.width ?
+                            <Morfologia
+                                width={width}
+                                height={height}
+                                onParedesChanged={this.onParedesChanged}
+                                onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
+                                sunPosition={this.state.sunPosition}
+                                click2D={click2D}
+                                dibujando={dibujandoMorf}
+                                seleccionando={seleccionandoMorf}
+                                borrando={borrandoMorf}
+                                onVentanasChanged={this.onVentanasChanged}
+                                dimensionesPared={dimensionesPared}
+                                paredes={this.props.paredes}
+                                comuna={this.state.comuna}
+                                onCasaChanged={this.onCasaChanged}
+                            /> :
+                                <div></div>}
+                            <Paper className={classNames(classes.paper, classes.contentBarra, {
+                                [classes.contentShift]: openMorf,
+                                [classes.contentShiftRight]: openMorf,
+                            })}>
+                                <BarraHerramientasMorfologia
+                                    click2D={click2D}
+                                    dibujando={dibujandoMorf}
+                                    borrando={borrandoMorf}
+                                    seleccionando={seleccionandoMorf}
+                                    onPerspectiveChanged={this.onPerspectiveChanged}
+                                    onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
+                                    onBorrandoMorfChanged={this.onBorrandoMorfChanged}
+                                    onDibujandoMorfChanged={this.onDibujandoMorfChanged}
+                                />
+                            </Paper>
+                        </main>
+
                             <Drawer
                                 variant='persistent'
-                                anchor='left'
+                                anchor="right"
                                 open={openMorf}
                                 classes={{
                                     paper: classes.drawerPaper,
@@ -349,39 +373,6 @@ class TabPanel extends Component {
                                 />
                             </Drawer>
 
-                            <main className={classNames(classes.contentLeft)}>
-                                <Morfologia
-                                    width={width}
-                                    height={height}
-                                    onParedesChanged={this.onParedesChanged}
-                                    onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
-                                    sunPosition={this.state.sunPosition}
-                                    click2D={click2D}
-                                    dibujando={dibujandoMorf}
-                                    seleccionando={seleccionandoMorf}
-                                    borrando={borrandoMorf}
-                                    onVentanasChanged={this.onVentanasChanged}
-                                    dimensionesPared={dimensionesPared}
-                                    paredes={this.props.paredes}
-                                    comuna={this.state.comuna}
-                                    onCasaChanged={this.onCasaChanged}
-                                />
-                                <Paper className={classNames(classes.paper, classes.contentBarra, {
-                                    [classes.contentShift]: openMorf,
-                                    [classes.contentShiftLeft]: openMorf,
-                                })}>
-                                    <BarraHerramientasMorfologia
-                                        click2D={click2D}
-                                        dibujando={dibujandoMorf}
-                                        borrando={borrandoMorf}
-                                        seleccionando={seleccionandoMorf}
-                                        onPerspectiveChanged={this.onPerspectiveChanged}
-                                        onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
-                                        onBorrandoMorfChanged={this.onBorrandoMorfChanged}
-                                        onDibujandoMorfChanged={this.onDibujandoMorfChanged}
-                                    />
-                                </Paper>
-                            </main>
                         </div>
                     </TabContainer>
                 </SwipeableViews>
