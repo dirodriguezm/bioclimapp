@@ -17,7 +17,8 @@ import ListItem from '@material-ui/core/ListItem';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from "@material-ui/core/InputLabel";
-import FormControl from '@material-ui/core/FormControl'
+import FormControl from '@material-ui/core/FormControl';
+import Paper from '@material-ui/core/Paper';
     ;
 import Clear from '@material-ui/icons/Clear';
 import IconButton from '@material-ui/core/IconButton';
@@ -48,6 +49,10 @@ const styles = theme => ({
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
     },
+    paper: {
+        height: 300,
+        flexDirection: 'column'
+    },
 
 });
 
@@ -73,6 +78,7 @@ class InformacionPared extends Component {
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
         this.handleClickBorrar = this.handleClickBorrar.bind(this);
         this.handleChangeDimension = this.handleChangeDimension.bind(this);
+        this.clickCapa = this.clickCapa.bind(this);
     }
 
     componentDidUpdate(prevProps) {
@@ -141,6 +147,10 @@ class InformacionPared extends Component {
         this.setState({
             capas: capas,
         })
+    }
+
+    clickCapa() {
+        console.log("Click");
     }
 
     handleClickAgregar() {
@@ -261,13 +271,50 @@ class InformacionPared extends Component {
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
                                     <Grid item xs={12}>
-                                        {capas.length === 0 ?
+                                        <Grid container spacing={0}>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper} style={{backgroundColor: 'red', color: 'white'}} onClick={this.clickCapa}>
+                                                    {'nombre capa'.split('').map(char => <Typography>{char}</Typography>)}
+                                                </Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                            <Grid item xs>
+                                                <Paper className={classes.paper}></Paper>
+                                            </Grid>
+                                        </Grid>
+
+                                       {/* {capas.length === 0 ?
                                             <Typography
                                                 variant={"subheading"}
                                             >
                                                 {"No hay capas"}
                                             </Typography>
                                             :
+
+
+
+
+
                                             <List>
                                                 {capas.map(capa => (
                                                     <ListItem>
@@ -383,7 +430,7 @@ class InformacionPared extends Component {
                                                     </ListItem>
                                                 ), this)}
                                             </List>
-                                        }
+                                        }*/}
 
                                     </Grid>
 

@@ -420,55 +420,63 @@ class TabPanel extends Component {
                         </Drawer>
                     </div>
 
-
-
-
-                    <TabContainer dir={theme.direction}>
-                        {/*<Drawer*/}
-                            {/*variant='persistent'*/}
-                            {/*anchor='left'*/}
-                            {/*open={openMorf}*/}
-                            {/*classes={{*/}
-                                {/*paper: classes.drawerPaper,*/}
-                            {/*}}*/}
-                        {/*>*/}
-                            {/*<InformacionEstructura*/}
-                                {/*seleccionado={seleccionadoMorf}*/}
-                                {/*comuna={this.state.comuna}*/}
-                                {/*ventanas={this.state.ventanas}*/}
-                                {/*onAporteSolarChanged={this.onAporteSolarChanged}*/}
-                                {/*onDimensionChanged={this.onDimensionChanged}*/}
-                            {/*/>*/}
-                        {/*</Drawer>*/}
-                        <Morfologia
-                            width={width}
-                            height={height}
-                            onParedesChanged={this.onParedesChanged}
-                            onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
-                            sunPosition={this.state.sunPosition}
-                            click2D={click2D}
-                            dibujando={dibujandoMorf}
-                            seleccionando={seleccionandoMorf}
-                            borrando={borrandoMorf}
-                            onVentanasChanged={this.onVentanasChanged}
-                            dimensionesPared={dimensionesPared}
-                            paredes={this.props.paredes}
-                            comuna={this.state.comuna}
-                            onCasaChanged={this.onCasaChanged}
-                        />
-                        <Paper className={classes.paper}>
-                            <BarraHerramientasMorfologia
-                                click2D={click2D}
-                                dibujando={dibujandoMorf}
-                                borrando={borrandoMorf}
-                                seleccionando={seleccionandoMorf}
-                                onPerspectiveChanged={this.onPerspectiveChanged}
-                                onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
-                                onBorrandoMorfChanged={this.onBorrandoMorfChanged}
-                                onDibujandoMorfChanged={this.onDibujandoMorfChanged}
+                    <div className={classes.appFrame}>
+                        <div className={classNames(classes.contentInside, classes.contentRight, {
+                            [classes.contentShift]: !openMorf,
+                            [classes.contentShiftRight]: !openMorf,
+                        })}>
+                            <TabContainer dir={theme.direction}>
+                                {this.state.width ?
+                                    <Morfologia
+                                        width={width}
+                                        height={height}
+                                        onParedesChanged={this.onParedesChanged}
+                                        onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
+                                        sunPosition={this.state.sunPosition}
+                                        click2D={click2D}
+                                        dibujando={dibujandoMorf}
+                                        seleccionando={seleccionandoMorf}
+                                        borrando={borrandoMorf}
+                                        onVentanasChanged={this.onVentanasChanged}
+                                        dimensionesPared={dimensionesPared}
+                                        paredes={this.props.paredes}
+                                        comuna={this.state.comuna}
+                                        onCasaChanged={this.onCasaChanged}
+                                    />:
+                                    <div></div>
+                                }
+                                <Paper className={classes.paper}>
+                                    <BarraHerramientasMorfologia
+                                        click2D={click2D}
+                                        dibujando={dibujandoMorf}
+                                        borrando={borrandoMorf}
+                                        seleccionando={seleccionandoMorf}
+                                        onPerspectiveChanged={this.onPerspectiveChanged}
+                                        onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
+                                        onBorrandoMorfChanged={this.onBorrandoMorfChanged}
+                                        onDibujandoMorfChanged={this.onDibujandoMorfChanged}
+                                    />
+                                </Paper>
+                            </TabContainer>
+                        </div>
+                        <Drawer
+                            variant='persistent'
+                            anchor='right'
+                            open={openMorf}
+                            hidden={!openMorf}
+                            classes={{
+                                paper: classes.drawerPaper,
+                            }}
+                        >
+                            <InformacionEstructura
+                                seleccionado={seleccionadoMorf}
+                                comuna={this.state.comuna}
+                                ventanas={this.state.ventanas}
+                                onAporteSolarChanged={this.onAporteSolarChanged}
+                                onDimensionChanged={this.onDimensionChanged}
                             />
-                        </Paper>
-                    </TabContainer>
+                        </Drawer>
+                    </div>
                 </SwipeableViews>
             </div>
         );
