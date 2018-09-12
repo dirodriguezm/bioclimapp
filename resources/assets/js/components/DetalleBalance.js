@@ -4,6 +4,25 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+
+const styles = theme => ({
+    root: {
+        flexGrow: 1,
+        background: '#212121'
+    },
+    paper: {
+        padding: theme.spacing.unit * 2,
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+        background: '#37474F'
+    },
+    title: {
+        textAlign: 'center',
+        color: 'white',
+        padding: theme.spacing.unit,
+    }
+});
 
 class DetalleBalance extends Component{
     constructor(props){
@@ -64,6 +83,8 @@ class DetalleBalance extends Component{
     }
 
     render(){
+        const { classes } = this.props;
+
         const data = {
             labels: ['Aportes Solares','Aportes Internos','Pérdidas por Conducción','Pérdidas por Ventilación'],
             datasets: [
@@ -79,53 +100,73 @@ class DetalleBalance extends Component{
                 },
             ]
         };
-
-        // if(this.props.aporte_solar != null){
-        //     let i = 0;
-        //     for(let key in this.props.aporte_solar){
-        //         if(i === 0) {i++; continue};
-        //         this.componentes_aporte_solar.push(key);
-        //         this.values.push(this.props.aporte_solar[key]);
-        //         i++;
-        //     }
-        // }
-        //
-        // const data_aportes_solares = {
-        //     labels: componentes_aporte_solar,
-        //     datasets: [{
-        //         data: values,
-        //     }]
-        // };
+        const dataAportes = {
+            labels: ['Aportes Solares','Aportes Internos'],
+            datasets: [
+                {
+                    data: [this.props.aporte_solar * 10000, this.props.aporte_interno],
+                    backgroundColor:['#3F51B5','#673AB7'],
+                    borderColor: ['#7E57C2','#5C6BC0'],
+                    label: 'Aportes'
+                }
+            ]
+        };
+        const dataPerdidas = {
+            labels: ['Pérdidas por Conducción','Pérdidas por Ventilación'],
+            datasets: [
+                {
+                    data: [this.props.perdida_conduccion, this.props.perdida_ventilacion],
+                    backgroundColor:['#E91E63','#9C27B0'],
+                    borderColor: ['#EC407A','#AB47BC'],
+                    label: 'Perdidas'
+                }
+            ]
+        };
+        const options = {
+            legend: {
+                labels: {
+                    fontColor: '#F5F5F5'
+                }
+            },
+        }
 
         return(
-            <div>
-                <Paper>
-                    <Bar
-                        height={this.props.height}
-                        width={this.props.width}
-                        data={data}
-                        options={this.options}
-                        onElementsClick={this.handleClick}
-                    />
-                    {/*<Doughnut*/}
-                        {/*data={data}*/}
-                        {/*height={this.props.height}*/}
-                        {/*width={this.props.width}*/}
-                    {/*/>*/}
-                </Paper>
-                {/*<Paper>*/}
-                    {/*{*/}
-                        {/*this.state.clicked != null &&*/}
-                        {/*<div>*/}
-                            {/*<Typography>{Object.keys(this.state.clicked)[0]}</Typography>*/}
+            <div className={classes.root}>
+                <Typography variant="title" gutterBottom className={classes.title}>
+                    Balance Energético
+                </Typography>
+                <Grid container spacing={24}>
+                    <Grid item xs={12}>
+                        {this.props.aporte_solar != null || this.props.aporte_interno != null ?
+                            <Paper className={classes.paper}>
+                                <Doughnut
+                                    data={dataAportes}
+                                    options={options}
+                                />
+                            </Paper>
+                            :
+                            <div/>
+                        }
+                    </Grid>
+                    <Grid item xs={12}>
+                        {this.props.perdida_conduccion != null || this.props.perdida_ventilacion != null ?
+                            <Paper className={classes.paper}>
+                                <Doughnut
+                                    data={dataPerdidas}
+                                    options={options}
+                                />
+                            </Paper>
+                            :
+                            <div/>
+                        }
 
-                        {/*</div>*/}
-                    {/*}*/}
-
-                {/*</Paper>*/}
+                    </Grid>
+                </Grid>
             </div>
         );
     }
 }
-
-export default DetalleBalance
+DetalleBalance.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+export default withStyles(styles) (DetalleBalance);

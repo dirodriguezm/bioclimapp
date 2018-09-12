@@ -32,7 +32,7 @@ function TabContainer(props) {
     );
 }
 
-const drawerWidth = 500;
+const drawerWidth = 400;
 const drawerRightWidth = 500;
 
 TabContainer.propTypes = {
@@ -310,9 +310,7 @@ class TabPanel extends Component {
     }
 
     onSeleccionarLocalidad(){
-        this.setState({
-            drawer_localidad: !this.state.drawer_localidad
-        })
+        this.setState({drawer_localidad: !this.state.drawer_localidad})
     }
 
 
@@ -351,7 +349,14 @@ class TabPanel extends Component {
                         paper: classes.drawerPaper,
                     }}
                 >
-                    DASHBOARD
+                    <DetalleBalance
+                        width={this.state.width}
+                        height={230}
+                        aporte_solar={this.state.aporte_solar}
+                        aporte_interno={this.state.aporte_interno}
+                        perdida_conduccion={this.state.perdida_conduccion}
+                        perdida_ventilacion={this.state.perdida_ventilacion}
+                    />
                 </Drawer>
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
