@@ -13,17 +13,16 @@ import Context from './Context';
 import BarraHerramientasMorfologia from './BarraHerramientasMorfologia';
 import BarraHerramientasContexto from './BarraHerramientasContexto';
 import Paper from '@material-ui/core/Paper';
-import IconButton from "@material-ui/core/IconButton";
-import Slide from "@material-ui/core/Slide"
 import Drawer from "@material-ui/core/Drawer";
 import InformacionEstructura from './InformacionEstructura'
-import Tooltip from "@material-ui/core/Tooltip";
-import Undo from '@material-ui/icons/Undo';
-import Redo from '@material-ui/icons/Redo';
 import DetalleBalance from "./DetalleBalance";
 import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 import GeoInfoPanel from "./GeoInfoPanel";
 import MapContainer from "./MapContainer";
+import IconButton from '@material-ui/core/IconButton';
+import MenuIcon from '@material-ui/icons/Menu';
+import DashboardIcon from '@material-ui/icons/Dashboard';
+import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 
 function TabContainer(props) {
     return (
@@ -34,6 +33,7 @@ function TabContainer(props) {
 }
 
 const drawerWidth = 500;
+const drawerRightWidth = 500;
 
 TabContainer.propTypes = {
     children: PropTypes.node.isRequired,
@@ -42,9 +42,41 @@ const styles = theme => ({
     root: {
         flexGrow: 1,
     },
+    appBar: {
+        position: 'absolute',
+        transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+    },
+    appBarShift: {
+        width: `calc(100% - ${drawerWidth}px)`,
+        transition: theme.transitions.create(['margin', 'width'], {
+            easing: theme.transitions.easing.easeOut,
+            duration: theme.transitions.duration.enteringScreen,
+        }),
+    },
+    appBarShiftLeft: {
+        marginLeft: drawerWidth,
+    },
+    toolbar: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'flex-end',
+        padding: '0 8px',
+        ...theme.mixins.toolbar,
+    },
+    menuButton: {
+        marginLeft: 12,
+        marginRight: 20,
+    },
     drawerPaper: {
         position: 'relative',
         width: drawerWidth,
+    },
+    drawerRightPaper:{
+        position: 'relative',
+        width: drawerRightWidth
     },
     contentBarra: {
         flexGrow: 1,
@@ -54,25 +86,29 @@ const styles = theme => ({
             duration: theme.transitions.duration.leavingScreen,
         }),
     },
-    contentLeft: {
+    content: {
+        flexGrow: 1,
+        backgroundColor: theme.palette.background.default,
+        paddingTop: theme.spacing.unit * 9,
+        transition: theme.transitions.create('margin', {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.leavingScreen,
+        }),
+    },
+    contentInside: {
         flexGrow: 1,
         backgroundColor: theme.palette.background.default,
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
+    },
+    contentLeft: {
         marginLeft: -drawerWidth,
     },
     contentRight: {
-        flexGrow: 1,
-        backgroundColor: theme.palette.background.default,
-        transition: theme.transitions.create('margin', {
-            easing: theme.transitions.easing.sharp,
-            duration: theme.transitions.duration.leavingScreen,
-        }),
-        marginRight: -drawerWidth,
+        marginRight: -drawerRightWidth,
     },
-
     contentShift: {
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.easeOut,
@@ -80,10 +116,10 @@ const styles = theme => ({
         }),
     },
     contentShiftLeft: {
-        marginLeft: drawerWidth,
+        marginLeft: 0,
     },
     contentShiftRight: {
-        marginRight: -drawerWidth,
+        marginRight: 0,
     },
     appFrame: {
         zIndex: 1,
@@ -91,6 +127,9 @@ const styles = theme => ({
         position: 'relative',
         display: 'flex',
         width: '100%',
+    },
+    hide: {
+        display: 'none',
     },
 });
 
@@ -107,6 +146,8 @@ class TabPanel extends Component {
             seleccionadoMorf: null,
             openMorf: false,
             dimensionesPared: null,
+            openDashboard: false,
+            drawer_localidad: false,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -128,6 +169,8 @@ class TabPanel extends Component {
         this.onRadiationsChanged = this.onRadiationsChanged.bind(this);
         this.onComunaChanged = this.onComunaChanged.bind(this);
         this.onSeleccionarLocalidad = this.onSeleccionarLocalidad.bind(this);
+        this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
+        this.handleDashboardOpen = this.handleDashboardOpen.bind(this);
     }
 
     handleDrawerOpen() {
@@ -137,6 +180,18 @@ class TabPanel extends Component {
     handleDrawerClose() {
         this.setState({openMorf: false});
     };
+
+    handleDashboardOpen(){
+        if(this.state.openDashboard){
+            let width = this.state.width;
+            this.setState({width: width + drawerWidth });
+        }
+        else {
+            let width = this.state.width;
+            this.setState({width: width - drawerWidth });
+        }
+        this.setState({openDashboard: !this.state.openDashboard});
+    }
 
     componentDidMount() {
         this.setState({
@@ -176,7 +231,8 @@ class TabPanel extends Component {
     }
 
     onParedesChanged(paredes) {
-        this.props.onParedesChanged(paredes);
+        let paredes_calculadas = BalanceEnergetico.calcularRbParedes(paredes.slice(), this.state.latitud, this.state.longitud, this.state.sunTimes);
+        this.setState({paredes: paredes_calculadas});
     }
 
     onVentanasChanged(ventanas){
@@ -184,7 +240,7 @@ class TabPanel extends Component {
     }
 
     onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
-        this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
+        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion});
     }
 
     agregarContexto() {
@@ -203,8 +259,12 @@ class TabPanel extends Component {
         let month = new Date().getMonth();
         let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
         console.log("APORTE SOLAR", aporte_solar);
-        this.props.onAporteSolarChanged(aporte_solar);
+        this.onAporteSolarChanged(aporte_solar);
         this.setState({ventanas: ventanas});
+    }
+
+    onAporteSolarChanged(aporte_solar){
+        this.setState({aporte_solar: aporte_solar});
     }
 
     //OJO, es objeto seleccionado desde morfologia
@@ -255,30 +315,59 @@ class TabPanel extends Component {
         })
     }
 
+
     render() {
         const {classes, theme, sunPosition} = this.props;
         const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensionesPared} = this.state;
-
         return (
 
-            <div className={classes.root} ref={(tab) => {
+            <div className={classes.appFrame} ref={(tab) => {
                 this.tab = tab
             }}>
-                <AppBar position="static">
-                    <Tabs value={value} onChange={this.handleChange} fullWidth centered>
-                        <Tab label="Contexto"/>
-                        <Tab label="Morfología"/>
-                    </Tabs>
+                <AppBar  className={classNames(classes.appBar, {
+                    [classes.appBarShift]: this.state.openDashboard,
+                    [classes.appBarShiftLeft]: this.state.openDashboard,
+                })}>
+                    <Toolbar>
+                        <IconButton
+                            color="inherit"
+                            aria-label="Dashboard"
+                            onClick={this.handleDashboardOpen}
+                            className={classNames(classes.menuButton)}
+                        >
+                            <DashboardIcon />
+                        </IconButton>
+                        <Tabs value={value} onChange={this.handleChange}  centered>
+                            <Tab label="Contexto"/>
+                            <Tab label="Morfología"/>
+                        </Tabs>
+                    </Toolbar>
                 </AppBar>
+                <Drawer
+                    variant="persistent"
+                    anchor={'left'}
+                    open={this.state.openDashboard}
+                    classes={{
+                        paper: classes.drawerPaper,
+                    }}
+                >
+                    DASHBOARD
+                </Drawer>
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={this.state.value}
                     onChangeIndex={this.handleChangeIndex}
-                    >
-                    <TabContainer dir={theme.direction}>
-                        <div className={classes.appFrame}>
-
-                            <main className={classNames(classes.contentRight)}>
+                    className={classNames(classes.content, classes.contentLeft, {
+                        [classes.contentShift]: this.state.openDashboard,
+                        [classes.contentShiftLeft]: this.state.openDashboard,
+                    })}
+                >
+                    <div className={classes.appFrame}>
+                        <div className={classNames(classes.contentInside, classes.contentRight, {
+                            [classes.contentShift]: this.state.drawer_localidad,
+                            [classes.contentShiftRight]: this.state.drawer_localidad,
+                        })}>
+                            <TabContainer dir={theme.direction}>
                                 {this.state.width ?
                                     <Context
                                         width={this.state.width}
@@ -292,10 +381,7 @@ class TabPanel extends Component {
                                     /> :
                                     <div></div>
                                 }
-                                <Paper className={classNames(classes.paper, classes.contentBarra, {
-                                    [classes.contentShift]: this.state.drawer_localidad,
-                                    [classes.contentShiftRight]: this.state.drawer_localidad,
-                                })}>
+                                <Paper className={classes.paper}>
                                     <BarraHerramientasContexto
                                         agregarContexto={this.agregarContexto}
                                         seleccionar={this.seleccionar}
@@ -303,86 +389,80 @@ class TabPanel extends Component {
                                         onSeleccionarLocalidad={this.onSeleccionarLocalidad}
                                     />
                                 </Paper>
-                            </main>
-                            <Drawer
-                                variant='persistent'
-                                anchor="right"
-                                open={this.state.drawer_localidad}
-                                classes={{
-                                    paper: classes.drawerPaper,
-                                }}
-                            >
-                                <MapContainer
-                                    lat={-36.82013519999999}
-                                    lng={-73.0443904}
-                                    zoom={12}
-                                    markers={[]}
-                                    onComunaChanged={this.onComunaChanged}
-                                />
-                                <GeoInfoPanel
-                                    comuna={this.state.comuna}
-                                    // width={this.props.width}
-                                    // height={this.state.height}
-                                    onRadiationsChanged={this.onRadiationsChanged}
-                                />
-                            </Drawer>
-
+                            </TabContainer>
                         </div>
-                    </TabContainer>
+                        <Drawer
+                            variant="persistent"
+                            anchor={'right'}
+                            open={this.state.drawer_localidad}
+                            classes={{
+                                paper: classes.drawerRightPaper,
+                            }}
+                        >
+                            <MapContainer
+                                lat={-36.82013519999999}
+                                lng={-73.0443904}
+                                zoom={12}
+                                markers={[]}
+                                onComunaChanged={this.onComunaChanged}
+                            />
+                            <GeoInfoPanel
+                                comuna={this.state.comuna}
+                                // width={this.props.width}
+                                // height={this.state.height}
+                                onRadiationsChanged={this.onRadiationsChanged}
+                                />
+                        </Drawer>
+                    </div>
+
+
+
 
                     <TabContainer dir={theme.direction}>
-                        <div className={classes.appFrame}>
-                            <Drawer
-                                variant='persistent'
-                                anchor='left'
-                                open={openMorf}
-                                classes={{
-                                    paper: classes.drawerPaper,
-                                }}
-                            >
-                                <InformacionEstructura
-                                    seleccionado={seleccionadoMorf}
-                                    comuna={this.state.comuna}
-                                    ventanas={this.state.ventanas}
-                                    onAporteSolarChanged={this.props.onAporteSolarChanged}
-                                    onDimensionChanged={this.onDimensionChanged}
-                                />
-                            </Drawer>
-
-                            <main className={classNames(classes.contentLeft)}>
-                                <Morfologia
-                                    width={width}
-                                    height={height}
-                                    onParedesChanged={this.onParedesChanged}
-                                    onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
-                                    sunPosition={this.state.sunPosition}
-                                    click2D={click2D}
-                                    dibujando={dibujandoMorf}
-                                    seleccionando={seleccionandoMorf}
-                                    borrando={borrandoMorf}
-                                    onVentanasChanged={this.onVentanasChanged}
-                                    dimensionesPared={dimensionesPared}
-                                    paredes={this.props.paredes}
-                                    comuna={this.state.comuna}
-                                    onCasaChanged={this.onCasaChanged}
-                                />
-                                <Paper className={classNames(classes.paper, classes.contentBarra, {
-                                    [classes.contentShift]: openMorf,
-                                    [classes.contentShiftLeft]: openMorf,
-                                })}>
-                                    <BarraHerramientasMorfologia
-                                        click2D={click2D}
-                                        dibujando={dibujandoMorf}
-                                        borrando={borrandoMorf}
-                                        seleccionando={seleccionandoMorf}
-                                        onPerspectiveChanged={this.onPerspectiveChanged}
-                                        onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
-                                        onBorrandoMorfChanged={this.onBorrandoMorfChanged}
-                                        onDibujandoMorfChanged={this.onDibujandoMorfChanged}
-                                    />
-                                </Paper>
-                            </main>
-                        </div>
+                        {/*<Drawer*/}
+                            {/*variant='persistent'*/}
+                            {/*anchor='left'*/}
+                            {/*open={openMorf}*/}
+                            {/*classes={{*/}
+                                {/*paper: classes.drawerPaper,*/}
+                            {/*}}*/}
+                        {/*>*/}
+                            {/*<InformacionEstructura*/}
+                                {/*seleccionado={seleccionadoMorf}*/}
+                                {/*comuna={this.state.comuna}*/}
+                                {/*ventanas={this.state.ventanas}*/}
+                                {/*onAporteSolarChanged={this.onAporteSolarChanged}*/}
+                                {/*onDimensionChanged={this.onDimensionChanged}*/}
+                            {/*/>*/}
+                        {/*</Drawer>*/}
+                        <Morfologia
+                            width={width}
+                            height={height}
+                            onParedesChanged={this.onParedesChanged}
+                            onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
+                            sunPosition={this.state.sunPosition}
+                            click2D={click2D}
+                            dibujando={dibujandoMorf}
+                            seleccionando={seleccionandoMorf}
+                            borrando={borrandoMorf}
+                            onVentanasChanged={this.onVentanasChanged}
+                            dimensionesPared={dimensionesPared}
+                            paredes={this.props.paredes}
+                            comuna={this.state.comuna}
+                            onCasaChanged={this.onCasaChanged}
+                        />
+                        <Paper className={classes.paper}>
+                            <BarraHerramientasMorfologia
+                                click2D={click2D}
+                                dibujando={dibujandoMorf}
+                                borrando={borrandoMorf}
+                                seleccionando={seleccionandoMorf}
+                                onPerspectiveChanged={this.onPerspectiveChanged}
+                                onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
+                                onBorrandoMorfChanged={this.onBorrandoMorfChanged}
+                                onDibujandoMorfChanged={this.onDibujandoMorfChanged}
+                            />
+                        </Paper>
                     </TabContainer>
                 </SwipeableViews>
             </div>

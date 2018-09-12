@@ -113,6 +113,12 @@ class Context extends Component {
             this.ventanas = this.props.ventanas.slice();
             this.calcularFAR(this.ventanas);
         }
+        if(this.props.width !== prevProps.width ){
+            this.renderer.setSize(this.props.width, this.props.height);
+            this.camara.aspect = this.props.width / this.props.height;
+            this.camara.updateProjectionMatrix();
+            this.renderer.render(this.escena, this.camara);
+        }
     }
 
     componentDidMount() {
@@ -602,7 +608,7 @@ class Context extends Component {
                         handleRotation={this.handleRotation}
                         handleChange={this.handleParamChange}
                     />
-                </Popper>;
+                </Popper>
 
             </div>
 

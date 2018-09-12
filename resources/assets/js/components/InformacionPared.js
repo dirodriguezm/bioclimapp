@@ -179,6 +179,70 @@ class InformacionPared extends Component {
         } else {
             hasTipos = null;
         }
+        let info_rb = <div/>;
+        if(seleccionado != null){
+            if (seleccionado.omegas.wm.desde != null && seleccionado.omegas.wt.desde == null){
+                info_rb = <div>
+                    <ExpansionPanelDetails>
+                        La pared recibe sol
+                        desde: {seleccionado.omegas.wm.desde.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        Hasta: {seleccionado.omegas.wm.hasta.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        RB: {seleccionado.rb}
+                    </ExpansionPanelDetails>
+                </div>
+            }
+            else if (seleccionado.omegas.wm.desde == null && seleccionado.omegas.wt.desde != null){
+                info_rb = <div>
+                    <ExpansionPanelDetails>
+                        La pared recibe sol
+                        desde: {seleccionado.omegas.wt.desde.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        Hasta: {seleccionado.omegas.wt.hasta.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        RB: {seleccionado.rb}
+                    </ExpansionPanelDetails>
+                </div>
+            }
+            else if(seleccionado.omegas.wm.desde != null && seleccionado.omegas.wt.desde != null){
+                info_rb = <div>
+                    <ExpansionPanelDetails>
+                        La pared recibe sol
+                        desde: {seleccionado.omegas.wm.desde.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        Hasta: {seleccionado.omegas.wm.hasta.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        Y luego desde: {seleccionado.omegas.wt.desde.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        Hasta: {seleccionado.omegas.wt.hasta.toLocaleTimeString()}
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        RB: {seleccionado.rb}
+                    </ExpansionPanelDetails>
+                </div>
+            }
+            else{
+                info_rb = <div>
+                    <ExpansionPanelDetails>
+                        La pared no recibe sol.
+                    </ExpansionPanelDetails>
+                    <ExpansionPanelDetails>
+                        RB: {seleccionado.rb}
+                    </ExpansionPanelDetails>
+                </div>
+
+            }
+        }
+
+
 
         return (
             <div>
@@ -501,33 +565,9 @@ class InformacionPared extends Component {
 
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>Dimensiones</Typography>
+                                <Typography className={classes.heading}>Radiación Solar</Typography>
                             </ExpansionPanelSummary>
-                            {seleccionado.omegas.wm.desde != null ?
-                                <ExpansionPanelDetails>
-                                    La pared recibe sol
-                                    desde: {seleccionado.omegas.wm.desde.getHours()}:{seleccionado.omegas.wm.desde.getMinutes()}
-                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
-                            }
-                            {seleccionado.omegas.wm.hasta != null ?
-                                <ExpansionPanelDetails>
-                                    Hasta: {seleccionado.omegas.wm.hasta.getHours()}:{seleccionado.omegas.wm.hasta.getMinutes()}
-                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
-                            }
-                            {seleccionado.omegas.wt.desde != null ?
-                                <ExpansionPanelDetails>
-                                    Y
-                                    desde: {seleccionado.omegas.wt.desde.getHours()}:{seleccionado.omegas.wt.desde.getMinutes()}
-                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
-                            }
-                            {seleccionado.omegas.wt.hasta != null ?
-                                <ExpansionPanelDetails>
-                                    Hasta: {seleccionado.omegas.wt.hasta.getHours()}:{seleccionado.omegas.wt.hasta.getMinutes()}
-                                </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
-                            }
-                            <ExpansionPanelDetails>
-                                RB: {seleccionado.rb}
-                            </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
+                            {info_rb}
 
                         </ExpansionPanel>
 
