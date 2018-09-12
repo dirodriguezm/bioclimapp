@@ -43,7 +43,7 @@ const styles = theme => ({
         flexGrow: 1,
     },
     drawerPaper: {
-        position: 'relative',
+        position: 'absolute',
         width: drawerWidth,
     },
     contentBarra: {
@@ -167,11 +167,11 @@ class TabPanel extends Component {
         this.props.onParedesChanged(paredes);
     }
 
-    onVentanasChanged(ventanas){
+    onVentanasChanged(ventanas) {
         this.setState({ventanas: ventanas});
     }
 
-    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
+    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion) {
         this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
     }
 
@@ -189,7 +189,7 @@ class TabPanel extends Component {
 
     onFarChanged(ventanas) {
         let month = new Date().getMonth();
-        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
+        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas, this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
         console.log("APORTE SOLAR", aporte_solar);
         this.props.onAporteSolarChanged(aporte_solar);
         this.setState({ventanas: ventanas});
@@ -223,7 +223,7 @@ class TabPanel extends Component {
         this.handleDrawerClose();
     }
 
-    onDimensionChanged(pared, width, height){
+    onDimensionChanged(pared, width, height) {
         this.setState({
             dimensionesPared: {
                 pared: pared,
@@ -233,11 +233,11 @@ class TabPanel extends Component {
         });
     }
 
-    onRadiationsChanged(global, direct, difuse){
+    onRadiationsChanged(global, direct, difuse) {
         this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
     }
 
-    onSeleccionarLocalidad(){
+    onSeleccionarLocalidad() {
         this.setState({
             drawer_localidad: !this.state.drawer_localidad
         })
@@ -262,7 +262,7 @@ class TabPanel extends Component {
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={this.state.value}
                     onChangeIndex={this.handleChangeIndex}
-                    >
+                >
                     <TabContainer dir={theme.direction}>
                         <div className={classes.appFrame}>
 
@@ -320,46 +320,48 @@ class TabPanel extends Component {
 
                     <TabContainer dir={theme.direction}>
                         <div className={classes.appFrame}>
-                        <main className={classNames(classes.contentRight)}>
-                            {this.state.width ?
-                            <Morfologia
-                                width={width}
-                                height={height}
-                                onParedesChanged={this.onParedesChanged}
-                                onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
-                                sunPosition={this.state.sunPosition}
-                                click2D={click2D}
-                                dibujando={dibujandoMorf}
-                                seleccionando={seleccionandoMorf}
-                                borrando={borrandoMorf}
-                                onVentanasChanged={this.onVentanasChanged}
-                                dimensionesPared={dimensionesPared}
-                                paredes={this.props.paredes}
-                                comuna={this.state.comuna}
-                                onCasaChanged={this.onCasaChanged}
-                            /> :
-                                <div></div>}
-                            <Paper className={classNames(classes.paper, classes.contentBarra, {
-                                [classes.contentShift]: openMorf,
-                                [classes.contentShiftRight]: openMorf,
-                            })}>
-                                <BarraHerramientasMorfologia
-                                    click2D={click2D}
-                                    dibujando={dibujandoMorf}
-                                    borrando={borrandoMorf}
-                                    seleccionando={seleccionandoMorf}
-                                    onPerspectiveChanged={this.onPerspectiveChanged}
-                                    onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
-                                    onBorrandoMorfChanged={this.onBorrandoMorfChanged}
-                                    onDibujandoMorfChanged={this.onDibujandoMorfChanged}
-                                />
-                            </Paper>
-                        </main>
+                            <main className={classNames(classes.contentRight)}>
+                                {this.state.width ?
+                                    <Morfologia
+                                        width={width}
+                                        height={height}
+                                        onParedesChanged={this.onParedesChanged}
+                                        onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
+                                        sunPosition={this.state.sunPosition}
+                                        click2D={click2D}
+                                        dibujando={dibujandoMorf}
+                                        seleccionando={seleccionandoMorf}
+                                        borrando={borrandoMorf}
+                                        onVentanasChanged={this.onVentanasChanged}
+                                        dimensionesPared={dimensionesPared}
+                                        paredes={this.props.paredes}
+                                        comuna={this.state.comuna}
+                                        onCasaChanged={this.onCasaChanged}
+                                    /> :
+                                    <div></div>
+                                }
+                                <Paper className={classNames(classes.paper, classes.contentBarra, {
+                                    [classes.contentShift]: openMorf,
+                                    [classes.contentShiftRight]: openMorf,
+                                })}>
+                                    <BarraHerramientasMorfologia
+                                        click2D={click2D}
+                                        dibujando={dibujandoMorf}
+                                        borrando={borrandoMorf}
+                                        seleccionando={seleccionandoMorf}
+                                        onPerspectiveChanged={this.onPerspectiveChanged}
+                                        onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
+                                        onBorrandoMorfChanged={this.onBorrandoMorfChanged}
+                                        onDibujandoMorfChanged={this.onDibujandoMorfChanged}
+                                    />
+                                </Paper>
+                            </main>
 
                             <Drawer
                                 variant='persistent'
                                 anchor="right"
                                 open={openMorf}
+                                hidden={!openMorf}
                                 classes={{
                                     paper: classes.drawerPaper,
                                 }}

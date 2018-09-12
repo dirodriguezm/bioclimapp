@@ -503,30 +503,30 @@ class InformacionPared extends Component {
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography className={classes.heading}>Dimensiones</Typography>
                             </ExpansionPanelSummary>
-                            {seleccionado.omegas.wm.desde != null ?
+                            {seleccionado.userData.omegas.wm.desde != null ?
                                 <ExpansionPanelDetails>
                                     La pared recibe sol
-                                    desde: {seleccionado.omegas.wm.desde.getHours()}:{seleccionado.omegas.wm.desde.getMinutes()}
+                                    desde: {seleccionado.userData.omegas.wm.desde.getHours()}:{seleccionado.userData.omegas.wm.desde.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
                             }
-                            {seleccionado.omegas.wm.hasta != null ?
+                            {seleccionado.userData.omegas.wm.hasta != null ?
                                 <ExpansionPanelDetails>
-                                    Hasta: {seleccionado.omegas.wm.hasta.getHours()}:{seleccionado.omegas.wm.hasta.getMinutes()}
+                                    Hasta: {seleccionado.userData.omegas.wm.hasta.getHours()}:{seleccionado.userData.omegas.wm.hasta.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
                             }
-                            {seleccionado.omegas.wt.desde != null ?
+                            {seleccionado.userData.omegas.wt.desde != null ?
                                 <ExpansionPanelDetails>
                                     Y
-                                    desde: {seleccionado.omegas.wt.desde.getHours()}:{seleccionado.omegas.wt.desde.getMinutes()}
+                                    desde: {seleccionado.userData.omegas.wt.desde.getHours()}:{seleccionado.userData.omegas.wt.desde.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Desde: -</ExpansionPanelDetails>
                             }
-                            {seleccionado.omegas.wt.hasta != null ?
+                            {seleccionado.userData.omegas.wt.hasta != null ?
                                 <ExpansionPanelDetails>
-                                    Hasta: {seleccionado.omegas.wt.hasta.getHours()}:{seleccionado.omegas.wt.hasta.getMinutes()}
+                                    Hasta: {seleccionado.userData.omegas.wt.hasta.getHours()}:{seleccionado.userData.omegas.wt.hasta.getMinutes()}
                                 </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
                             }
                             <ExpansionPanelDetails>
-                                RB: {seleccionado.rb}
+                                RB: {seleccionado.userData.rb}
                             </ExpansionPanelDetails> : <ExpansionPanelDetails>Hasta: -</ExpansionPanelDetails>
 
                         </ExpansionPanel>
