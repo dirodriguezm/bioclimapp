@@ -58,6 +58,12 @@ class Morfologia extends Component {
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
             this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
         }
+        if(this.props.width !== prevProps.width ){
+            this.renderer.setSize(this.props.width, this.props.height);
+            this.camara.aspect = this.props.width / this.props.height;
+            this.camara.updateProjectionMatrix();
+            this.renderer.render(this.escena, this.camara);
+        }
     }
 
     onComunaChanged() {

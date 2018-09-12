@@ -347,6 +347,38 @@ function calcularAporteSolar(ventanas, difusa, directa){
     // };
 }
 
+function calcularRbParedes(paredes, latitud, longitud, sunTimes) {
+    for (let pared of paredes) {
+        let angulos = calcularAngulos(pared.gamma, 90,  latitud,  sunTimes);
+        let sun = SunCalc.getPosition(hourAngleToDate(angulos.omega,  latitud,  longitud),  latitud,  longitud);
+        let azimuth = sun.azimuth * 180 / Math.PI;
+        let gammas = calcularGammasPared(pared.gamma);
+        let omega_mna = calcularOmegaPared(angulos.phi, angulos.delta, gammas.gamma1,  latitud,  longitud);
+        let omega_tde = calcularOmegaPared(angulos.phi, angulos.delta, gammas.gamma2,  latitud,  longitud);
+        let omegas = calcularHoraIncidencia(pared.gamma, angulos.w1, angulos.w2, omega_mna, omega_tde);
+
+        let omegasDate = {
+            wm: {
+                desde: omegas.wm[0] >= angulos.w1 && omegas.wm[0] <= angulos.w2 ?
+                    hourAngleToDate(omegas.wm[0], latitud,  longitud) : null,
+                hasta: omegas.wt[0] >= angulos.w1 && omegas.wt[0] <= angulos.w2 ?
+                    hourAngleToDate(omegas.wt[0], latitud,  longitud) : null
+            },
+            wt: {
+                desde: omegas.wm[1] >= angulos.w1 && omegas.wm[1] <= angulos.w2 ?
+                    hourAngleToDate(omegas.wm[1], latitud,  longitud): null,
+                hasta: omegas.wt[1] >= angulos.w1 && omegas.wt[1] <= angulos.w2 ?
+                    hourAngleToDate(omegas.wt[1], latitud,  longitud): null
+            }
+        };
+
+        let Rb = calcularRB(angulos, pared, omegas);
+        pared.omegas = omegasDate;
+        pared.rb = Rb;
+    }
+    return paredes;
+}
+
 export {perdidasConduccion, puenteTermico, cambioTransmitanciaSuperficie, transmitanciaSuperficie, calcularGammaParedes , aporteInterno , gradosDias, perdidasVentilacion, calcularF,
     calcularIgb, calcularAngulos, calcularHoraIncidencia, calcularOmegaPared, calcularRB,
-    calcularGammasPared, hourAngleToDate, getHourAngle, calcularAporteSolar};
+    calcularGammasPared, hourAngleToDate, getHourAngle, calcularAporteSolar, calcularRbParedes};
