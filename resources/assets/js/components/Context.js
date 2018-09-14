@@ -39,6 +39,7 @@ class Context extends Component {
         this.ventanas = [];
         let PW_N = new Map(); // p/w orientacion norte para calculo de FAV2
         this.PW_N = PW_N;
+        this.dif = 0;
         PW_N.set(0, [1,1,1,1,1,1,1,1,1,1]);
         PW_N.set(0.2, [0.89,0.94,0.97,0.99,0.99,0.99,1,1,1,1]);
         PW_N.set(0.4, [0.75,0.81,0.89,0.94,0.96,0.98,0.99,1,1,1]);
@@ -114,9 +115,26 @@ class Context extends Component {
             this.calcularFAR(this.ventanas);
         }
         if(this.props.width !== prevProps.width ){
+            if(this.props.width < prevProps.width){
+                this.dif = prevProps.width - this.props.width;
+            }
+            else{
+                this.dif = 0;
+            }
             this.renderer.setSize(this.props.width, this.props.height);
-            this.camara.aspect = this.props.width / this.props.height;
+            this.escena.remove(this.camara);
+            this.camara = new THREE.OrthographicCamera(this.props.width / -20, this.props.width / 20, this.props.height / 20, this.props.height / -20, 1, 2000);
+            this.camara.position.set(0, 10, 0);
+            this.camara.lookAt(new THREE.Vector3());
+            this.camara.zoom = 0.8;
             this.camara.updateProjectionMatrix();
+            this.escena.add(this.camara);
+            this.control = new Orbitcontrols(this.camara, this.renderer.domElement);
+            this.control.maxPolarAngle = 0;
+            this.control.maxAzimuthAngle = 0;
+            this.control.minAzimuthAngle = 0;
+            this.control.enabled = true;
+            this.control.enableKeys = true;
             this.renderer.render(this.escena, this.camara);
         }
     }
@@ -244,14 +262,6 @@ class Context extends Component {
         this.escena.add(light);
 
         this.mount.appendChild(this.renderer.domElement);
-        let popperDiv = document.createElement('div');
-        popperDiv.setAttribute("id", "popperDiv");
-        popperDiv.style.position = 'absolute';
-        popperDiv.style.top = '200px';
-        popperDiv.style.left = '200px';
-        document.body.appendChild(popperDiv);
-        this.setState({anchorEl: popperDiv});
-
         this.start();
     }
 
@@ -306,9 +316,9 @@ class Context extends Component {
         text2.style.height = 100;
         text2.style.backgroundColor = "#f0f0f0";
         text2.innerHTML = Math.round(point.x) + "," + Math.round(point.y);
-        text2.style.top = (event.clientY) + 'px';
-        text2.style.left = (event.clientX + 20) + 'px';
-        document.body.appendChild(text2);
+        text2.style.top = (event.clientY - 60 ) + 'px';
+        text2.style.left = (event.clientX + 20 - this.dif) + 'px';
+        this.mount.parentNode.insertBefore(text2,this.mount);
 
         if (this.dibujando) {
             this.nuevaObstruccion();
@@ -320,7 +330,8 @@ class Context extends Component {
 
     onClick(event) {
         if (this.seleccionando) {
-            this.onSelectObstruction();
+            event.client
+            this.onSelectObstruction(event.clientX, event.clientY);
         }
         if (this.borrando) {
             this.onDeleteObstruction();
@@ -373,13 +384,13 @@ class Context extends Component {
         }
     }
 
-    onSelectObstruction() {
+    onSelectObstruction(x,y) {
         if (this.intersections.length > 0) {
             if (this.selectedObstruction !== this.hoveredObstruction && this.selectedObstruction != null) {
                 this.selectedObstruction.material = new THREE.MeshBasicMaterial({color: this.selectedObstruction.currentHex});
             }
             this.selectedObstruction = this.hoveredObstruction;
-            this.setState({open: true});
+            this.setState({open: true, popperCoords: {x:x, y:y}});
         }
         else {
             this.selectedObstruction.material = new THREE.MeshBasicMaterial({color: this.selectedObstruction.currentHex});
@@ -584,11 +595,25 @@ class Context extends Component {
 
 
     render() {
-        const anchorEl = this.state.anchorEl;
         const open = this.state.open;
         const id = open ? 'simple-popper' : null;
+        console.log("popper coords", this.state.popperCoords);
+        let divStyle = {
+            position: 'absolute',
+            left: this.state.popperCoords != null ? (this.state.popperCoords.x - this.dif)+ 'px' : 0,
+            top: this.state.popperCoords != null ? this.state.popperCoords.y + 'px' : 0,
+            zIndex: 1
+        }
+        console.log("popper open", open);
         return (
             <div>
+                <div
+                    ref={(popper) => {
+                        this.popper = popper
+                    }}
+                    style={divStyle}
+                />
+
                 <div
                     ref={(mount) => {
                         this.mount = mount
@@ -600,17 +625,15 @@ class Context extends Component {
                     onMouseLeave={this.onMouseLeave}
                     onKeyDown={this.onKeyDown}
                 />
-
-
-                <Popper id={id} open={open} anchorEl={anchorEl}>
+                <Popper id={id} open={open} anchorEl={this.popper} style={{zIndex:1}}>
                     <InfoObstruccion
                         selectedObstruction={this.selectedObstruction}
                         handleRotation={this.handleRotation}
                         handleChange={this.handleParamChange}
                     />
                 </Popper>
-
             </div>
+
 
         )
     }

@@ -58,17 +58,17 @@ class BarraHerramientasContexto extends Component {
     }
 
     handleSeleccionar(event) {
-        this.setState({seleccionar: true});
+        //this.setState({seleccionar: true});
         this.props.seleccionar();
     }
 
     handleAgregar(event) {
-        this.setState({agregar: true});
+        //this.setState({agregar: true});
         this.props.agregarContexto();
     }
 
     handleBorrar(event){
-        this.setState({borrar: true});
+        //this.setState({borrar: true});
         this.props.borrarContexto();
     }
 

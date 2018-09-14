@@ -4,6 +4,25 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
+import Grid from '@material-ui/core/Grid';
+
+const styles = theme => ({
+    root: {
+        flexGrow: 1,
+        background: '#F0F0F0'
+    },
+    paper: {
+        padding: theme.spacing.unit * 2,
+        textAlign: 'center',
+        color: theme.palette.text.secondary,
+        background: '#fdfdfd'
+    },
+    title: {
+        textAlign: 'center',
+        color: 'black',
+        padding: theme.spacing.unit,
+    }
+});
 
 class DetalleBalance extends Component{
     constructor(props){
@@ -15,8 +34,6 @@ class DetalleBalance extends Component{
             perdida_conduccion : 0,
             perdida_ventilacion : 0,
         };
-
-        this.data_componentes = [];
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -37,95 +54,88 @@ class DetalleBalance extends Component{
     }
 
     componentDidMount(){
-
+        this.options = {
+            legend: {
+                labels: {
+                    fontColor: '#212121'
+                }
+            },
+        }
     }
 
     componentDidUpdate(prevProps){
-
-        console.log("PROPS", this.props);
-        // this.options = {
-        //     maintainAspectRatio: false,
-        //     responsive: false,
-        //     scales:{
-        //         yAxes: [{
-        //             scaleLabel: {
-        //                 display: true,
-        //                 labelString: '°C'
-        //             },
-        //             ticks:{
-        //                 beginAtZero:false,
-        //                 stepSize: 5,
-        //                 // min: Math.min(this.props.perdidas_conduccion,this.props.perdidas_ventilacion) - 5,
-        //                 // max: Math.max(this.props.aportes_solares,this.props.aportes_internos) + 5
-        //             }
-        //         }],
-        //     }
-        // };
+        if(this.props.aporte_solar !== prevProps.aporte_solar || this.props.aporte_interno !== prevProps.aporte_interno) {
+            this.setState({
+                dataAportes : {
+                    labels: ['Aportes Solares', 'Aportes Internos'],
+                    datasets: [
+                        {
+                            data: [this.props.aporte_solar * 10000, this.props.aporte_interno],
+                            backgroundColor: ['#F19C00', '#F16600'],
+                            borderColor: ['#F19C00', '#F16600'],
+                            label: 'Aportes'
+                        }
+                    ]
+                }
+            });
+        }
+        if(this.props.perdida_conduccion !== prevProps.perdida_conduccion || this.props.perdida_ventilacion !== prevProps.perdida_ventilacion) {
+            this.setState({
+                dataPerdidas: {
+                    labels: ['Pérdidas por Conducción', 'Pérdidas por Ventilación'],
+                    datasets: [
+                        {
+                            data: [this.props.perdida_conduccion, this.props.perdida_ventilacion],
+                            backgroundColor: ['#009688', '#1043A0'],
+                            borderColor: ['#009688', '#1043A0'],
+                            label: 'Perdidas'
+                        }
+                    ]
+                }
+            });
+        }
     }
 
     render(){
-        const data = {
-            labels: ['Aportes Solares','Aportes Internos','Pérdidas por Conducción','Pérdidas por Ventilación'],
-            datasets: [
-                {
-                    label: 'Balance Energético',
-                    backgroundColor: 'rgba(48,63,159,0.5)',
-                    borderColor: 'rgba(48,63,159,1)',
-                    borderWidth: 1,
-                    hoverBackgroundColor: 'rgba(48,63,159,0.8)',
-                    hoverBorderColor: 'rgba(48,63,159,1)',
-                    data: [this.props.aporte_solar*100000, this.props.aporte_interno,
-                        -this.props.perdida_conduccion, -this.props.perdida_ventilacion]
-                },
-            ]
-        };
-
-        // if(this.props.aporte_solar != null){
-        //     let i = 0;
-        //     for(let key in this.props.aporte_solar){
-        //         if(i === 0) {i++; continue};
-        //         this.componentes_aporte_solar.push(key);
-        //         this.values.push(this.props.aporte_solar[key]);
-        //         i++;
-        //     }
-        // }
-        //
-        // const data_aportes_solares = {
-        //     labels: componentes_aporte_solar,
-        //     datasets: [{
-        //         data: values,
-        //     }]
-        // };
+        const { classes } = this.props;
 
         return(
-            <div>
-                <Paper>
-                    <Bar
-                        height={this.props.height}
-                        width={this.props.width}
-                        data={data}
-                        options={this.options}
-                        onElementsClick={this.handleClick}
-                    />
-                    {/*<Doughnut*/}
-                        {/*data={data}*/}
-                        {/*height={this.props.height}*/}
-                        {/*width={this.props.width}*/}
-                    {/*/>*/}
-                </Paper>
-                {/*<Paper>*/}
-                    {/*{*/}
-                        {/*this.state.clicked != null &&*/}
-                        {/*<div>*/}
-                            {/*<Typography>{Object.keys(this.state.clicked)[0]}</Typography>*/}
+            <div className={classes.root}>
+                <Typography variant="headline" gutterBottom className={classes.title}>
+                    Balance Energético
+                </Typography>
+                <Grid container spacing={24}>
+                    <Grid item xs={12}>
+                        {this.state.dataAportes != null ?
+                            <Paper className={classes.paper}>
+                                <Doughnut
+                                    data={this.state.dataAportes}
+                                    options={this.options}
+                                />
+                            </Paper>
+                            :
+                            <div/>
+                        }
+                    </Grid>
+                    <Grid item xs={12}>
+                        {this.state.dataPerdidas != null ?
+                            <Paper className={classes.paper}>
+                                <Doughnut
+                                    data={this.state.dataPerdidas}
+                                    options={this.options}
+                                />
+                            </Paper>
+                            :
+                            <div/>
+                        }
 
-                        {/*</div>*/}
-                    {/*}*/}
-
-                {/*</Paper>*/}
+                    </Grid>
+                </Grid>
             </div>
         );
     }
 }
-
-export default DetalleBalance
+DetalleBalance.propTypes = {
+    classes: PropTypes.object.isRequired,
+};
+export default withStyles(styles) (DetalleBalance);

@@ -237,6 +237,7 @@ class BarraHerramientasMorfologia extends Component {
         this.handleDibujo = this.handleDibujo.bind(this);
         this.handleClickSeleccionar = this.handleClickSeleccionar.bind(this);
         this.onActionChanged = this.onActionChanged.bind(this);
+        this.handleSunpathClick = this.handleSunpathClick.bind(this);
 
     };
 
@@ -316,6 +317,10 @@ class BarraHerramientasMorfologia extends Component {
     handleClickAddPredefined(event) {
         this.setState({dibujo: event.target.value});
         this.props.onDrawingChanged(event.target.value);
+    }
+
+    handleSunpathClick(){
+        this.props.onSunpathClicked();
     }
 
 
@@ -569,6 +574,17 @@ class BarraHerramientasMorfologia extends Component {
                         </MenuItem>
                     </Tooltip>
                 </Menu>
+
+                <Tooltip title="Ver/Ocultar Sunpath">
+                    <div>
+                        <IconButton
+                            className={classes.button}
+                            aria-label="Sunpath"
+                            onClick={this.handleSunpathClick}>
+                            <CursorIcon/>
+                        </IconButton>
+                    </div>
+                </Tooltip>
 
 
             </div>

@@ -147,7 +147,8 @@ class TabPanel extends Component {
             openMorf: false,
             dimensionesPared: null,
             openDashboard: false,
-            drawer_localidad: false,
+            drawer_localidad: true,
+            sunPathClicked: false,
             paredCapaChange: false,
         };
         this.handleChange = this.handleChange.bind(this);
@@ -172,6 +173,7 @@ class TabPanel extends Component {
         this.onSeleccionarLocalidad = this.onSeleccionarLocalidad.bind(this);
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
         this.handleDashboardOpen = this.handleDashboardOpen.bind(this);
+        this.onSunpathClicked = this.onSunpathClicked.bind(this);
         this.onCapaChanged = this.onCapaChanged.bind(this);
         this.onCapaReady = this.onCapaReady.bind(this);
     }
@@ -230,6 +232,7 @@ class TabPanel extends Component {
             longitud: mapState.lng,
             sunTimes: mapState.sunTimes,
             sunPosition: mapState.sunPosition,
+            sunPath: mapState.sunPath,
         });
     }
 
@@ -325,9 +328,12 @@ class TabPanel extends Component {
     }
 
     onSeleccionarLocalidad(){
-        this.setState({
-            drawer_localidad: !this.state.drawer_localidad
-        })
+        this.setState((state) => {
+            return {drawer_localidad: !state.drawer_localidad}
+        });
+    }
+    onSunpathClicked(){
+        this.setState( (state) => {return {sunPathClicked: !state.sunPathClicked}});
     }
 
 
@@ -366,7 +372,14 @@ class TabPanel extends Component {
                         paper: classes.drawerPaper,
                     }}
                 >
-                    DASHBOARD
+                    <DetalleBalance
+                        width={this.state.width}
+                        height={230}
+                        aporte_solar={this.state.aporte_solar}
+                        aporte_interno={this.state.aporte_interno}
+                        perdida_conduccion={this.state.perdida_conduccion}
+                        perdida_ventilacion={this.state.perdida_ventilacion}
+                    />
                 </Drawer>
                 <SwipeableViews
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
@@ -387,7 +400,7 @@ class TabPanel extends Component {
                                     <Context
                                         width={this.state.width}
                                         height={this.state.height}
-                                        sunPosition={this.props.sunPosition}
+                                        sunPosition={this.state.sunPosition}
                                         agregarContexto={this.state.agregarContexto}
                                         seleccionar={this.state.seleccionar}
                                         borrarContexto={this.state.borrarContexto}
@@ -443,6 +456,7 @@ class TabPanel extends Component {
                                         onParedesChanged={this.onParedesChanged}
                                         onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
                                         sunPosition={this.state.sunPosition}
+                                        sunPath={this.state.sunPath}
                                         click2D={click2D}
                                         dibujando={dibujandoMorf}
                                         seleccionando={seleccionandoMorf}
@@ -455,6 +469,7 @@ class TabPanel extends Component {
                                         onCapaReady={this.onCapaReady}
                                         paredCapaChange={paredCapaChange}
                                         seleccionadoMorf={seleccionadoMorf}
+                                        sunPathClicked={this.state.sunPathClicked}
                                     />:
                                     <div></div>
                                 }
