@@ -33,14 +33,32 @@ class MaterialController extends Controller
         foreach (Material::all() as $material){
             $obj = new \stdClass();
             $obj->material = $material->nombre;
+            $obj->color = $material->color;
             $material_propiedades = MaterialTienePropiedad::where('material_id','=',$material->id)->get();
             $tipos = [];
             $propiedades = [];
             foreach ($material_propiedades as $item) {
                 foreach ($item->tipo as $tipo){
                     $propiedad = PropiedadMaterial::find($item->propiedad_id);
-                    $tipo->propiedad = $propiedad;
-                    array_push($tipos,$tipo);
+                    if(count($tipos) > 0){
+                        if($tipos[count($tipos)-1]->id == $tipo->id){
+                            $propiedadesTipo = $tipos[count($tipos)-1]->propiedades;
+                            array_push($propiedadesTipo, $propiedad);
+                            $tipos[count($tipos)-1]->propiedades = $propiedadesTipo;
+                        }else{
+                            $tipo->propiedades = [];
+                            $propiedadesTipo = $tipo->propiedades;
+                            array_push($propiedadesTipo, $propiedad);
+                            $tipo->propiedades = $propiedadesTipo;
+                            array_push($tipos,$tipo);
+                        }
+                    }else{
+                        $tipo->propiedades = [];
+                        $propiedadesTipo = $tipo->propiedades;
+                        array_push($propiedadesTipo, $propiedad);
+                        $tipo->propiedades = $propiedadesTipo;
+                        array_push($tipos,$tipo);
+                    }
                 }
                 if(count($tipos) > 0){
                     $obj->tipos = $tipos;
@@ -50,8 +68,8 @@ class MaterialController extends Controller
                     array_push($propiedades,$propiedad);
                     $obj->propiedades = $propiedades;
                 }
-
             }
+
             array_push($response,$obj);
         }
         return response($response);

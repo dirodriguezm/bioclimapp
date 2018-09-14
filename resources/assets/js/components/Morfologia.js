@@ -64,6 +64,16 @@ class Morfologia extends Component {
             this.camara.updateProjectionMatrix();
             this.renderer.render(this.escena, this.camara);
         }
+
+        if(this.props.paredCapaChange){
+            this.managerCasas.capasChanged(this.props.seleccionadoMorf);
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
+            this.props.onCapaReady();
+        }
     }
 
     onComunaChanged() {
@@ -1260,6 +1270,7 @@ Morfologia.propTypes = {
     seleccionando: PropTypes.bool,
     onSeleccionadoChanged: PropTypes.func,
     dimensionesPared: PropTypes.object,
+    onCapaReady: PropTypes.func,
 
 };
 

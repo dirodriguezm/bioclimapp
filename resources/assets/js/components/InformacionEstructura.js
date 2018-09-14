@@ -42,7 +42,7 @@ class InformacionEstructura extends Component {
     }
 
     render() {
-        const {classes, seleccionado, onDimensionChanged} = this.props;
+        const {classes, seleccionado, onDimensionChanged, onCapaChanged} = this.props;
 
 
         return (
@@ -50,6 +50,8 @@ class InformacionEstructura extends Component {
                 <InformacionPared
                     seleccionado={seleccionado}
                     onDimensionChanged={onDimensionChanged}
+                    onCapaChanged={onCapaChanged}
+
                 />
 
                 <InformacionVentana
@@ -67,6 +69,7 @@ class InformacionEstructura extends Component {
 InformacionEstructura.propTypes = {
     classes: PropTypes.object.isRequired,
     onDimensionChanged: PropTypes.func,
+    onCapaChanged: PropTypes.func,
     seleccionado: PropTypes.object,
 };
 

@@ -162,6 +162,22 @@ class ManagerCasas {
         this.habitacionConstruccion.visible = true;
     }
 
+    capasChanged(elemento){
+        let habitacion = elemento.parent.parent;
+
+        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+
+        transmitanciaSuperficies -= elemento.userData.transSup;
+        BalanceEnergetico.transmitanciaSuperficie(elemento);
+        transmitanciaSuperficies += elemento.userData.transSup;
+
+        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+
+        habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
+
+        this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
+    }
+
     agregarHabitacionDibujada(){
 
         var habitacion = this.habitacionConstruccion.clone();
@@ -186,14 +202,14 @@ class ManagerCasas {
                 [
                     {
                         material : 1,
-                        tipo : null,
+                        tipo : 0,
                         propiedad : 0,
                         conductividad : this.info_material[1].propiedades[0].conductividad,
                         espesor : 0.1
                     },
                     {
                         material : 3,
-                        tipo : null,
+                        tipo : 0,
                         propiedad : 0,
                         conductividad : this.info_material[3].propiedades[0].conductividad,
                         espesor : 0.2
@@ -234,7 +250,7 @@ class ManagerCasas {
                     material : 11,
                     tipo : 2,
                     propiedad : 0,
-                    conductividad : this.info_material[11].tipos[2].propiedad.conductividad,
+                    conductividad : this.info_material[11].tipos[2].propiedades[0].conductividad,
                     espesor : 0.2
                 }
             ];
