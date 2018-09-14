@@ -170,12 +170,16 @@ class ManagerCasas {
         transmitanciaSuperficies -= elemento.userData.transSup;
         BalanceEnergetico.transmitanciaSuperficie(elemento);
         transmitanciaSuperficies += elemento.userData.transSup;
+        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
 
         this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
 
         habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
+        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
 
         this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
+        this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
     }
 
     agregarHabitacionDibujada(){
