@@ -81,6 +81,7 @@ class InfoObstruccion extends Component{
     }
 
     render(){
+        console.log("this is rendering");
         const {classes} = this.props;
         return(
             <div className={classes.root}>

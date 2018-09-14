@@ -37,7 +37,10 @@ class Morfologia extends Component {
     componentDidUpdate(prevProps) {
         if (this.props.sunPosition !== prevProps.sunPosition) {
             this.onSunpositionChanged();
-
+        }
+        if(this.props.sunPath !== prevProps.sunPath){
+            console.log("SUNPATH", this.props.sunPath);
+            this.getSunPath();
         }
         if (this.props.click2D !== prevProps.click2D) {
             this.onPerspectiveChanged();
@@ -63,6 +66,9 @@ class Morfologia extends Component {
             this.camara.aspect = this.props.width / this.props.height;
             this.camara.updateProjectionMatrix();
             this.renderer.render(this.escena, this.camara);
+        }
+        if(this.props.sunPathClicked !== prevProps.sunPathClicked){
+            this.handleSunpathClicked(this.props.sunPathClicked);
         }
     }
 
@@ -100,6 +106,76 @@ class Morfologia extends Component {
         this.light.position.set(sunPos.x, sunAlt.y - 1, sunPos.z);
 
         this.sol.position.set(this.light.position.x, this.light.position.y, this.light.position.z);
+    }
+
+    handleSunpathClicked(sunPathClicked){
+        let sunPath = this.escena.getObjectByName("sunPath");
+        if(sunPathClicked){
+            if(sunPath != null){
+                for(let child of sunPath){
+                    child.visible = false;
+                }
+            } sunPath.visible = false;
+        }
+        else{
+            if(sunPath != null){
+                for(let child of sunPath){
+                    child.visible = true;
+                }
+            } sunPath.visible = true;
+        }
+    }
+
+    getSunPath(){
+        let sunPath = this.escena.getObjectByName("sunPath");
+        if(sunPath != null){
+            this.escena.remove(sunPath);
+        }
+        let day = -1;
+        let allPoints= [];
+        let today = -1;
+        let group = new THREE.Group();
+        group.name = "sunPath";
+        for(let daySunPath of this.props.sunPath){
+            day++;
+            let curvePoints = [];
+            for(let sunPosition of daySunPath){
+                let sunDegrees = this.transformGammaToDegree(sunPosition.azimuth);
+                let index = Math.round(sunDegrees);
+                let sunPosCircle = this.circlePoints[index];
+                index = Math.round(sunPosition.altitude);
+                if (index < 0) {
+                    index = 360 + index;
+                }
+                let sunAlt = this.circlePoints[index];
+
+                let sunPos = new THREE.Vector3(sunPosCircle.x, 0, sunPosCircle.y);
+                let d = sunPos.distanceTo(new THREE.Vector3(0, 0.001, 0));
+                let f = sunAlt.x / d;
+                sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
+                curvePoints.push(new THREE.Vector3(sunPos.x, sunAlt.y - 1, sunPos.z));
+                if(Math.abs(sunPos.x - this.sol.position.x) < 0.1 && Math.abs(sunPos.z - this.sol.position.z) < 0.1 ){
+                    today = day;
+                }
+                //allPoints.push(new THREE.Vector3(sunPos.x, sunAlt.y - 1, sunPos.z));
+            }
+            let curve = new THREE.CatmullRomCurve3(curvePoints, true);
+            let points = curve.getPoints(100);
+            allPoints.push(points);
+            let geometry = new THREE.BufferGeometry().setFromPoints(points);
+            if(day === today){
+                let material = new THREE.LineBasicMaterial({color: 0x950714, linewidth: 2});
+                let curveObject = new THREE.Line(geometry, material);
+                group.add(curveObject);
+            }
+            else{
+                let material = new THREE.LineBasicMaterial({color: 0xfbeb90, linewidth: 2});
+                let curveObject = new THREE.Line(geometry, material);
+                group.add(curveObject);
+            }
+
+        }
+        this.escena.add(group);
     }
 
     onPerspectiveChanged() {
@@ -271,7 +347,7 @@ class Morfologia extends Component {
             false,            // aClockwise
             0                 // aRotation
         );
-        var points = curve.getPoints(359);
+        var points = curve.getPoints(360);
         var circleGeometry = new THREE.BufferGeometry().setFromPoints(points);
         var circleMaterial = new THREE.LineBasicMaterial({color: 0xCCCCCC});
         var cardinalPointsCircle = new THREE.Line(circleGeometry, circleMaterial);

@@ -147,7 +147,8 @@ class TabPanel extends Component {
             openMorf: false,
             dimensionesPared: null,
             openDashboard: false,
-            drawer_localidad: false,
+            drawer_localidad: true,
+            sunPathClicked: false,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -171,6 +172,7 @@ class TabPanel extends Component {
         this.onSeleccionarLocalidad = this.onSeleccionarLocalidad.bind(this);
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
         this.handleDashboardOpen = this.handleDashboardOpen.bind(this);
+        this.onSunpathClicked = this.onSunpathClicked.bind(this);
     }
 
     handleDrawerOpen() {
@@ -227,6 +229,7 @@ class TabPanel extends Component {
             longitud: mapState.lng,
             sunTimes: mapState.sunTimes,
             sunPosition: mapState.sunPosition,
+            sunPath: mapState.sunPath,
         });
     }
 
@@ -310,7 +313,12 @@ class TabPanel extends Component {
     }
 
     onSeleccionarLocalidad(){
-        this.setState({drawer_localidad: !this.state.drawer_localidad})
+        this.setState((state) => {
+            return {drawer_localidad: !state.drawer_localidad}
+        });
+    }
+    onSunpathClicked(){
+        this.setState( (state) => {return {sunPathClicked: !state.sunPathClicked}});
     }
 
 
@@ -377,7 +385,7 @@ class TabPanel extends Component {
                                     <Context
                                         width={this.state.width}
                                         height={this.state.height}
-                                        sunPosition={this.props.sunPosition}
+                                        sunPosition={this.state.sunPosition}
                                         agregarContexto={this.state.agregarContexto}
                                         seleccionar={this.state.seleccionar}
                                         borrarContexto={this.state.borrarContexto}
@@ -433,6 +441,7 @@ class TabPanel extends Component {
                                         onParedesChanged={this.onParedesChanged}
                                         onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
                                         sunPosition={this.state.sunPosition}
+                                        sunPath={this.state.sunPath}
                                         click2D={click2D}
                                         dibujando={dibujandoMorf}
                                         seleccionando={seleccionandoMorf}
@@ -442,6 +451,7 @@ class TabPanel extends Component {
                                         paredes={this.props.paredes}
                                         comuna={this.state.comuna}
                                         onCasaChanged={this.onCasaChanged}
+                                        sunPathClicked={this.state.sunPathClicked}
                                     />:
                                     <div></div>
                                 }
