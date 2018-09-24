@@ -80,7 +80,7 @@ class DetalleBalance extends Component{
                                 return {
                                     // Instead of `text: label,`
                                     // We add the value to the string
-                                    text: label + " : \" + Math.round(value),
+                                    text: label + " : " + Math.round(value),
                                     fillStyle: fill,
                                     strokeStyle: stroke,
                                     lineWidth: bw,
