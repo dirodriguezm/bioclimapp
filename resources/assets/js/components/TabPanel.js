@@ -32,7 +32,7 @@ function TabContainer(props) {
     );
 }
 
-const drawerWidth = 400;
+const drawerWidth = 500;
 const drawerRightWidth = 500;
 
 TabContainer.propTypes = {
@@ -149,6 +149,7 @@ class TabPanel extends Component {
             openDashboard: false,
             drawer_localidad: true,
             sunPathClicked: false,
+            paredCapaChange: false,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -173,6 +174,8 @@ class TabPanel extends Component {
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
         this.handleDashboardOpen = this.handleDashboardOpen.bind(this);
         this.onSunpathClicked = this.onSunpathClicked.bind(this);
+        this.onCapaChanged = this.onCapaChanged.bind(this);
+        this.onCapaReady = this.onCapaReady.bind(this);
     }
 
     handleDrawerOpen() {
@@ -308,6 +311,18 @@ class TabPanel extends Component {
         });
     }
 
+    onCapaChanged(){
+        this.setState({
+            paredCapaChange: true,
+        })
+    }
+
+    onCapaReady(){
+        this.setState({
+            paredCapaChange: false,
+        })
+    }
+
     onRadiationsChanged(global, direct, difuse){
         this.setState({radiaciones: {global: global, directa: direct, difusa: difuse}});
     }
@@ -324,7 +339,7 @@ class TabPanel extends Component {
 
     render() {
         const {classes, theme, sunPosition} = this.props;
-        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensionesPared} = this.state;
+        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensionesPared, paredCapaChange} = this.state;
         return (
 
             <div className={classes.appFrame} ref={(tab) => {
@@ -451,6 +466,9 @@ class TabPanel extends Component {
                                         paredes={this.props.paredes}
                                         comuna={this.state.comuna}
                                         onCasaChanged={this.onCasaChanged}
+                                        onCapaReady={this.onCapaReady}
+                                        paredCapaChange={paredCapaChange}
+                                        seleccionadoMorf={seleccionadoMorf}
                                         sunPathClicked={this.state.sunPathClicked}
                                     />:
                                     <div></div>
@@ -484,6 +502,7 @@ class TabPanel extends Component {
                                 ventanas={this.state.ventanas}
                                 onAporteSolarChanged={this.onAporteSolarChanged}
                                 onDimensionChanged={this.onDimensionChanged}
+                                onCapaChanged={this.onCapaChanged}
                             />
                         </Drawer>
                     </div>
