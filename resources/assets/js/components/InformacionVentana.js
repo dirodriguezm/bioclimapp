@@ -144,15 +144,15 @@ class InformacionVentana extends Component {
     render() {
         const {classes, seleccionado} = this.props;
         const {material, tipo, U, FS, marco, tipo_marco, U_marco, FM} = this.state;
-
+        console.log("rendering",seleccionado);
         return (
             <div>
-                {seleccionado !== null && seleccionado.tipo === Morfologia.tipos.VENTANA ?
+                {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.VENTANA ?
                     <div className={classes.root}>
                         <Typography
                             variant={"title"}
                         >
-                            {Morfologia.tipos_texto[seleccionado.tipo] + ' ' + seleccionado.id}
+                            {Morfologia.tipos_texto[seleccionado.userData.tipo] + ' ' + seleccionado.id}
                         </Typography>
 
                         <ExpansionPanel>
@@ -346,11 +346,14 @@ class InformacionVentana extends Component {
                                 <Typography className={classes.heading}>Dimensiones</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <Typography>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse malesuada lacus
-                                    ex,
-                                    sit amet blandit leo lobortis eget.
-                                </Typography>
+                                <Grid container spacing={8}>
+                                    <Grid item xs={12}>
+                                        Ancho: {seleccionado.geometry.boundingBox.max.x}
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        Alto: {seleccionado.geometry.boundingBox.max.y}
+                                    </Grid>
+                                </Grid>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
@@ -363,9 +366,9 @@ class InformacionVentana extends Component {
                                     <Grid item xs={12}>
                                         <FormControl className={classes.formControl}>
                                             <Typography>
-                                                FAR de la ventana: {seleccionado.far}
+                                                FAR de la ventana: {seleccionado.userData.far}
                                             </Typography>
-                                            {seleccionado.obstrucciones != null ? seleccionado.obstrucciones.map((obstruccion,index) => (
+                                            {seleccionado.userData.obstrucciones != null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
                                                 <ExpansionPanel>
                                                     <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                                         <Typography className={classes.heading}>Obstruccion: {index}</Typography>

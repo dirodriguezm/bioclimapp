@@ -264,7 +264,6 @@ class TabPanel extends Component {
     onFarChanged(ventanas) {
         let month = new Date().getMonth();
         let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
-        console.log("APORTE SOLAR", aporte_solar);
         this.onAporteSolarChanged(aporte_solar);
         this.setState({ventanas: ventanas});
     }

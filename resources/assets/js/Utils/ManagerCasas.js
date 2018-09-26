@@ -261,7 +261,7 @@ class ManagerCasas {
         BalanceEnergetico.transmitanciaSuperficie(techo);
         transmitanciaSuperficies += techo.userData.transSup;
 
-        console.log(techo.userData.transSup);
+        //console.log(techo.userData.transSup);
 
         let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion);
 

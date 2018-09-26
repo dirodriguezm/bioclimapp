@@ -39,7 +39,6 @@ class Morfologia extends Component {
             this.onSunpositionChanged();
         }
         if(this.props.sunPath !== prevProps.sunPath){
-            console.log("SUNPATH", this.props.sunPath);
             this.getSunPath();
         }
         if (this.props.click2D !== prevProps.click2D) {
@@ -921,7 +920,7 @@ class Morfologia extends Component {
                 }
                 casa.userData.aporteInterno = aporteInterno;
                 casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-                console.log(casa);
+                //console.log(casa);
             }
             this.escena.add(casas);
 
@@ -952,7 +951,7 @@ class Morfologia extends Component {
             }
             casa.userData.aporteInterno = aporteInterno;
             casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-            console.log(casa);
+            //console.log(casa);
             this.escena.add(casa);
         }
         //calcularGammaParedes(this.paredes);

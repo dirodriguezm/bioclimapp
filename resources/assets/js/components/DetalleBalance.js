@@ -1,10 +1,15 @@
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {Bar, Doughnut} from 'react-chartjs-2';
 import PropTypes from 'prop-types';
-import { withStyles } from '@material-ui/core/styles';
+import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import {Parser as HtmlToReactParser} from 'html-to-react';
+import Button from "@material-ui/core/Button/Button";
+
+const htmlToReactParser = new HtmlToReactParser();
+
 
 const styles = theme => ({
     root: {
@@ -21,86 +26,141 @@ const styles = theme => ({
         textAlign: 'center',
         color: 'black',
         padding: theme.spacing.unit,
-    }
+    },
+    button: {
+        width: 64, height: 64,
+        padding: 0,
+    },
 });
 
-class DetalleBalance extends Component{
-    constructor(props){
+function Legend(props) {
+    let porcentaje = [0,0];
+    let total = 0;
+    for(let i = 0; i < props.data.datasets[0].data.length; i++){
+        total += props.data.datasets[0].data[i] ? props.data.datasets[0].data[i] : 0;
+    }
+    for(let i = 0; i < props.data.datasets[0].data.length; i++){
+        porcentaje[i] = Math.round(props.data.datasets[0].data[i] * 100 / total);
+    }
+    return(
+        <div>
+            <Typography variant="title" gutterBottom style={{color:'grey'}}>
+                % de influencia
+            </Typography>
+            {props.data.labels.map((label, index) => (
+                <Grid key={index} container spacing={8}>
+                    <Grid item xs={4}>
+                        <div style={{background: props.data.datasets[0].backgroundColor[index], padding: 0, width: 36, height:12}}></div>
+                        {/*<div style={{color: props.data.datasets[0].backgroundColor[index]}}></div>*/}
+                    </Grid>
+                    <Grid item xs={8}>
+                        {label} : {props.data.datasets[0].data[index] ? porcentaje[index] : 0}
+                    </Grid>
+                </Grid>
+            ))}
+        </div>
+    );
+}
+
+function Chart(props){
+    return (
+        <Paper>
+            <Grid container spacing={24}>
+                <Grid item xs={8}>
+                    <Doughnut
+                        data={props.data}
+                        options={props.options}
+                        //width={1000}
+                        height={props.height}
+                    />
+                </Grid>
+                <Grid item xs={4}>
+                    <Legend data={props.data} />
+                </Grid>
+            </Grid>
+        </Paper>
+    );
+}
+
+class DetalleBalance extends Component {
+    constructor(props) {
         super(props);
         this.state = {
             clicked: null,
-            aporte_solar : 0,
-            aporte_interno : 0,
-            perdida_conduccion : 0,
-            perdida_ventilacion : 0,
+            dataAportes: {
+                labels: ['Aportes Solares', 'Aportes Internos'],
+                datasets: [
+                    {
+                        data: [0, 0],
+                        backgroundColor: ['#F19C00', '#F16600'],
+                        borderColor: ['#F19C00', '#F16600'],
+                        label: 'Aportes'
+                    }
+                ]
+            },
+            dataPerdidas: {
+                labels: ['Pérdidas por Conducción', 'Pérdidas por Ventilación'],
+                datasets: [
+                    {
+                        data: [0, 0],
+                        backgroundColor: ['#009688', '#1043A0'],
+                        borderColor: ['#009688', '#1043A0'],
+                        label: 'Perdidas'
+                    }
+                ]
+            }
         };
         this.handleClick = this.handleClick.bind(this);
     }
 
-    handleClick(e){
-        if(e[0]._index === 0){
+    handleClick(e) {
+        if (e[0]._index === 0) {
             this.setState({clicked: this.aporte_solar})
         }
-        if(e[0]._index === 1){
+        if (e[0]._index === 1) {
             this.setState({clicked: this.aporte_interno})
         }
-        if(e[0]._index === 2){
+        if (e[0]._index === 2) {
             this.setState({clicked: this.perdida_conduccion})
         }
-        if(e[0]._index === 3){
+        if (e[0]._index === 3) {
             this.setState({clicked: this.perdida_ventilacion})
         }
 
     }
 
-    componentDidMount(){
+    componentDidMount() {
+        this.setState({
+           grafico_aporte: this.aporte,
+           grafico_perdida: this.perdida,
+        });
         this.options = {
-            legend: {
-                position:'right',
-                labels: {
-                    fontColor: '#212121',
-
-                    generateLabels: function(chart){
-                        var data = chart.data;
-                        if (data.labels.length && data.datasets.length) {
-                            return data.labels.map(function(label, i) {
-                                var meta = chart.getDatasetMeta(0);
-                                var ds = data.datasets[0];
-                                var arc = meta.data[i];
-                                var custom = arc && arc.custom || {};
-                                var getValueAtIndexOrDefault = Chart.helpers.getValueAtIndexOrDefault;
-                                var arcOpts = chart.options.elements.arc;
-                                var fill = custom.backgroundColor ? custom.backgroundColor : getValueAtIndexOrDefault(ds.backgroundColor, i, arcOpts.backgroundColor);
-                                var stroke = custom.borderColor ? custom.borderColor : getValueAtIndexOrDefault(ds.borderColor, i, arcOpts.borderColor);
-                                var bw = custom.borderWidth ? custom.borderWidth : getValueAtIndexOrDefault(ds.borderWidth, i, arcOpts.borderWidth);
-
-                                // We get the value of the current label
-                                var value = chart.config.data.datasets[arc._datasetIndex].data[arc._index];
-
-                                return {
-                                    // Instead of `text: label,`
-                                    // We add the value to the string
-                                    text: label + " : " + Math.round(value),
-                                    fillStyle: fill,
-                                    strokeStyle: stroke,
-                                    lineWidth: bw,
-                                    hidden: isNaN(ds.data[i]) || meta.data[i].hidden,
-                                    index: i
-                                };
-                            });
-                        } else {
-                            return [];
-                        }
-                    }
-                }
+            // maintainAspectRatio: false,
+            // responsive: false,
+            cutoutPercentage: 50,
+            legendCallback: function (chart) {
+                var ul = document.createElement('ul');
+                var borderColor = chart.data.datasets[0].borderColor;
+                chart.data.labels.forEach(function (label, index) {
+                    ul.innerHTML += `
+                        <li>
+                        <span style=" display:inline-block; background-color: ${borderColor[index]}; width:36px; height:12px"></span>
+                            ${label} : ${Math.round(chart.data.datasets[0].data[index])}
+                        </li>`; // ^ ES6 Template String
+                });
+                return ul.outerHTML;
             },
-        }
+            legend: {
+                display: false,
+            }
+        };
+
     }
 
-    componentDidUpdate(prevProps){
-        if(this.props.aporte_solar !== prevProps.aporte_solar || this.props.aporte_interno !== prevProps.aporte_interno) {
+    componentDidUpdate(prevProps) {
+        if (this.props.aporte_solar !== prevProps.aporte_solar || this.props.aporte_interno !== prevProps.aporte_interno) {
             this.setState({
-                dataAportes : {
+                dataAportes: {
                     labels: ['Aportes Solares', 'Aportes Internos'],
                     datasets: [
                         {
@@ -112,8 +172,9 @@ class DetalleBalance extends Component{
                     ]
                 }
             });
+
         }
-        if(this.props.perdida_conduccion !== prevProps.perdida_conduccion || this.props.perdida_ventilacion !== prevProps.perdida_ventilacion) {
+        if (this.props.perdida_conduccion !== prevProps.perdida_conduccion || this.props.perdida_ventilacion !== prevProps.perdida_ventilacion) {
             this.setState({
                 dataPerdidas: {
                     labels: ['Pérdidas por Conducción', 'Pérdidas por Ventilación'],
@@ -127,49 +188,39 @@ class DetalleBalance extends Component{
                     ]
                 }
             });
+
         }
     }
 
-    render(){
-        const { classes } = this.props;
-
-        return(
+    render() {
+        const {classes} = this.props;
+        return (
             <div className={classes.root}>
                 <Typography variant="headline" gutterBottom className={classes.title}>
                     Balance Energético
                 </Typography>
-                <Grid container spacing={24}>
+                <Grid container spacing={32}>
                     <Grid item xs={12}>
-                        {this.state.dataAportes != null ?
-                            <Paper className={classes.paper}>
-                                <Doughnut
-                                    data={this.state.dataAportes}
-                                    options={this.options}
-                                />
-                            </Paper>
-                            :
-                            <div/>
-                        }
+                        <Chart
+                            data={this.state.dataAportes}
+                            options={this.options}
+                            height={200}
+                        />
                     </Grid>
                     <Grid item xs={12}>
-                        {this.state.dataPerdidas != null ?
-                            <Paper className={classes.paper}>
-                                <Doughnut
-                                    data={this.state.dataPerdidas}
-                                    options={this.options}
-                                />
-                            </Paper>
-                            :
-                            <div/>
-                        }
-
+                        <Chart
+                            data={this.state.dataPerdidas}
+                            options={this.options}
+                            height={200}
+                        />
                     </Grid>
                 </Grid>
             </div>
         );
     }
 }
+
 DetalleBalance.propTypes = {
     classes: PropTypes.object.isRequired,
 };
-export default withStyles(styles) (DetalleBalance);
+export default withStyles(styles)(DetalleBalance);
