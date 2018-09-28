@@ -1165,7 +1165,7 @@ class Morfologia extends Component {
                         if (this.construyendo) {
                             var nextPosition = (intersect.point).add(intersect.face.normal).clone();
                             nextPosition.round();
-                            this.managerCasas.setEndHabitacion(nextPosition, this.raycaster);
+                            //this.managerCasas.setEndHabitacion(nextPosition, this.raycaster);
                             this.managerCasas.crecerHabitacion(nextPosition);
 
 

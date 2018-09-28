@@ -166,7 +166,7 @@ class ManagerCasas {
         this.gradoDias = gradoDias;
     }
 
-    setEndHabitacion(end, raycaster){
+    setEndHabitacion(end, raycaster) {
         /*if(!this.habitacionConstruccion.userData.errorStart){
             let intersects = raycaster.intersectObjects(this.pisos);
             if (intersects.length > 0) {
@@ -212,29 +212,24 @@ class ManagerCasas {
         this.habitacionConstruccion.visible = true;
     }
 
-    setErrorConstruccion(error, start) {
+    setErrorConstruccion(error) {
         let paredes = this.habitacionConstruccion.getObjectByName("Paredes");
         let piso = this.habitacionConstruccion.getObjectByName("Piso");
         let techo = this.habitacionConstruccion.getObjectByName("Techo");
         for (let i = 0; i < paredes.children.length; i++) {
             let pared = paredes.children[i];
-            if(error){
+            if (error) {
                 pared.material = this.materialError.clone();
-            }else{
+            } else {
                 pared.material = this.materialParedConstruccion.clone();
             }
         }
-        if(error){
+        if (error) {
             piso.material = this.materialError.clone();
             techo.material = this.materialError.clone();
-        }else{
+        } else {
             piso.material = this.materialPisoConstruccion.clone();
             techo.material = this.materialTechoConstruccion.clone();
-        }
-        if(start){
-            this.habitacionConstruccion.userData.errorStart = error;
-        }else{
-            this.habitacionConstruccion.userData.errorEnd = error;
         }
 
 
@@ -260,32 +255,35 @@ class ManagerCasas {
         this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
     }
 
-    pisosChocan(habitacion){
+    pisosChocan(habitacion) {
         let piso = this.habitacionConstruccion.getObjectByName("Piso");
-        var ray = new THREE.Ray( new THREE.Vector3(0,0,0), new THREE.Vector3(0,0,0));
-        for(var vertexIndex = 0; vertexIndex < piso.geometry.vertices.length; vertexIndex++)        {
-            var localVertex = piso.geometry.vertices[vertexIndex].clone();
-            var globalVertex = piso.matrix.multiplyVector3(localVertex);
-            var directionVector = globalVertex.subSelf( piso.position );
+        let start = habitacion.userData.start.clone();
+        let end = habitacion.userData.end.clone();
+        var dir = end.clone().sub(start);
+        var len = dir.length();
+        dir = dir.normalize();
+        var ray = new THREE.Raycaster();
 
-            ray.origin =
-            ray = new THREE.Ray( piso.position, directionVector.clone().normalize() );
-            var collisionResults = ray.intersectObjects( this.pisos );
-            if ( collisionResults.length > 0 && collisionResults[0].distance < directionVector.length() )
-            {
-                console.log("true");
-                return true;
-            }
-            else {
-                console.log("false");
-                return false;
-            }
+        ray.set(new THREE.Vector3(start.x, 0, start.z), new THREE.Vector3(dir.x, dir.y, dir.z));
+        console.log("piso",piso);
+        console.log("start", start);
+        console.log("dir", dir);
+
+        var intersects = ray.intersectObjects(this.pisos);
+        if (intersects.length > 0) {
+
+            console.log("si");
+            return false;
+        }
+        else {
+            console.log("no");
+            return false;
         }
     }
 
     agregarHabitacionDibujada() {
 
-        if(this.habitacionConstruccion.userData.errorStart || this.habitacionConstruccion.userData.errorEnd){
+        if (this.habitacionConstruccion.userData.errorStart || this.habitacionConstruccion.userData.errorEnd) {
             //this.habitacionConstruccion.visible = false;
             this.crecerHabitacion(this.habitacionConstruccion.userData.start);
             return;
@@ -629,17 +627,17 @@ class ManagerCasas {
         habitacion.position.y = 0;
         habitacion.userData.end = end.clone();
         habitacion.userData.start = start.clone();
-        if(start.x < end.x){
+        if (start.x < end.x) {
             habitacion.userData.x1 = start.x;
             habitacion.userData.x2 = end.x;
-        }else{
+        } else {
             habitacion.userData.x2 = start.x;
             habitacion.userData.x1 = end.x;
         }
-        if(start.z < end.z){
+        if (start.z < end.z) {
             habitacion.userData.z1 = start.z;
             habitacion.userData.z2 = end.z;
-        }else{
+        } else {
             habitacion.userData.z2 = start.z;
             habitacion.userData.z1 = end.z;
         }
@@ -742,24 +740,26 @@ class ManagerCasas {
 
     crecerHabitacion(nextPosition) {
         let start = this.habitacionConstruccion.userData.start.clone();
+        this.habitacionConstruccion.userData.end = nextPosition.clone();
         let end = nextPosition.clone();
 
-        if(start.x < end.x){
+        if (start.x < end.x) {
             this.habitacionConstruccion.userData.x1 = start.x;
             this.habitacionConstruccion.userData.x2 = end.x;
-        }else{
+        } else {
             this.habitacionConstruccion.userData.x2 = start.x;
             this.habitacionConstruccion.userData.x1 = end.x;
         }
-        if(start.z < end.z){
+        if (start.z < end.z) {
             this.habitacionConstruccion.userData.z1 = start.z;
             this.habitacionConstruccion.userData.z2 = end.z;
-        }else{
+        } else {
             this.habitacionConstruccion.userData.z2 = start.z;
             this.habitacionConstruccion.userData.z1 = end.z;
         }
 
-        //this.pisosChocan(this.habitacionConstruccion);
+        this.setErrorConstruccion(this.pisosChocan(this.habitacionConstruccion));
+
 
         var dir = end.clone().sub(start);
         var len = dir.length();
@@ -872,7 +872,6 @@ class ManagerCasas {
         piso.name = "Piso";
         piso.userData.width = width;
         piso.userData.depth = depth;
-
 
 
         var techo = this.crearMeshTecho(width, depth, height);
