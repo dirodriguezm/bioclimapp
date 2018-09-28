@@ -39,7 +39,7 @@ class Morfologia extends Component {
             this.onSunpositionChanged();
         }
         if(this.props.sunPath !== prevProps.sunPath){
-            console.log("SUNPATH", this.props.sunPath);
+            //console.log("SUNPATH", this.props.sunPath);
             this.getSunPath();
         }
         if (this.props.click2D !== prevProps.click2D) {
@@ -921,7 +921,7 @@ class Morfologia extends Component {
                 }
                 casa.userData.aporteInterno = aporteInterno;
                 casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-                console.log(casa);
+                //console.log(casa);
             }
             this.escena.add(casas);
 
@@ -952,7 +952,7 @@ class Morfologia extends Component {
             }
             casa.userData.aporteInterno = aporteInterno;
             casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-            console.log(casa);
+            //console.log(casa);
             this.escena.add(casa);
         }
         //calcularGammaParedes(this.paredes);
@@ -1047,7 +1047,7 @@ class Morfologia extends Component {
                     let intersect = intersects[0];
                     let startHabitacion = (intersect.point).add(intersect.face.normal).clone();
                     startHabitacion = startHabitacion.round();
-                    this.managerCasas.setStartHabitacion(startHabitacion);
+                    this.managerCasas.setStartHabitacion(startHabitacion, this.raycaster);
 
 
                     /*let intersect = intersects[0];
@@ -1165,6 +1165,7 @@ class Morfologia extends Component {
                         if (this.construyendo) {
                             var nextPosition = (intersect.point).add(intersect.face.normal).clone();
                             nextPosition.round();
+                            this.managerCasas.setEndHabitacion(nextPosition, this.raycaster);
                             this.managerCasas.crecerHabitacion(nextPosition);
 
 

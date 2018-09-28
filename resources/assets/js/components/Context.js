@@ -597,14 +597,14 @@ class Context extends Component {
     render() {
         const open = this.state.open;
         const id = open ? 'simple-popper' : null;
-        console.log("popper coords", this.state.popperCoords);
+        //console.log("popper coords", this.state.popperCoords);
         let divStyle = {
             position: 'absolute',
             left: this.state.popperCoords != null ? (this.state.popperCoords.x - this.dif)+ 'px' : 0,
             top: this.state.popperCoords != null ? this.state.popperCoords.y + 'px' : 0,
             zIndex: 1
         }
-        console.log("popper open", open);
+        //console.log("popper open", open);
         return (
             <div>
                 <div

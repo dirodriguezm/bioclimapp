@@ -287,9 +287,9 @@ function calcularRB(angulos, pared, omegas) {
             + Math.sin(toRadians(angulos.delta)) * Math.sin(toRadians(angulos.phi))
             * (w2 - w1) * (Math.PI / 180) );
         R_ave.push( b_Rb[i] !== 0 ? a_Rb[i] / b_Rb[i] : 0 );
-        console.log("a_Rb", a_Rb);
+        /*console.log("a_Rb", a_Rb);
         console.log("b_Rb", b_Rb);
-        console.log("R_ave", R_ave);
+        console.log("R_ave", R_ave);*/
     }
     if (R_ave.length === 2 ) {
         if(R_ave[0] === 0) return Math.abs(R_ave[1]);
