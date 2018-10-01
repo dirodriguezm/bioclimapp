@@ -345,7 +345,7 @@ class Morfologia extends Component {
         //Indicador de puntos cardinales
         let curve = new THREE.EllipseCurve(
             0, 0,            // ax, aY
-            20, 20,           // xRadius, yRadius
+            10, 10,           // xRadius, yRadius
             0, 2 * Math.PI,  // aStartAngle, aEndAngle
             false,            // aClockwise
             0                 // aRotation
@@ -370,7 +370,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, -20, 0.3);
+        sprite.position.set(0, -10, 0.3);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("N", {
             align: textAlign.center,
@@ -380,7 +380,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, 20, 0.3);
+        sprite.position.set(0, 10, 0.3);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("E", {
             align: textAlign.center,
@@ -390,7 +390,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(20, 0.3, 0);
+        sprite.position.set(10, 0.3, 0);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("O", {
             align: textAlign.center,
@@ -400,7 +400,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(-20, 0.3, 0);
+        sprite.position.set(-10, 0.3, 0);
         cardinalPointsCircle.add(sprite);
 
 
