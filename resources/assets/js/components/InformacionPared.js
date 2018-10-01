@@ -119,51 +119,51 @@ class InformacionPared extends Component {
                     width: this.props.seleccionado.userData.width,
                 });
                 this.info_rb = <div/>;
-                if (this.props.seleccionado.omegas.wm.desde != null && this.props.seleccionado.omegas.wt.desde == null) {
+                if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde == null) {
                     this.info_rb = <div>
                         <ExpansionPanelDetails>
                             La pared recibe sol
-                            desde: {this.props.seleccionado.omegas.wm.desde.toLocaleTimeString()}
+                            desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.omegas.wm.hasta.toLocaleTimeString()}
+                            Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.rb}
+                            RB: {this.props.seleccionado.userData.rb}
                         </ExpansionPanelDetails>
                     </div>
                 }
-                else if (this.props.seleccionado.omegas.wm.desde == null && this.props.seleccionado.omegas.wt.desde != null) {
+                else if (this.props.seleccionado.userData.omegas.wm.desde == null && this.props.seleccionado.userData.omegas.wt.desde != null) {
                     this.info_rb = <div>
                         <ExpansionPanelDetails>
                             La pared recibe sol
-                            desde: {this.props.seleccionado.omegas.wt.desde.toLocaleTimeString()}
+                            desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.omegas.wt.hasta.toLocaleTimeString()}
+                            Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.rb}
+                            RB: {this.props.seleccionado.userData.rb}
                         </ExpansionPanelDetails>
                     </div>
                 }
-                else if (this.props.seleccionado.omegas.wm.desde != null && this.props.seleccionado.omegas.wt.desde != null) {
+                else if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde != null) {
                     this.info_rb = <div>
                         <ExpansionPanelDetails>
                             La pared recibe sol
-                            desde: {this.props.seleccionado.omegas.wm.desde.toLocaleTimeString()}
+                            desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.omegas.wm.hasta.toLocaleTimeString()}
+                            Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            Y luego desde: {this.props.seleccionado.omegas.wt.desde.toLocaleTimeString()}
+                            Y luego desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.omegas.wt.hasta.toLocaleTimeString()}
+                            Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.rb}
+                            RB: {this.props.seleccionado.userData.rb}
                         </ExpansionPanelDetails>
                     </div>
                 }
@@ -173,7 +173,7 @@ class InformacionPared extends Component {
                             La pared no recibe sol.
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.rb}
+                            RB: {this.props.seleccionado.userData.rb}
                         </ExpansionPanelDetails>
                     </div>
 
@@ -652,7 +652,10 @@ class InformacionPared extends Component {
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography className={classes.heading}>Radiación Solar</Typography>
                             </ExpansionPanelSummary>
+                            <div>
+                                holaaaaa {seleccionado != null ? seleccionado.userData.gamma : "nada"}
                             {this.info_rb}
+                            </div>
 
                         </ExpansionPanel>
 

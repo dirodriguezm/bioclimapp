@@ -44,6 +44,18 @@ function CursorIcon(props) {
     );
 };
 
+function MapIcon(props) {
+    return (
+        <SvgIcon viewBox="0 0 64 64">
+            <path fill="#757575"
+                  d="M52 32a10 10 0 0 0-10 10c0 9 10 20 10 20s10-11 10-20a10 10 0 0 0-10-10zm0 12a2 2 0 1 1 2-2 2 2 0 0 1-2 2z"
+                  data-name="layer2"></path>
+            <path d="M16 10.7L2 2v42.1l14 8.7V10.7zm18-7.6l-14 7.7v42.1l14-7.7V3.1zM38 42a14 14 0 0 1 14-14l2 .2V11.9L38 3.1"
+                  fill="#757575" data-name="layer1"></path>
+        </SvgIcon>
+    );
+};
+
 class BarraHerramientasContexto extends Component {
     constructor(props) {
         super(props);
@@ -80,11 +92,7 @@ class BarraHerramientasContexto extends Component {
         const {classes} = this.props;
         return (
             <div className={classes.root} align="center">
-                <Tooltip title="Seleccionar localidad">
-                    <IconButton className={classes.button} aria-label="Undo" onClick={this.handleSeleccionarLocalidad}>
-                        <Map/>
-                    </IconButton>
-                </Tooltip>
+
                 <Tooltip title="Deshacer">
                     <IconButton className={classes.button} aria-label="Undo">
                         <Undo/>
@@ -117,6 +125,14 @@ class BarraHerramientasContexto extends Component {
                         onClick={this.handleBorrar}
                     >
                         <Delete/>
+                    </IconButton>
+                </Tooltip>
+
+                <div style={{width:'25%'}}/>
+
+                <Tooltip title="Seleccionar localidad">
+                    <IconButton className={classes.button} aria-label="Undo" onClick={this.handleSeleccionarLocalidad}>
+                        <MapIcon/>
                     </IconButton>
                 </Tooltip>
             </div>

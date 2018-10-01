@@ -144,7 +144,6 @@ class InformacionVentana extends Component {
     render() {
         const {classes, seleccionado} = this.props;
         const {material, tipo, U, FS, marco, tipo_marco, U_marco, FM} = this.state;
-        console.log("rendering",seleccionado);
         return (
             <div>
                 {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.VENTANA ?
@@ -366,7 +365,8 @@ class InformacionVentana extends Component {
                                     <Grid item xs={12}>
                                         <FormControl className={classes.formControl}>
                                             <Typography>
-                                                FAR de la ventana: {seleccionado.userData.far}
+                                                FAR de la ventana: {seleccionado.userData.far} <br/>
+                                                orientacion: {seleccionado.userData.orientacion.x}, {seleccionado.userData.orientacion.z}
                                             </Typography>
                                             {seleccionado.userData.obstrucciones != null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
                                                 <ExpansionPanel>

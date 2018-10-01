@@ -92,35 +92,6 @@ function perdidasConduccion(transmitanciaSuperficies, gradosDias, puenteTermico)
     return 24 * ((transmitanciaSuperficies + puenteTermico) * gradosDias );
 }
 
-function calcularGammaParedes(paredes, cardinalPointsCircle, circlePoints) {
-    for (let pared of paredes) {
-        var orientacionRaycaster = new THREE.Raycaster();
-        orientacionRaycaster.set(new THREE.Vector3(), pared.userData.orientacion);
-        var inter = orientacionRaycaster.intersectObject(cardinalPointsCircle);
-        let interPoint = inter[0].point.add(inter[1].point);
-        interPoint = interPoint.multiplyScalar(0.5);
-
-        // var hex = 0xffff;
-        // var arrowHelper = new THREE.ArrowHelper( inter[11].point, new THREE.Vector3(), 10, hex );
-        // this.escena.add(arrowHelper);
-        let closestDistance = 99;
-        let closestPoint = {};
-        let i = 0;
-        let index = 0;
-
-        for (let point of circlePoints) {
-            let circlePoint = new THREE.Vector3(point.x, 0.001, point.y);
-            let temp = circlePoint.distanceTo(interPoint);
-            if (temp < closestDistance) {
-                closestDistance = temp;
-                closestPoint = circlePoint;
-                index = i;
-            }
-            i++;
-        }
-        pared.gamma = transformDegreeToGamma(index);
-    }
-}
 
 function transformDegreeToGamma(degree) {
     if (degree > 270 && degree <= 360) degree = 180 - degree;
@@ -275,13 +246,13 @@ function calcularRB(angulos, pared, omegas) {
         a_Rb.push( (Math.sin(toRadians(angulos.delta)) * Math.sin(toRadians(angulos.phi))
             * Math.cos(toRadians(90)) - Math.sin(toRadians(angulos.delta))
             * Math.cos(toRadians(angulos.phi)) * Math.sin(toRadians(90))
-            * Math.cos(toRadians(pared.gamma))) * (w2 - w1) * (Math.PI / 180)
+            * Math.cos(toRadians(pared.userData.gamma))) * (w2 - w1) * (Math.PI / 180)
             + (Math.cos(toRadians(angulos.delta)) * Math.cos(toRadians(angulos.phi))
                 * Math.cos(toRadians(90)) + Math.cos(toRadians(angulos.delta))
                 * Math.sin(toRadians(angulos.phi)) * Math.sin(toRadians(90))
-                * Math.cos(toRadians(pared.gamma))) * (Math.sin(toRadians(w2)) - Math.sin(toRadians(w1)))
+                * Math.cos(toRadians(pared.userData.gamma))) * (Math.sin(toRadians(w2)) - Math.sin(toRadians(w1)))
             - Math.cos(toRadians(angulos.delta)) * Math.sin(toRadians(90))
-            * Math.sin(toRadians(pared.gamma)) * (Math.cos(toRadians(w2)) - Math.cos(toRadians(w1))) );
+            * Math.sin(toRadians(pared.userData.gamma)) * (Math.cos(toRadians(w2)) - Math.cos(toRadians(w1))) );
         b_Rb.push( Math.cos(toRadians(angulos.phi)) * Math.cos(toRadians(angulos.delta))
             * (Math.sin(toRadians(w2)) - Math.sin(toRadians(w1)))
             + Math.sin(toRadians(angulos.delta)) * Math.sin(toRadians(angulos.phi))
@@ -327,7 +298,7 @@ function calcularAporteSolar(ventanas, difusa, directa){
         let f = calcularF(ventana);
         f_suma += f;
         let pared = ventana.parent;
-        let Igb = calcularIgb(difusa, directa, pared.rb);
+        let Igb = calcularIgb(difusa, directa, pared.userData.rb);
         igb_suma += Igb;
         let area_ventana = Math.abs( (ventana.geometry.boundingBox.max.x - ventana.geometry.boundingBox.min.x) *
             (ventana.geometry.boundingBox.max.y - ventana.geometry.boundingBox.min.y) );
@@ -346,13 +317,13 @@ function calcularAporteSolar(ventanas, difusa, directa){
 
 function calcularRbParedes(paredes, latitud, longitud, sunTimes) {
     for (let pared of paredes) {
-        let angulos = calcularAngulos(pared.gamma, 90,  latitud,  sunTimes);
+        let angulos = calcularAngulos(pared.userData.gamma, 90,  latitud,  sunTimes);
         let sun = SunCalc.getPosition(hourAngleToDate(angulos.omega,  latitud,  longitud),  latitud,  longitud);
         let azimuth = sun.azimuth * 180 / Math.PI;
-        let gammas = calcularGammasPared(pared.gamma);
+        let gammas = calcularGammasPared(pared.userData.gamma);
         let omega_mna = calcularOmegaPared(angulos.phi, angulos.delta, gammas.gamma1,  latitud,  longitud);
         let omega_tde = calcularOmegaPared(angulos.phi, angulos.delta, gammas.gamma2,  latitud,  longitud);
-        let omegas = calcularHoraIncidencia(pared.gamma, angulos.w1, angulos.w2, omega_mna, omega_tde);
+        let omegas = calcularHoraIncidencia(pared.userData.gamma, angulos.w1, angulos.w2, omega_mna, omega_tde);
 
         let omegasDate = {
             wm: {
@@ -370,8 +341,8 @@ function calcularRbParedes(paredes, latitud, longitud, sunTimes) {
         };
 
         let Rb = calcularRB(angulos, pared, omegas);
-        pared.omegas = omegasDate;
-        pared.rb = Rb;
+        pared.userData.omegas = omegasDate;
+        pared.userData.rb = Rb;
     }
     return paredes;
 }
