@@ -255,11 +255,13 @@ class Morfologia extends Component {
         //camara 2d
         const val = 2 * 16;
         let camara2D = new THREE.OrthographicCamera(width / -val, width / val, height / val, height / -val, 1, 1000);
-        camara2D.position.set(0, 10, 0);
+        camara2D.position.set(0, 3, 0);
+        camara2D.zoom = 2.5;
+        camara2D.updateProjectionMatrix ();
         this.camara2D = camara2D;
         //CAMARA 3D
-        let camara3D = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
-        camara3D.position.set(5, 8, 13);
+        let camara3D = new THREE.PerspectiveCamera(20, width / height, 1, 1000);
+        camara3D.position.set(0, 8, 27);
         camara3D.lookAt(new THREE.Vector3());
         this.camara3D = camara3D;
 
@@ -324,7 +326,7 @@ class Morfologia extends Component {
 
 
         //Plano se agrega a objetos
-        let planoGeometria = new THREE.PlaneBufferGeometry(50, 50);
+        let planoGeometria = new THREE.PlaneBufferGeometry(20, 20);
         planoGeometria.rotateX(-Math.PI / 2);
 
         planoGeometria.computeFaceNormals();
@@ -346,7 +348,7 @@ class Morfologia extends Component {
         this.objetos.push(plano);
 
         //Grid del plano
-        let gridHelper = new THREE.GridHelper(50, 50, 0xCCCCCC, 0xCCCCCC);
+        let gridHelper = new THREE.GridHelper(20, 20, 0xCCCCCC, 0xCCCCCC);
         escena.add(gridHelper);
 
         //Indicador de puntos cardinales
@@ -814,7 +816,7 @@ class Morfologia extends Component {
 
     renderScene() {
 
-        this.renderer.render(this.escena, this.camara)
+        this.renderer.render(this.escena, this.camara);
     }
 
     crearMeshPared(width, height) {
@@ -1188,28 +1190,25 @@ class Morfologia extends Component {
                 }
             }
             //si se dibuja una ventana, se intersecta con paredes.
-            else if (this.props.dibujando == 5 ) {
+            else if (this.props.dibujando === 5 || this.props.dibujando === 6 ) {
                 let intersects = this.raycaster.intersectObjects(this.paredes);
                 if (intersects.length > 0) {
                     intersect = intersects[0];
                     let pared = intersect.object;
                     let pos = intersect.point.clone();
-                    this.managerCasas.moverVentanaConstruccion(pared, pos, intersect.point);
+                    if(this.props.dibujando === 5){
+                        this.managerCasas.moverVentanaConstruccion(pared, pos, intersect.point);
+                    }else{
+                        this.managerCasas.moverPuertaConstruccion(pared, pos, intersect.point);
+                    }
 
                 }else{
-                    this.managerCasas.ocultarVentanaConstruccion();
-                }
-            }
-            else if(this.props.dibujando == 6 ){
-                let intersects = this.raycaster.intersectObjects(this.paredes);
-                if (intersects.length > 0) {
-                    intersect = intersects[0];
-                    let pared = intersect.object;
-                    let pos = intersect.point.clone();
-                    this.managerCasas.moverPuertaConstruccion(pared, pos, intersect.point);
+                    if(this.props.dibujando === 5){
+                        this.managerCasas.ocultarVentanaConstruccion();
+                    }else{
+                        this.managerCasas.ocultarPuertaConstruccion();
+                    }
 
-                }else{
-                    this.managerCasas.ocultarPuertaConstruccion();
                 }
             }
         }
@@ -1271,6 +1270,7 @@ class Morfologia extends Component {
         }
 
         if (this.props.dibujando === 5 && this.props.dibujando !== -1) {
+            console.log("Asdsa");
             this.managerCasas.agregarVentana();
             this.props.onVentanasChanged(this.ventanas);
         }

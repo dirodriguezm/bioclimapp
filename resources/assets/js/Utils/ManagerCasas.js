@@ -7,6 +7,8 @@ class ManagerCasas {
     constructor(escena, paredes, ventanas, puertas, allObjects, ocupantes, horasIluminacion, aireRenovado) {
         this.escena = escena;
         this.paredes = paredes;
+        this.paredesX = [];
+        this.paredesZ = [];
         this.ventanas = ventanas;
         this.puertas = puertas;
         this.pisos = [];
@@ -56,7 +58,7 @@ class ManagerCasas {
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
             color: '#62bf00',
-            opacity: 0,
+            opacity: 0.7,
             transparent: true,
             side: THREE.DoubleSide,
         });
@@ -100,20 +102,26 @@ class ManagerCasas {
         });
 
         //habitacion que dibuja nuevas habitaciones
-        this.habitacionConstruccion = this.crearHabitacion(0, 1, 0, 1).clone();
+        this.habitacionConstruccion = this.crearHabitacion(0, 2.5, 0, 1).clone();
         this.habitacionConstruccion.visible = false;
         //Ventana que dibuja nuevas ventanas
-        this.ventanaConstruccion = this.crearMeshVentana(1, 0.5);
+        this.ventanaConstruccion = this.crearMeshVentana(2.5, 0.5);
         this.ventanaConstruccion.visible = false;
         //Puerta que dibuja nuevas puertas
-        this.puertaConstruccion = this.crearMeshPuerta(0.6, 0.8);
+        this.puertaConstruccion = this.crearMeshPuerta(0.6, 1.8);
         this.puertaConstruccion.visible = false;
 
         escena.add(this.habitacionConstruccion);
         escena.add(this.ventanaConstruccion);
         escena.add(this.puertaConstruccion);
 
+        //raycaster
+        var ray = new THREE.Raycaster();
+        ray.linePrecision = 1;
+        this.ray = ray;
 
+        //arrows
+        this.arrows = [];
     }
 
     getJsonMarcos(response) {
@@ -166,48 +174,7 @@ class ManagerCasas {
         this.gradoDias = gradoDias;
     }
 
-    setEndHabitacion(end, raycaster) {
-        /*if(!this.habitacionConstruccion.userData.errorStart){
-            let intersects = raycaster.intersectObjects(this.pisos);
-            if (intersects.length > 0) {
-                let piso = intersects[0].object;
-                let habitacion = piso.parent;
-                let x1 = habitacion.userData.x1;
-                let x2 = habitacion.userData.x2;
-                let z1 = habitacion.userData.z1;
-                let z2 = habitacion.userData.z2;
-
-                if(end.x > x1 && end.x < x2 && end.z > z1 && end.z < z2){
-                    this.setErrorConstruccion(true, false);
-                }else if(end.x === x1 || end.x === x2 || end.z === z1 || end.z === z2){
-                    this.setErrorConstruccion(false, false);
-                }
-            } else {
-                this.setErrorConstruccion(false, false);
-            }
-        }
-*/
-        this.habitacionConstruccion.userData.end = end.clone();
-    }
-
     setStartHabitacion(start, raycaster) {
-        /*let intersects = raycaster.intersectObjects(this.pisos);
-        if (intersects.length > 0) {
-            let piso = intersects[0].object;
-            let habitacion = piso.parent;
-            let x1 = habitacion.userData.x1;
-            let x2 = habitacion.userData.x2;
-            let z1 = habitacion.userData.z1;
-            let z2 = habitacion.userData.z2;
-
-            if(start.x > x1 && start.x < x2 && start.z > z1 && start.z < z2){
-                this.setErrorConstruccion(true,true);
-            }else if(start.x === x1 || start.x === x2 || start.z === z1 || start.z === z2){
-                this.setErrorConstruccion(false, true);
-            }
-        } else {
-            this.setErrorConstruccion(false, true);
-        }*/
         this.habitacionConstruccion.userData.start = start.clone();
         this.habitacionConstruccion.visible = true;
     }
@@ -231,6 +198,7 @@ class ManagerCasas {
             piso.material = this.materialPisoConstruccion.clone();
             techo.material = this.materialTechoConstruccion.clone();
         }
+        this.habitacionConstruccion.userData.error = error;
 
 
     }
@@ -256,36 +224,89 @@ class ManagerCasas {
     }
 
     pisosChocan(habitacion) {
-        let piso = this.habitacionConstruccion.getObjectByName("Piso");
+
         let start = habitacion.userData.start.clone();
+        start.y = 0;
         let end = habitacion.userData.end.clone();
-        var dir = end.clone().sub(start);
-        var len = dir.length();
-        dir = dir.normalize();
-        var ray = new THREE.Raycaster();
+        end.y = 0;
 
-        ray.set(new THREE.Vector3(start.x, 0, start.z), new THREE.Vector3(dir.x, dir.y, dir.z));
-        console.log("piso",piso);
-        console.log("start", start);
-        console.log("dir", dir);
+        var dirX = new THREE.Vector3(0,0,1).normalize();
+        var dirZ = new THREE.Vector3(1,0,0).normalize();
+        let origin = new THREE.Vector3(0,0.5,0);
 
-        var intersects = ray.intersectObjects(this.pisos);
-        if (intersects.length > 0) {
+        var lenX = Math.abs(start.x - end.x);
+        var lenZ = Math.abs(start.z - end.z);
+        let x = Math.min(start.x, end.x);
+        let z = Math.min(start.z, end.z);
 
-            console.log("si");
-            return false;
+        for(let arrow of this.arrows){
+            this.escena.remove(arrow);
         }
-        else {
-            console.log("no");
-            return false;
+
+        this.ray.far = lenZ;
+        origin.z = z;
+        for(let i = x+0.5; i <= x+lenX; i++){
+            origin.x = i;
+            this.ray.set(origin, dirX);
+            var intersects = this.ray.intersectObjects(this.paredesX);
+            let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
+            this.arrows.push(arrow);
+            this.escena.add(arrow);
+            if (intersects.length > 0) {
+                if(intersects[0].distance > 0.5 && intersects[0].distance < lenZ-0.5){
+                    this.escena.remove(arrow);
+                    this.arrows.splice(this.arrows.indexOf(arrow));
+                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
+                    this.arrows.push(arrow);
+                    this.escena.add(arrow);
+                    return true;
+                }
+            }
         }
+
+        this.ray.far = lenX;
+        origin.x = x;
+        for(let i = z+0.5; i <= z+lenZ; i++){
+            origin.z = i;
+            this.ray.set(origin, dirZ);
+            var intersects = this.ray.intersectObjects(this.paredesZ);
+            let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
+            this.arrows.push(arrow);
+            this.escena.add(arrow);
+            if (intersects.length > 0) {
+                if(intersects[0].distance > 0.5 && intersects[0].distance < lenX-0.5){
+                    this.escena.remove(arrow);
+                    this.arrows.splice(this.arrows.indexOf(arrow));
+                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
+                    this.arrows.push(arrow);
+                    this.escena.add(arrow);
+                    return true;
+                }
+            }
+        }
+        return false;
+
+        /*for(let i = x; i <= x+lenX; i++){
+            origin.x = i;
+            for(let j = z; j <= z+lenZ; j++){
+                origin.z = j;
+                this.ray.set(origin, dir);
+                var intersects = this.ray.intersectObjects(this.pisos);
+                if (intersects.length > 0) {
+                    return true;
+                }
+            }
+        }
+        return false;*/
+
     }
 
     agregarHabitacionDibujada() {
 
-        if (this.habitacionConstruccion.userData.errorStart || this.habitacionConstruccion.userData.errorEnd) {
+        if (this.habitacionConstruccion.userData.error) {
             //this.habitacionConstruccion.visible = false;
             this.crecerHabitacion(this.habitacionConstruccion.userData.start);
+            this.habitacionConstruccion.userData.error = false;
             return;
         }
 
@@ -330,6 +351,11 @@ class ManagerCasas {
             transmitanciaSuperficies += pared.userData.transSup;
 
             this.paredes.push(pared);
+            if(pared.userData.orientacion.z !== 0){
+                this.paredesX.push(pared);
+            }else{
+                this.paredesZ.push(pared);
+            }
             this.allObjects.push(pared);
         }
         let piso = habitacion.getObjectByName("Piso");
@@ -742,21 +768,6 @@ class ManagerCasas {
         let start = this.habitacionConstruccion.userData.start.clone();
         this.habitacionConstruccion.userData.end = nextPosition.clone();
         let end = nextPosition.clone();
-
-        if (start.x < end.x) {
-            this.habitacionConstruccion.userData.x1 = start.x;
-            this.habitacionConstruccion.userData.x2 = end.x;
-        } else {
-            this.habitacionConstruccion.userData.x2 = start.x;
-            this.habitacionConstruccion.userData.x1 = end.x;
-        }
-        if (start.z < end.z) {
-            this.habitacionConstruccion.userData.z1 = start.z;
-            this.habitacionConstruccion.userData.z2 = end.z;
-        } else {
-            this.habitacionConstruccion.userData.z2 = start.z;
-            this.habitacionConstruccion.userData.z1 = end.z;
-        }
 
         this.setErrorConstruccion(this.pisosChocan(this.habitacionConstruccion));
 
