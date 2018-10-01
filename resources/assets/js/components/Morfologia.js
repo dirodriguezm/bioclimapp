@@ -1046,7 +1046,7 @@ class Morfologia extends Component {
                     let intersect = intersects[0];
                     let startHabitacion = (intersect.point).add(intersect.face.normal).clone();
                     startHabitacion = startHabitacion.round();
-                    this.managerCasas.setStartHabitacion(startHabitacion);
+                    this.managerCasas.setStartHabitacion(startHabitacion, this.raycaster);
 
 
                     /*let intersect = intersects[0];
@@ -1164,6 +1164,7 @@ class Morfologia extends Component {
                         if (this.construyendo) {
                             var nextPosition = (intersect.point).add(intersect.face.normal).clone();
                             nextPosition.round();
+                            //this.managerCasas.setEndHabitacion(nextPosition, this.raycaster);
                             this.managerCasas.crecerHabitacion(nextPosition);
 
 

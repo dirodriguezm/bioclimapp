@@ -72,10 +72,12 @@ const styles = theme => ({
     },
     drawerPaper: {
         position: 'relative',
+        height: '90vh',
         width: drawerWidth,
     },
     drawerRightPaper:{
         position: 'relative',
+        height: '90vh',
         width: drawerRightWidth
     },
     contentBarra: {
@@ -125,6 +127,11 @@ const styles = theme => ({
         zIndex: 1,
         overflow: 'hidden',
         position: 'relative',
+        display: 'flex',
+        width: '100%',
+    },
+    frameTabs: {
+        zIndex: 1,
         display: 'flex',
         width: '100%',
     },
@@ -389,7 +396,7 @@ class TabPanel extends Component {
                         [classes.contentShiftLeft]: this.state.openDashboard,
                     })}
                 >
-                    <div className={classes.appFrame}>
+                    <div className={classes.frameTabs}>
                         <div className={classNames(classes.contentInside, classes.contentRight, {
                             [classes.contentShift]: this.state.drawer_localidad,
                             [classes.contentShiftRight]: this.state.drawer_localidad,
@@ -442,7 +449,7 @@ class TabPanel extends Component {
                         </Drawer>
                     </div>
 
-                    <div className={classes.appFrame}>
+                    <div className={classes.frameTabs}>
                         <div className={classNames(classes.contentInside, classes.contentRight, {
                             [classes.contentShift]: !openMorf,
                             [classes.contentShiftRight]: !openMorf,

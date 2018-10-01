@@ -121,7 +121,7 @@ class InformacionVentana extends Component {
         this.setState({
             [event.target.name]: event.target.value,
         });
-        console.log(event.target.name, event.target.value);
+        //console.log(event.target.name, event.target.value);
     }
 
     handleClickAgregar() {

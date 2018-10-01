@@ -104,7 +104,7 @@ export default class MapContainer extends Component {
     handleLocationFound(e) {
         let lng = parseFloat(e.location.x);
         let lat = parseFloat(e.location.y);
-        console.log(lat + "," + lng);
+        //console.log(lat + "," + lng);
         this.createMarker(lat, lng);
         axios.get("http://127.0.0.1:8000/api/comuna/" + lat + "/" + lng)
             .then(response => {
