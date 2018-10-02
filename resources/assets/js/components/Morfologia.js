@@ -19,14 +19,16 @@ class Morfologia extends Component {
         this.onMouseDown = this.onMouseDown.bind(this);
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onClick = this.onClick.bind(this);
+        this.onDrag = this.onDrag.bind(this);
         this.agregarPared = this.agregarPared.bind(this);
         this.onChangeCamera = this.onChangeCamera.bind(this);
         this.crearIndicadores = this.crearIndicadores.bind(this);
 
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
         this.temperaturaConfort = 19;
+        this.angleRotated = 0;
 
-        this.state = {
+        this.state  = {
             height: props.height,
             width: props.width,
         };
@@ -39,7 +41,6 @@ class Morfologia extends Component {
             this.onSunpositionChanged();
         }
         if(this.props.sunPath !== prevProps.sunPath){
-            //console.log("SUNPATH", this.props.sunPath);
             this.getSunPath();
         }
         if (this.props.click2D !== prevProps.click2D) {
@@ -78,7 +79,7 @@ class Morfologia extends Component {
             this.props.onCapaReady();
         }
         if(this.props.sunPathClicked !== prevProps.sunPathClicked){
-            this.handleSunpathClicked(this.props.sunPathClicked);
+            this.handleSunPathClicked(this.props.sunPathClicked);
         }
     }
 
@@ -118,21 +119,15 @@ class Morfologia extends Component {
         this.sol.position.set(this.light.position.x, this.light.position.y, this.light.position.z);
     }
 
-    handleSunpathClicked(sunPathClicked){
-        let sunPath = this.escena.getObjectByName("sunPath");
-        if(sunPathClicked){
-            if(sunPath != null){
-                for(let child of sunPath){
-                    child.visible = false;
-                }
-            } sunPath.visible = false;
+    handleSunPathClicked(sunPathClicked){
+        let group = this.escena.getObjectByName("sunPath");
+        if(sunPathClicked === true){
+            if(group != null){
+                this.escena.remove(group);
+            }
         }
-        else{
-            if(sunPath != null){
-                for(let child of sunPath){
-                    child.visible = true;
-                }
-            } sunPath.visible = true;
+        else {
+            this.escena.add(this.sunPath);
         }
     }
 
@@ -164,10 +159,6 @@ class Morfologia extends Component {
                 let f = sunAlt.x / d;
                 sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
                 curvePoints.push(new THREE.Vector3(sunPos.x, sunAlt.y - 1, sunPos.z));
-                if(Math.abs(sunPos.x - this.sol.position.x) < 0.1 && Math.abs(sunPos.z - this.sol.position.z) < 0.1 ){
-                    today = day;
-                }
-                //allPoints.push(new THREE.Vector3(sunPos.x, sunAlt.y - 1, sunPos.z));
             }
             let curve = new THREE.CatmullRomCurve3(curvePoints, true);
             let points = curve.getPoints(100);
@@ -185,6 +176,8 @@ class Morfologia extends Component {
             }
 
         }
+        group.add(this.sol);
+        this.sunPath = group;
         this.escena.add(group);
     }
 
@@ -226,8 +219,6 @@ class Morfologia extends Component {
         this.techos = [];
 
         this.casas = new THREE.Group();
-
-        var ventanas = [];
 
         //Hay que cargar escena, camara, y renderer,
         //Escena
@@ -300,7 +291,7 @@ class Morfologia extends Component {
         var solMaterial = new THREE.MeshBasicMaterial({color: 0xffff00});
         this.sol = new THREE.Mesh(solGeometry, solMaterial);
         this.sol.position.set(this.light.position.x, this.light.position.y, this.light.position.z);
-        this.escena.add(this.sol);
+        //this.escena.add(this.sol);
 
         //Controles para la camara2D
         const control2D = new OrbitControls(camara2D, renderer.domElement);
@@ -354,7 +345,7 @@ class Morfologia extends Component {
         //Indicador de puntos cardinales
         let curve = new THREE.EllipseCurve(
             0, 0,            // ax, aY
-            20, 20,           // xRadius, yRadius
+            10, 10,           // xRadius, yRadius
             0, 2 * Math.PI,  // aStartAngle, aEndAngle
             false,            // aClockwise
             0                 // aRotation
@@ -379,9 +370,8 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, 0.3, 20);
-        sprite.rotateX(-Math.PI / 2);
-        escena.add(sprite);
+        sprite.position.set(0, -10, 0.3);
+        cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("N", {
             align: textAlign.center,
             font: '40px Arial',
@@ -390,9 +380,8 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, 0.3, -20);
-        sprite.rotateX(-Math.PI / 2);
-        escena.add(sprite);
+        sprite.position.set(0, 10, 0.3);
+        cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("E", {
             align: textAlign.center,
             font: '40px Arial',
@@ -401,9 +390,8 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(20, 0.3, 0);
-        sprite.rotateX(-Math.PI / 2);
-        escena.add(sprite);
+        sprite.position.set(10, 0.3, 0);
+        cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("O", {
             align: textAlign.center,
             font: '40px Arial',
@@ -412,9 +400,8 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(-20, 0.3, 0);
-        sprite.rotateX(-Math.PI / 2);
-        escena.add(sprite);
+        sprite.position.set(-10, 0.3, 0);
+        cardinalPointsCircle.add(sprite);
 
 
         //Indicador de la pared
@@ -958,7 +945,7 @@ class Morfologia extends Component {
             this.escena.add(casa);
         }
         //calcularGammaParedes(this.paredes);
-        BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
         this.props.onParedesChanged(this.paredes);
     }
 
@@ -1024,7 +1011,7 @@ class Morfologia extends Component {
         pared.tipo =  Morfologia.tipos.PARED;
         this.paredes.push(pared);
         this.allObjects.push(pared);
-        BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
         this.props.onParedesChanged(this.paredes);
 
     }
@@ -1060,6 +1047,10 @@ class Morfologia extends Component {
                 }
             }
         }
+
+        if(this.props.rotando && event.button === 0){
+            this.dragging = true;
+        }
     }
 
     onMouseUp(event) {
@@ -1081,11 +1072,36 @@ class Morfologia extends Component {
 
                 this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
 
-                BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+                //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
 
             }
+        }
+
+        if(this.dragging && this.props.rotando){
+            this.dragging = false;
+            console.log("rotado", this.angleRotated);
+            for(let pared of this.paredes){
+                let resultAngle = pared.userData.gamma + this.angleRotated;
+                if(resultAngle > 180){
+                    pared.userData.gamma = resultAngle - 360;
+                }
+                else if(resultAngle < -180){
+                    pared.userData.gamma = resultAngle + 360;
+                }
+                else{
+                    pared.userData.gamma = resultAngle;
+                }
+                for(let child of pared.children){
+                    if(child.userData.tipo === Morfologia.tipos.VENTANA){
+                        child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotated * Math.PI / 180);
+                    }
+                }
+            }
+            this.angleRotated = 0;
+            this.props.onParedesChanged(this.paredes);
+            console.log("cambio", this.paredes);
         }
     }
 
@@ -1219,6 +1235,16 @@ class Morfologia extends Component {
             }
         }
 
+        //si se está rotando
+        if(this.dragging){
+            let angle = Math.PI * event.movementX / 180;
+            this.angleRotated += (angle*180/Math.PI);
+            this.cardinalPointsCircle.rotateZ(angle);
+            this.sunPath.rotateY(angle);
+            this.light.position.set(this.sol.position.x, this.sol.position.y, this.sol.position.z);
+
+        }
+
         /*if (this.dibujando != -1 && this.dibujando < 4) {
             var index = parseInt(this.dibujando);
             if (this.indicador_dibujado != this.indicadores[index]) {
@@ -1272,7 +1298,7 @@ class Morfologia extends Component {
         if (this.props.dibujando === 5 && this.props.dibujando !== -1) {
             console.log("Asdsa");
             this.managerCasas.agregarVentana();
-            this.props.onVentanasChanged(this.ventanas);
+            this.props.onVentanasChanged(this.managerCasas.getVentanas());
         }
 
         if (this.props.dibujando === 6 && this.props.dibujando !== -1) {
@@ -1282,6 +1308,10 @@ class Morfologia extends Component {
         if(this.props.seleccionando){
             this.handleSeleccionado();
         }
+    }
+
+    onDrag(event){
+        console.log("drag", event);
     }
 
     handleSeleccionado(){
@@ -1331,6 +1361,7 @@ class Morfologia extends Component {
                 onMouseUp={this.onMouseUp}
                 onMouseMove={this.onMouseMove}
                 onClick={this.onClick}
+                onDrag={this.onDrag}
                 ref={(mount) => {
                     this.mount = mount
                 }}

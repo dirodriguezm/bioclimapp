@@ -392,7 +392,7 @@ class ManagerCasas {
         BalanceEnergetico.transmitanciaSuperficie(techo);
         transmitanciaSuperficies += techo.userData.transSup;
 
-        console.log(techo.userData.transSup);
+        //console.log(techo.userData.transSup);
 
         let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion);
 
@@ -472,6 +472,7 @@ class ManagerCasas {
             let habitacion = pared.parent.parent;
             let orientacion = pared.userData.orientacion;
             ventana.userData.orientacion = new THREE.Vector3(orientacion.x, orientacion.y, orientacion.z);
+            //ventana.userData.orientacion = pared.userData.orientacion;
             ventana.userData.pos = new THREE.Vector3();
             ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
             ventana.material = this.materialVentanaConstruida.clone();
@@ -514,6 +515,10 @@ class ManagerCasas {
             this.ventanas.push(ventana);
             this.allObjects.push(ventana);
         }
+    }
+
+    getVentanas(){
+        return this.ventanas;
     }
 
     moverVentanaConstruccion(pared, point) {
@@ -854,28 +859,32 @@ class ManagerCasas {
 
         var pared1 = this.crearMeshPared(width, height);
         pared1.position.z = pared1.position.z + halfWidth;
-        pared1.userData.orientacion = new THREE.Vector3(0, 0, -1);
+        pared1.userData.gamma = 180;
+        pared1.userData.orientacion = new THREE.Vector3(0,0,-1);
         pared1.userData.width = width;
         pared1.userData.height = height;
 
         var pared2 = this.crearMeshPared(width, height);
         pared2.rotation.y = Math.PI / 2;
         pared2.position.x = pared2.position.x + halfWidth;
-        pared2.userData.orientacion = new THREE.Vector3(-1, 0, 0);
+        pared2.userData.gamma = 90;
+        pared2.userData.orientacion = new THREE.Vector3(-1,0,0);
         pared2.userData.width = width;
         pared2.userData.height = height;
 
         var pared3 = this.crearMeshPared(width, height);
         pared3.rotation.y = Math.PI;
         pared3.position.z = pared3.position.z - halfWidth;
-        pared3.userData.orientacion = new THREE.Vector3(0, 0, 1);
+        pared3.userData.gamma = 0;
+        pared3.userData.orientacion = new THREE.Vector3(0,0,1);
         pared3.userData.width = width;
         pared3.userData.height = height;
 
         var pared4 = this.crearMeshPared(width, height);
         pared4.rotation.y = -Math.PI / 2;
         pared4.position.x = pared4.position.x - halfWidth;
-        pared4.userData.orientacion = new THREE.Vector3(1, 0, 0);
+        pared4.userData.gamma = -90;
+        pared4.userData.orientacion = new THREE.Vector3(1,0,0);
         pared4.userData.width = width;
         pared4.userData.height = height;
 

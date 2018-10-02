@@ -110,9 +110,11 @@ class Context extends Component {
             this.agregarContexto = false;
             this.borrando = true;
         }
-        if(this.props.ventanas != null && this.ventanas !== this.props.ventanas){
+        if(this.props.ventanas != null && prevProps.ventanas !== this.props.ventanas){
             this.ventanas = this.props.ventanas.slice();
-            this.calcularFAR(this.ventanas);
+            if(this.props.ventanas.length !== prevProps.ventanas.length) {
+                this.calcularFAR(this.ventanas);
+            }
         }
         if(this.props.width !== prevProps.width ){
             if(this.props.width < prevProps.width){
@@ -597,14 +599,12 @@ class Context extends Component {
     render() {
         const open = this.state.open;
         const id = open ? 'simple-popper' : null;
-        //console.log("popper coords", this.state.popperCoords);
         let divStyle = {
             position: 'absolute',
             left: this.state.popperCoords != null ? (this.state.popperCoords.x - this.dif)+ 'px' : 0,
             top: this.state.popperCoords != null ? this.state.popperCoords.y + 'px' : 0,
             zIndex: 1
         }
-        //console.log("popper open", open);
         return (
             <div>
                 <div

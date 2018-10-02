@@ -8,7 +8,9 @@ import Delete from '@material-ui/icons/Delete';
 import AddCircle from '@material-ui/icons/AddCircle'
 import SvgIcon from '@material-ui/core/SvgIcon';
 import Tooltip from '@material-ui/core/Tooltip';
-
+import ThreeDRotation from '@material-ui/icons/ThreeDRotation';
+import RotateLeft from '@material-ui/icons/RotateLeft';
+import RotateRight from '@material-ui/icons/RotateRight';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 
@@ -206,6 +208,19 @@ function HomeIcon() {
     );
 }
 
+function SunPathIcon() {
+    return (
+        <SvgIcon viewBox="0 0 64 64">
+            <path d="M62 30H47.9a15.9 15.9 0 0 0-3.2-7.8l10-10a2 2 0 0 0-2.8-2.8l-10 10a15.9 15.9 0 0 0-7.9-3.3V2a2 2 0 0 0-4 0v14.2a15.9 15.9 0 0 0-7.8 3.2l-10-10a2 2 0 1 0-2.8 2.8l10 10a15.9 15.9 0 0 0-3.2 7.8H2a2 2 0 1 0 0 4h14.2a15.9 15.9 0 0 0 3.2 7.8l-10 10a2 2 0 1 0 2.8 2.8l10-10a15.9 15.9 0 0 0 7.8 3.3V62a2 2 0 0 0 4 0V47.9a15.9 15.9 0 0 0 7.8-3.2l10 10a2 2 0 1 0 2.8-2.8l-10-10a15.9 15.9 0 0 0 3.3-7.9H62a2 2 0 1 0 0-4z"
+            fill="#757575"></path>
+        </SvgIcon>
+    );
+}
+
+function RotateIcon(){
+
+}
+
 class BarraHerramientasMorfologia extends Component {
 
     constructor(props) {
@@ -220,6 +235,7 @@ class BarraHerramientasMorfologia extends Component {
             dibujandoStatesButtons: dibujandoStatesButtons,
             borrando: props.borrando,
             seleccionando: props.seleccionando,
+            rotando: props.borrando,
             anchorEl: null,
             anchor: null,
         };
@@ -237,7 +253,8 @@ class BarraHerramientasMorfologia extends Component {
         this.handleDibujo = this.handleDibujo.bind(this);
         this.handleClickSeleccionar = this.handleClickSeleccionar.bind(this);
         this.onActionChanged = this.onActionChanged.bind(this);
-        this.handleSunpathClick = this.handleSunpathClick.bind(this);
+        this.handleSunPathClick = this.handleSunPathClick.bind(this);
+        this.handleRotation = this.handleRotation.bind(this);
 
     };
 
@@ -284,10 +301,11 @@ class BarraHerramientasMorfologia extends Component {
     }
 
 
-    onActionChanged(dibujando, borrando, seleccionando) {
+    onActionChanged(dibujando, borrando, seleccionando, rotando = false) {
         this.props.onSeleccionandoMorfChanged(seleccionando);
         this.props.onBorrandoMorfChanged(borrando);
         this.props.onDibujandoMorfChanged(dibujando);
+        this.props.onRotationClicked(rotando);
     }
 
     handleBorrando() {
@@ -319,8 +337,21 @@ class BarraHerramientasMorfologia extends Component {
         this.props.onDrawingChanged(event.target.value);
     }
 
-    handleSunpathClick(){
-        this.props.onSunpathClicked();
+    handleSunPathClick(){
+        this.props.onSunPathClicked();
+    }
+
+    handleRotation(){
+        let dibujandoStatesButtons = this.state.dibujandoStatesButtons;
+        dibujandoStatesButtons[this.state.dibujando] = false;
+        this.setState({
+            dibujando: -1,
+            borrando: false,
+            seleccionando: false,
+            dibujandoStatesButtons: dibujandoStatesButtons,
+            rotando: true,
+        });
+        this.onActionChanged(-1, false, false, true);
     }
 
 
@@ -580,12 +611,25 @@ class BarraHerramientasMorfologia extends Component {
                         <IconButton
                             className={classes.button}
                             aria-label="Sunpath"
-                            onClick={this.handleSunpathClick}>
-                            <CursorIcon/>
+                            onClick={this.handleSunPathClick}>
+                            <SunPathIcon/>
                         </IconButton>
                     </div>
                 </Tooltip>
 
+                <Tooltip title="Rotar"
+                         disableFocusListener={!this.state.rotando}
+                >
+                    <div>
+                        <IconButton
+                            className={classes.button}
+                            aria-label="Rotar"
+                            aria-haspopup="true"
+                            onClick={this.handleRotation}>
+                            <ThreeDRotation/>
+                        </IconButton>
+                    </div>
+                </Tooltip>
 
             </div>
 

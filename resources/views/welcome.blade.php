@@ -18,6 +18,7 @@
             font-size: 64px;
             text-align: center;
           }
+
         </style>
         <!-- Leaflet CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"

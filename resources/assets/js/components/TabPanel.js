@@ -157,6 +157,8 @@ class TabPanel extends Component {
             drawer_localidad: true,
             sunPathClicked: false,
             paredCapaChange: false,
+            rotando: false,
+            ventanas: []
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -180,9 +182,10 @@ class TabPanel extends Component {
         this.onSeleccionarLocalidad = this.onSeleccionarLocalidad.bind(this);
         this.onAporteSolarChanged = this.onAporteSolarChanged.bind(this);
         this.handleDashboardOpen = this.handleDashboardOpen.bind(this);
-        this.onSunpathClicked = this.onSunpathClicked.bind(this);
+        this.onSunPathClicked = this.onSunPathClicked.bind(this);
         this.onCapaChanged = this.onCapaChanged.bind(this);
         this.onCapaReady = this.onCapaReady.bind(this);
+        this.onRotationClicked = this.onRotationClicked.bind(this);
     }
 
     handleDrawerOpen() {
@@ -271,9 +274,7 @@ class TabPanel extends Component {
     onFarChanged(ventanas) {
         let month = new Date().getMonth();
         let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
-        console.log("APORTE SOLAR", aporte_solar);
-        this.onAporteSolarChanged(aporte_solar);
-        this.setState({ventanas: ventanas});
+        this.setState({ventanas: ventanas, aporte_solar:aporte_solar});
     }
 
     onAporteSolarChanged(aporte_solar){
@@ -339,8 +340,12 @@ class TabPanel extends Component {
             return {drawer_localidad: !state.drawer_localidad}
         });
     }
-    onSunpathClicked(){
+    onSunPathClicked(){
         this.setState( (state) => {return {sunPathClicked: !state.sunPathClicked}});
+    }
+
+    onRotationClicked(rotando){
+        this.setState({rotando: rotando});
     }
 
 
@@ -477,6 +482,7 @@ class TabPanel extends Component {
                                         paredCapaChange={paredCapaChange}
                                         seleccionadoMorf={seleccionadoMorf}
                                         sunPathClicked={this.state.sunPathClicked}
+                                        rotando={this.state.rotando}
                                     />:
                                     <div></div>
                                 }
@@ -486,10 +492,13 @@ class TabPanel extends Component {
                                         dibujando={dibujandoMorf}
                                         borrando={borrandoMorf}
                                         seleccionando={seleccionandoMorf}
+                                        rotando={this.state.rotando}
                                         onPerspectiveChanged={this.onPerspectiveChanged}
                                         onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
                                         onBorrandoMorfChanged={this.onBorrandoMorfChanged}
                                         onDibujandoMorfChanged={this.onDibujandoMorfChanged}
+                                        onSunPathClicked={this.onSunPathClicked}
+                                        onRotationClicked={this.onRotationClicked}
                                     />
                                 </Paper>
                             </TabContainer>
