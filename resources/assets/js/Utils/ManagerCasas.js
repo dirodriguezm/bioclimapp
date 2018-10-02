@@ -253,20 +253,24 @@ class ManagerCasas {
             this.arrows.push(arrow);
             this.escena.add(arrow);
             if (intersects.length > 0) {
-                if((intersects[0].distance > 0.5 || intersects[0].distance ) && intersects[0].distance < lenZ-0.5){
-                    this.escena.remove(arrow);
-                    this.arrows.splice(this.arrows.indexOf(arrow));
-                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
-                    this.arrows.push(arrow);
-                    this.escena.add(arrow);
-                    return true;
-                }else{
-                    this.escena.remove(arrow);
-                    this.arrows.splice(this.arrows.indexOf(arrow));
-                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
-                    this.arrows.push(arrow);
-                    this.escena.add(arrow);
+                for(let pared of intersects){
+                    let distance = pared.distance;
+                    if(distance > 0.5  && distance < lenZ-0.5 ){
+                        this.escena.remove(arrow);
+                        this.arrows.splice(this.arrows.indexOf(arrow));
+                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
+                        this.arrows.push(arrow);
+                        this.escena.add(arrow);
+                        return true;
+                    }else{
+                        this.escena.remove(arrow);
+                        this.arrows.splice(this.arrows.indexOf(arrow));
+                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
+                        this.arrows.push(arrow);
+                        this.escena.add(arrow);
+                    }
                 }
+
             }
         }
 
@@ -280,22 +284,27 @@ class ManagerCasas {
             this.arrows.push(arrow);
             this.escena.add(arrow);
             if (intersects.length > 0) {
-                if(intersects[0].distance > 0.5 && intersects[0].distance < lenX-0.5){
-                    this.escena.remove(arrow);
-                    this.arrows.splice(this.arrows.indexOf(arrow));
-                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
-                    this.arrows.push(arrow);
-                    this.escena.add(arrow);
-                    return true;
-                }else{
-                    this.escena.remove(arrow);
-                    this.arrows.splice(this.arrows.indexOf(arrow));
-                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
-                    this.arrows.push(arrow);
-                    this.escena.add(arrow);
+                for(let pared of intersects){
+                    let distance = pared.distance;
+                    if(distance > 0.5  && distance < lenX-0.5 ){
+                        this.escena.remove(arrow);
+                        this.arrows.splice(this.arrows.indexOf(arrow));
+                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
+                        this.arrows.push(arrow);
+                        this.escena.add(arrow);
+                        return true;
+                    }else{
+                        this.escena.remove(arrow);
+                        this.arrows.splice(this.arrows.indexOf(arrow));
+                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
+                        this.arrows.push(arrow);
+                        this.escena.add(arrow);
+                    }
                 }
+
             }
         }
+
         return false;
 
     }
