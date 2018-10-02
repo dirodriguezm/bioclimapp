@@ -52,10 +52,19 @@ export default class MapContainer extends Component {
 
     getSunPath(lat, lng){
         let sunPath = [];
-        for(let i = 0; i < 172; i++){
+        let now = new Date();
+        let start = new Date(now.getFullYear(),0,0)
+        let invierno = new Date(now.getFullYear(),5,21);
+        let verano = new Date(now.getFullYear(),11,21);
+        let diff_invierno = (invierno - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        let diff_verano = (verano - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        let oneDay = 1000 * 60 * 60 * 24;
+        let day_invierno = Math.floor(diff_invierno / oneDay);
+        let day_verano = Math.floor(diff_verano / oneDay);
+        for(let i = day_invierno; i < day_verano; i++){
             let daySunPath = [];
             for(let j = 0; j < 24; j++){
-                let date = this.dateFromDay(2018,i);
+                let date = this.dateFromDay(now.getFullYear(),i);
                 let dateWithTime = new Date(date.getFullYear(), date.getMonth(), date.getDate(), j);
                 let sunPosition = this.getSunPosition(lat, lng, dateWithTime);
                 daySunPath.push(sunPosition);

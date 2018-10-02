@@ -136,13 +136,28 @@ class Morfologia extends Component {
         if(sunPath != null){
             this.escena.remove(sunPath);
         }
-        let day = -1;
         let allPoints= [];
-        let today = -1;
+        let now = new Date();
+        let start = new Date(now.getFullYear(), 0, 0);
+        let diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        let oneDay = 1000 * 60 * 60 * 24;
+        let today = Math.floor(diff / oneDay);
+        let invierno = new Date(now.getFullYear(),5,21);
+        let verano = new Date(now.getFullYear(),11,21);
+        let diff_invierno = (invierno - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        let diff_verano = (verano - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        let day_invierno = Math.floor(diff_invierno / oneDay);
+        let day_verano = Math.floor(diff_verano / oneDay);
+        if(today < day_invierno){
+            today = day_invierno + (day_invierno - today);
+        }
+        if(today > day_verano){
+            today = day_verano + (day_verano - today);
+        }
+        let day = day_invierno;
         let group = new THREE.Group();
         group.name = "sunPath";
         for(let daySunPath of this.props.sunPath){
-            day++;
             let curvePoints = [];
             for(let sunPosition of daySunPath){
                 let sunDegrees = this.transformGammaToDegree(sunPosition.azimuth);
@@ -167,6 +182,7 @@ class Morfologia extends Component {
             if(day === today){
                 let material = new THREE.LineBasicMaterial({color: 0x950714, linewidth: 2});
                 let curveObject = new THREE.Line(geometry, material);
+                curveObject.position.set(curveObject.position.x, curveObject.position.y + 0.1, curveObject.position.z -0.1);
                 group.add(curveObject);
             }
             else{
@@ -174,9 +190,11 @@ class Morfologia extends Component {
                 let curveObject = new THREE.Line(geometry, material);
                 group.add(curveObject);
             }
+            day++;
 
         }
         group.add(this.sol);
+        group.add(this.light);
         this.sunPath = group;
         this.escena.add(group);
     }
@@ -275,16 +293,14 @@ class Morfologia extends Component {
         this.light = new THREE.DirectionalLight(0xffffff, 1, 100);
         this.light.position.set(10, 10, 1); 			//default; light shining from top
         this.light.castShadow = true;            // default false
-        this.escena.add(this.light);
+        //this.escena.add(this.light);
 
         this.light.shadow.mapSize.width = 512;  // default
         this.light.shadow.mapSize.height = 512; // default
         this.light.shadow.camera.near = 0.5;    // default
         this.light.shadow.camera.far = 500;
 
-        var helper = new THREE.CameraHelper(this.light.shadow.camera);
 
-        this.escena.add(helper);
 
         //Mesh Sol
         var solGeometry = new THREE.SphereBufferGeometry(0.5, 32, 32);
@@ -1246,7 +1262,7 @@ class Morfologia extends Component {
             this.angleRotated += (angle*180/Math.PI);
             this.cardinalPointsCircle.rotateZ(angle);
             this.sunPath.rotateY(angle);
-            this.light.position.set(this.sol.position.x, this.sol.position.y, this.sol.position.z);
+            //this.light.position.set(this.sol.position.x, this.sol.position.y, this.sol.position.z);
 
         }
 
