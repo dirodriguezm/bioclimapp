@@ -57,7 +57,7 @@ class ManagerCasas {
         });
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
-            color: '#62bf00',
+            color: '#33ebed',
             opacity: 0.7,
             transparent: true,
             side: THREE.DoubleSide,
@@ -105,7 +105,7 @@ class ManagerCasas {
         this.habitacionConstruccion = this.crearHabitacion(0, 2.5, 0, 1).clone();
         this.habitacionConstruccion.visible = false;
         //Ventana que dibuja nuevas ventanas
-        this.ventanaConstruccion = this.crearMeshVentana(2.5, 0.5);
+        this.ventanaConstruccion = this.crearMeshVentana(1.25, 1);
         this.ventanaConstruccion.visible = false;
         //Puerta que dibuja nuevas puertas
         this.puertaConstruccion = this.crearMeshPuerta(0.6, 1.8);
