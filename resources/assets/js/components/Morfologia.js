@@ -1050,6 +1050,7 @@ class Morfologia extends Component {
 
         if(this.props.rotando && event.button === 0){
             this.dragging = true;
+            this.prevX = event.screenX;
         }
     }
 
@@ -1237,7 +1238,11 @@ class Morfologia extends Component {
 
         //si se está rotando
         if(this.dragging){
-            let angle = Math.PI * event.movementX / 180;
+            // console.log("comparar", movementX, event.movementX);
+            // this.angleRotated += (angle*180/Math.PI);
+            let movementX = event.screenX - this.prevX;
+            this.prevX = event.screenX;
+            let angle = Math.PI * movementX / 180;
             this.angleRotated += (angle*180/Math.PI);
             this.cardinalPointsCircle.rotateZ(angle);
             this.sunPath.rotateY(angle);
