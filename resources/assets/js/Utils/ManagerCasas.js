@@ -243,8 +243,8 @@ class ManagerCasas {
             this.escena.remove(arrow);
         }
 
-        this.ray.far = lenZ;
-        origin.z = z;
+        this.ray.far = lenZ + 0.2;
+        origin.z = z - 0.1;
         for(let i = x+0.5; i <= x+lenX; i++){
             origin.x = i;
             this.ray.set(origin, dirX);
@@ -255,7 +255,8 @@ class ManagerCasas {
             if (intersects.length > 0) {
                 for(let pared of intersects){
                     let distance = pared.distance;
-                    if(distance > 0.5  && distance < lenZ-0.5 ){
+                    distance = Math.round(distance);
+                    if(distance > 0  &&  distance < lenZ){
                         this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
                         arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
@@ -274,8 +275,8 @@ class ManagerCasas {
             }
         }
 
-        this.ray.far = lenX;
-        origin.x = x;
+        this.ray.far = lenX + 0.2;
+        origin.x = x - 0.1;
         for(let i = z+0.5; i <= z+lenZ; i++){
             origin.z = i;
             this.ray.set(origin, dirZ);
@@ -286,7 +287,8 @@ class ManagerCasas {
             if (intersects.length > 0) {
                 for(let pared of intersects){
                     let distance = pared.distance;
-                    if(distance > 0.5  && distance < lenX-0.5 ){
+                    distance = Math.round(distance);
+                    if(distance > 0  &&  distance < lenX){
                         this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
                         arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
@@ -490,6 +492,9 @@ class ManagerCasas {
 
             pared.add(ventana);
             pared.worldToLocal(ventana.position);
+
+            pared.holes.push(ventana);
+            pared.extrude( e)
 
 
             ventana.userData.tipo = Morfologia.tipos.VENTANA;
