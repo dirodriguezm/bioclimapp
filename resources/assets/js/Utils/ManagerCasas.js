@@ -51,7 +51,7 @@ class ManagerCasas {
 
         this.materialTechoConstruccion = new THREE.MeshBasicMaterial({
             color: '#3d8179',
-            opacity: 0.7,
+            opacity: 0,
             transparent: true,
             side: THREE.DoubleSide,
         });
@@ -223,7 +223,7 @@ class ManagerCasas {
         this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
     }
 
-    pisosChocan(habitacion) {
+    casasChocan(habitacion) {
 
         let start = habitacion.userData.start.clone();
         start.y = 0;
@@ -253,13 +253,19 @@ class ManagerCasas {
             this.arrows.push(arrow);
             this.escena.add(arrow);
             if (intersects.length > 0) {
-                if(intersects[0].distance > 0.5 && intersects[0].distance < lenZ-0.5){
+                if((intersects[0].distance > 0.5 || intersects[0].distance ) && intersects[0].distance < lenZ-0.5){
                     this.escena.remove(arrow);
                     this.arrows.splice(this.arrows.indexOf(arrow));
                     arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
                     this.arrows.push(arrow);
                     this.escena.add(arrow);
                     return true;
+                }else{
+                    this.escena.remove(arrow);
+                    this.arrows.splice(this.arrows.indexOf(arrow));
+                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
+                    this.arrows.push(arrow);
+                    this.escena.add(arrow);
                 }
             }
         }
@@ -281,30 +287,22 @@ class ManagerCasas {
                     this.arrows.push(arrow);
                     this.escena.add(arrow);
                     return true;
+                }else{
+                    this.escena.remove(arrow);
+                    this.arrows.splice(this.arrows.indexOf(arrow));
+                    arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
+                    this.arrows.push(arrow);
+                    this.escena.add(arrow);
                 }
             }
         }
         return false;
-
-        /*for(let i = x; i <= x+lenX; i++){
-            origin.x = i;
-            for(let j = z; j <= z+lenZ; j++){
-                origin.z = j;
-                this.ray.set(origin, dir);
-                var intersects = this.ray.intersectObjects(this.pisos);
-                if (intersects.length > 0) {
-                    return true;
-                }
-            }
-        }
-        return false;*/
 
     }
 
     agregarHabitacionDibujada() {
 
         if (this.habitacionConstruccion.userData.error) {
-            //this.habitacionConstruccion.visible = false;
             this.crecerHabitacion(this.habitacionConstruccion.userData.start);
             this.habitacionConstruccion.userData.error = false;
             return;
@@ -325,6 +323,8 @@ class ManagerCasas {
             pared.userData.superficie = pared.userData.width * pared.userData.height;
 
             //TODO: DETERMINAR CUALES SON EXTERIORES, TANTO PARA PAREDES COMO PARA PISO TECHO VENTANA Y PUERTAS.
+
+
             pared.userData.separacion = Morfologia.separacion.EXTERIOR;
 
             pared.userData.tipo = Morfologia.tipos.PARED;
@@ -774,8 +774,7 @@ class ManagerCasas {
         this.habitacionConstruccion.userData.end = nextPosition.clone();
         let end = nextPosition.clone();
 
-        this.setErrorConstruccion(this.pisosChocan(this.habitacionConstruccion));
-
+        this.setErrorConstruccion(this.casasChocan(this.habitacionConstruccion));
 
         var dir = end.clone().sub(start);
         var len = dir.length();
