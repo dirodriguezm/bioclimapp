@@ -7,7 +7,7 @@ import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
 import Konva from 'konva';
 import { render } from 'react-dom';
-import { Stage, Layer, Text, Label, Tag } from 'react-konva';
+import {Stage, Layer, Text, Label, Tag, Line} from 'react-konva';
 import {Parser as HtmlToReactParser} from 'html-to-react';
 
 const htmlToReactParser = new HtmlToReactParser();
@@ -95,207 +95,88 @@ function Chart(props){
 }
 
 function Grades(props){
+    let grades = ['A','B','C','D','E','F','G'];
+    let colors = ['#00b23b','#00ca2f','#91f300','#f3ff00','#fabf00','#ff4300','#ff0000'];
+    let startPosition = [120,20];
+    let ranges = ['< 10','10 - 30','30 - 50','50 - 70','70 - 90','90 - 110','> 110'];
+    let grade = null;
+    if(props.balance < 10) grade = 'A';
+    else if(props.balance >= 10 && props.balance < 30) grade = 'B';
+    else if(props.balance >= 30 && props.balance < 50) grade = 'C';
+    else if(props.balance >= 50 && props.balance < 70) grade = 'D';
+    else if(props.balance >= 70 && props.balance < 90) grade = 'E';
+    else if(props.balance >= 90 && props.balance < 110) grade = 'F';
+    else if(props.balance >= 110) grade = 'G';
     return (
-        <Stage width={500} height={250} >
-            <Layer>
-                <Label x={120} y={20}>
-                    <Tag
-                        fill= '#00b23b'
-                        pointerDirection= 'right'
-                        pointerWidth={20}
-                        pointerHeight={28}
-                        lineJoin= 'round'
-                        shadowColor= '#00b23b'
+        <Paper>
+            <Stage width={500} height={250} >
+                {grades.map((grade, index ) => (
+                    <Layer key={index}>
+                        <Label x={startPosition[0] + (index*20)} y={startPosition[1] + (index * 35)}>
+                            <Tag
+                                fill={colors[index]}
+                                pointerDirection='right'
+                                pointerWidth={20}
+                                pointerHeight={28}
+                                lineJoin='round'
+                                shadowColor='#000000'
+                            />
+                            <Text
+                                width={90 + (20*index)}
+                                text={grade}
+                                align='right'
+                                fontStyle='bold'
+                                fontSize={18}
+                                padding={5}
+                                fill='white'
+                            />
+                        </Label>
+                        <Text
+                            y={5 + (35*index)}
+                            x={8}
+                            text={ranges[index]}
+                            align='left'
+                            fontSize={18}
+                            padding={5}
+                            fill='white'
+                        />
+                    </Layer>
+                ))}
+                <Layer>
+                    <Line
+                        x={270}
+                        y={0}
+                        points={[0, 0, 0, 280]}
+                        stroke="black"
                     />
-                    <Text
-                        width={90}
-                        text='A'
-                        align='right'
-                        fontStyle="bold"
-                        fontSize={18}
-                        padding={5}
-                        fill='white'
-                    />
-                </Label>
-                <Text
-                    y={5}
-                    x={8}
-                    text='< 10'
-                    align='left'
-                    fontSize={18}
-                    padding={5}
-                    fill='white'
-                />
-                <Label x={140} y={55}>
-                    <Tag
-                        fill= '#00ca2f'
-                        pointerDirection= 'right'
-                        pointerWidth={20}
-                        pointerHeight={28}
-                        lineJoin= 'round'
-                        shadowColor= '#00ca2f'
-                    />
-                    <Text
-                        width={110}
-                        text='B'
-                        align='right'
-                        fontStyle="bold"
-                        fontSize={18}
-                        padding={5}
-                        fill='white'
-                    />
-                </Label>
-                <Text
-                    y={40}
-                    x={8}
-                    text='10 - 30'
-                    align='left'
-                    fontSize={18}
-                    padding={5}
-                    fill='white'
-                />
-                <Label x={160} y={90}>
-                    <Tag
-                        fill= '#91f300'
-                        pointerDirection= 'right'
-                        pointerWidth={20}
-                        pointerHeight={28}
-                        lineJoin= 'round'
-                        shadowColor= '#91f300'
-                    />
-                    <Text
-                        width={130}
-                        text='C'
-                        align='right'
-                        fontStyle="bold"
-                        fontSize={18}
-                        padding={5}
-                        fill='white'
-                    />
-                </Label>
-                <Text
-                    y={75}
-                    x={8}
-                    text='30 - 50'
-                    align='left'
-                    fontSize={18}
-                    padding={5}
-                    fill='white'
-                />
-                <Label x={180} y={125}>
-                    <Tag
-                        fill= '#f3ff00'
-                        pointerDirection= 'right'
-                        pointerWidth={20}
-                        pointerHeight={28}
-                        lineJoin= 'round'
-                        shadowColor= '#f3ff00'
-                    />
-                    <Text
-                        width={150}
-                        text='D'
-                        align='right'
-                        fontStyle="bold"
-                        fontSize={18}
-                        padding={5}
-                        fill='white'
-                    />
-                </Label>
-                <Text
-                    y={110}
-                    x={8}
-                    text='50 - 70'
-                    align='left'
-                    fontSize={18}
-                    padding={5}
-                    fill='white'
-                />
-                <Label x={200} y={160}>
-                    <Tag
-                        fill= '#fabf00'
-                        pointerDirection= 'right'
-                        pointerWidth={20}
-                        pointerHeight={28}
-                        lineJoin= 'round'
-                        shadowColor= '#fabf00'
-                    />
-                    <Text
-                        width={170}
-                        text='E'
-                        align='right'
-                        fontStyle="bold"
-                        fontSize={18}
-                        padding={5}
-                        fill='white'
-                    />
-                </Label>
-                <Text
-                    y={145}
-                    x={8}
-                    text='70 - 90'
-                    align='left'
-                    fontSize={18}
-                    padding={5}
-                    fill='white'
-                />
-                <Label x={220} y={195}>
-                    <Tag
-                        fill= '#ff4300'
-                        pointerDirection= 'right'
-                        pointerWidth={20}
-                        pointerHeight={28}
-                        lineJoin= 'round'
-                        shadowColor= '#ff4300'
-                    />
-                    <Text
-                        width={190}
-                        text='F'
-                        align='right'
-                        fontStyle="bold"
-                        fontSize={18}
-                        padding={5}
-                        fill='white'
-                    />
-                </Label>
-                <Text
-                    y={180}
-                    x={8}
-                    text='90 - 110'
-                    align='left'
-                    fontSize={18}
-                    padding={5}
-                    fill='white'
-                />
-                <Label x={240} y={230}>
-                    <Tag
-                        fill= '#ff0000'
-                        pointerDirection= 'right'
-                        pointerWidth={20}
-                        pointerHeight={28}
-                        lineJoin= 'round'
-                        shadowColor= '#ff0000'
-                    />
-                    <Text
-                        width={210}
-                        text='G'
-                        align='right'
-                        fontStyle="bold"
-                        fontSize={18}
-                        padding={5}
-                        fill='white'
-                    />
-                </Label>
-                <Text
-                    y={215}
-                    x={8}
-                    text='> 110'
-                    align='left'
-                    fontSize={18}
-                    padding={5}
-                    fill='white'
-                />
-            </Layer>
-        </Stage>
+                </Layer>
+                {grade != null ?
+                    <Layer>
+                        <Label x={300} y={startPosition[1] + (35 * grades.indexOf(grade))}>
+                            <Tag
+                                fill='#000000'
+                                pointerDirection='left'
+                                pointerWidth={20}
+                                pointerHeight={28}
+                                lineJoin='round'
+                                shadowColor='#000000'
+                            />
+                            <Text
+                                width={80}
+                                text={grade}
+                                align='left'
+                                fontStyle='bold'
+                                fontSize={18}
+                                padding={5}
+                                fill='white'
+                            />
+                        </Label>
+                    </Layer>
+                    :
+                    <Layer></Layer>
+                }
+            </Stage>
+        </Paper>
     );
 }
 
@@ -417,9 +298,9 @@ class DetalleBalance extends Component {
                     Balance Energético
                 </Typography>
                 <Grid container spacing={32}>
-                    {/*<Grid item xs={12}>
-                        <Grades/>
-                    </Grid>*/}
+                    <Grid item xs={12}>
+                        <Grades balance = {20}/>
+                    </Grid>
                     <Grid item xs={12}>
                         <Chart
                             data={this.state.dataAportes}
