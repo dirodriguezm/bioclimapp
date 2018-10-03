@@ -272,19 +272,20 @@ class ManagerCasas {
                         let paredes = habitacion.getObjectByName("Paredes");
                         if(distance === 0){
                             let paredNueva = paredes.children[0];
-                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
-                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            console.log(pared.object);
+                            if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                paredNueva.userData.choques[pared.object.id] = [i];
                             }else{
-                                paredNueva.userData.choques[pared.object.uuid].push(i);
+                                paredNueva.userData.choques[pared.object.id].push(i);
 
                             }
                         }else{
                             let paredNueva = paredes.children[2];
-                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
-                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                paredNueva.userData.choques[pared.object.id] = [i];
                             }else{
-                                if(paredNueva.userData.choques[pared.object.uuid].indexOf(i) === -1){
-                                    paredNueva.userData.choques[pared.object.uuid].push(i);
+                                if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
+                                    paredNueva.userData.choques[pared.object.id].push(i);
                                 }
                             }
                         }
@@ -323,20 +324,20 @@ class ManagerCasas {
                         let paredes = habitacion.getObjectByName("Paredes");
                         if(distance === 0){
                             let paredNueva = paredes.children[1];
-                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
-                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                paredNueva.userData.choques[pared.object.id] = [i];
                             }else{
-                                if(paredNueva.userData.choques[pared.object.uuid].indexOf(i) === -1){
-                                    paredNueva.userData.choques[pared.object.uuid].push(i);
+                                if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
+                                    paredNueva.userData.choques[pared.object.id].push(i);
                                 }
                             }
                         }else{
                             let paredNueva = paredes.children[3];
-                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
-                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                paredNueva.userData.choques[pared.object.id] = [i];
                             }else{
-                                if(paredNueva.userData.choques[pared.object.uuid].indexOf(i) === -1){
-                                    paredNueva.userData.choques[pared.object.uuid].push(i);
+                                if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
+                                    paredNueva.userData.choques[pared.object.id].push(i);
                                 }
                             }
                         }
@@ -353,6 +354,121 @@ class ManagerCasas {
 
         return false;
 
+    }
+
+    separarParedes(paredNueva, paredExistente, desde, hasta, orientacion){
+        console.log(paredExistente);
+        let widthChoque = Math.abs(hasta - desde);
+        //hay cuatro casos de chque, que sea completo en ambas paredes, que la nueva sea mas grande, que la existente sea
+        //mas grande o que ambas sean mas grandes que el choque
+        if(widthChoque === paredNueva.userData.width && widthChoque === paredExistente.userData.width){
+            paredNueva.parent.remove(paredNueva);
+            paredExistente.userData.separacion = Morfologia.separacion.INTERIOR;
+        }else if(widthChoque === paredNueva.userData.width){
+            paredNueva.userData.separacion = Morfologia.separacion.INTERIOR;
+            if(paredExistente.userData.point[1] > hasta){
+                paredExistente.userData.width = paredExistente.userData.width - widthChoque;
+                paredExistente.userData.superficie = paredExistente.userData.width * paredExistente.userData.height;
+                paredExistente.geometry.dispose();
+                paredExistente.geometry.dynamic = true;
+                paredExistente.geometry = this.crearGeometriaPared(widthChoque, paredExistente.height);
+                if(orientacion.z !== 0){
+                    paredExistente.position.x = paredExistente.position.x + widthChoque;
+                }else{
+                    paredExistente.position.z = paredExistente.position.z + widthChoque;
+                }
+                paredExistente.userData.point[0] = paredNueva.userData.point[1];
+            }else if(paredExistente.userData.point[0] < desde){
+                paredExistente.userData.width = paredExistente.userData.width - widthChoque;
+                paredExistente.userData.superficie = paredExistente.userData.width * paredExistente.userData.height;
+                paredExistente.geometry.dispose();
+                paredExistente.geometry.dynamic = true;
+                paredExistente.geometry = this.crearGeometriaPared(widthChoque, paredExistente.height);
+                paredExistente.userData.point[1] = paredNueva.userData.point[0];
+
+            }else{
+                let widthExistente = Math.abs(paredNueva.userData.point[0]- paredExistente.userData.point[0]);
+                let widthExistenteNueva = Math.abs(paredExistente.userData.point[1] - paredNueva.userData.point[1]);
+                paredExistente.userData.width =  widthExistente;
+                paredExistente.userData.superficie = paredExistente.userData.width * paredExistente.userData.height;
+                paredExistente.geometry.dispose();
+                paredExistente.geometry.dynamic = true;
+                paredExistente.geometry = this.crearGeometriaPared(widthExistente, paredExistente.height);
+                paredExistente.userData.point[1] = paredNueva.userData.point[0];
+
+                let paredExistenteNueva = paredExistente.clone();
+                paredExistente.parent.add(paredExistenteNueva);
+
+                paredExistenteNueva.userData.width =  widthExistenteNueva;
+                paredExistenteNueva.userData.superficie = paredExistenteNueva.userData.width * paredExistenteNueva.userData.height;
+                paredExistenteNueva.geometry.dispose();
+                paredExistenteNueva.geometry.dynamic = true;
+                paredExistenteNueva.geometry = this.crearGeometriaPared(widthExistenteNueva, paredExistenteNueva.height);
+
+                if(orientacion.z !== 0){
+                    paredExistenteNueva.position.x = paredExistenteNueva.position.x + widthChoque + widthExistente;
+                }else{
+                    paredExistenteNueva.position.z = paredExistenteNueva.position.z + widthChoque + widthExistente;
+                }
+                paredExistenteNueva.userData.point[0] = paredNueva.userData.point[1];
+
+            }
+
+
+        }else if(widthChoque === paredExistente.userData.width){
+
+            paredExistente.userData.separacion = Morfologia.separacion.INTERIOR;
+            if(paredNueva.userData.point[1] > hasta){
+                paredNueva.userData.width = paredNueva.userData.width - widthChoque;
+                paredNueva.userData.superficie = paredNueva.userData.width * paredNueva.userData.height;
+                paredNueva.geometry.dispose();
+                paredNueva.geometry.dynamic = true;
+                paredNueva.geometry = this.crearGeometriaPared(widthChoque, paredNueva.height);
+                if(orientacion.z !== 0){
+                    paredNueva.position.x = paredNueva.position.x + widthChoque;
+                }else{
+                    paredNueva.position.z = paredNueva.position.z + widthChoque;
+                }
+                paredNueva.userData.point[0] = paredExistente.userData.point[1];
+            }else if(paredNueva.userData.point[0] < desde){
+                paredNueva.userData.width = paredNueva.userData.width - widthChoque;
+                paredNueva.userData.superficie = paredNueva.userData.width * paredNueva.userData.height;
+                paredNueva.geometry.dispose();
+                paredNueva.geometry.dynamic = true;
+                paredNueva.geometry = this.crearGeometriaPared(widthChoque, paredNueva.height);
+                paredNueva.userData.point[1] = paredExistente.userData.point[0];
+
+            }else{
+                let widthNueva = Math.abs(paredExistente.userData.point[0]- paredNueva.userData.point[0]);
+                let widthNuevaNueva = Math.abs(paredNueva.userData.point[1] - paredExistente.userData.point[1]);
+                paredNueva.userData.width =  widthNueva;
+                paredNueva.userData.superficie = paredNueva.userData.width * paredNueva.userData.height;
+                paredNueva.geometry.dispose();
+                paredNueva.geometry.dynamic = true;
+                paredNueva.geometry = this.crearGeometriaPared(widthNueva, paredNueva.height);
+                paredNueva.userData.point[1] = paredExistente.userData.point[0];
+
+                let paredNuevaNueva = paredNueva.clone();
+                paredNueva.parent.add(paredNuevaNueva);
+
+                paredNuevaNueva.userData.width =  widthNuevaNueva;
+                paredNuevaNueva.userData.superficie = paredNuevaNueva.userData.width * paredNuevaNueva.userData.height;
+                paredNuevaNueva.geometry.dispose();
+                paredNuevaNueva.geometry.dynamic = true;
+                paredNuevaNueva.geometry = this.crearGeometriaPared(widthNuevaNueva, paredNuevaNueva.height);
+
+                if(orientacion.z !== 0){
+                    paredNuevaNueva.position.x = paredNuevaNueva.position.x + widthChoque + widthNueva;
+                }else{
+                    paredNuevaNueva.position.z = paredNuevaNueva.position.z + widthChoque + widthNueva;
+                }
+                paredNuevaNueva.userData.point[0] = paredNuevaNueva.userData.point[1];
+
+            }
+
+        }else{
+            //TODO: ultimo caso
+        }
     }
 
     agregarHabitacionDibujada() {
@@ -381,22 +497,20 @@ class ManagerCasas {
 
             console.log(pared.userData.choques);
 
+            pared.userData.separacion = Morfologia.separacion.EXTERIOR;
+
+
             let keys = Object.keys(pared.userData.choques);
             if(keys.length > 0){
                 for(let key of keys){
+                    console.log(key);
+                    let paredChocada = this.escena.getObjectById(key);
                     let choques = pared.userData.choques[key];
                     let from = choques[0];
                     let to = choques[choques.length];
-                    if(pared.userData.orientacion.z !== 0){
-
-                    }else{
-
-                    }
+                    //this.separarParedes(pared, paredChocada, from, to, pared.userData.orientacion);
                 }
             }
-
-
-            pared.userData.separacion = Morfologia.separacion.EXTERIOR;
 
             pared.userData.tipo = Morfologia.tipos.PARED;
             pared.userData.capas =
@@ -893,16 +1007,37 @@ class ManagerCasas {
             switch (i) {
                 case 0:
                     pared.position.z = -depth / 2;
+                    if(start.x < end.x){
+                        pared.userData.points = [start.x,end.x];
+                    }else{
+                        pared.userData.points = [end.x,start.x];
+                    }
 
                     break;
                 case 1:
                     pared.position.x = -width / 2;
+                    if(start.z < end.z){
+                        pared.userData.points = [start.z,end.z];
+                    }else{
+                        pared.userData.points = [end.z,start.z];
+                    }
+
                     break;
                 case 2:
                     pared.position.z = +depth / 2;
+                    if(start.x < end.x){
+                        pared.userData.points = [start.x,end.x];
+                    }else{
+                        pared.userData.points = [end.x,start.x];
+                    }
                     break;
                 case 3:
                     pared.position.x = +width / 2;
+                    if(start.z < end.z){
+                        pared.userData.points = [start.z,end.z];
+                    }else{
+                        pared.userData.points = [end.z,start.z];
+                    }
                     break;
             }
         }
@@ -1013,10 +1148,6 @@ class ManagerCasas {
         habitacion.userData.nivel = nivel;
 
         return habitacion;
-
-    }
-
-    crearShapePared(width, height){
 
     }
 

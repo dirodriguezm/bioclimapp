@@ -417,9 +417,9 @@ class DetalleBalance extends Component {
                     Balance Energético
                 </Typography>
                 <Grid container spacing={32}>
-                    <Grid item xs={12}>
+                    {/*<Grid item xs={12}>
                         <Grades/>
-                    </Grid>
+                    </Grid>*/}
                     <Grid item xs={12}>
                         <Chart
                             data={this.state.dataAportes}
