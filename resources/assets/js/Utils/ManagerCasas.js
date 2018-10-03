@@ -1266,8 +1266,6 @@ class ManagerCasas {
         return new THREE.Mesh(geometria, this.materialParedConstruccion.clone());
     }
 
-
-
     crearMeshPiso(width, depth) {
         //piso representa el numero de piso donde se encuentra el piso
         let geometria = this.crearGeometriaPiso(width, depth);

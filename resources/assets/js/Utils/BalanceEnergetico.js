@@ -2,6 +2,7 @@ import * as THREE from 'three'
 import Morfologia from "../components/Morfologia";
 var SunCalc = require('suncalc');
 
+var periodo = [];
 const diasMeses = [31,28,31,30,31,30,31,31,30,31,30,31];
 const uso = 1407.12;
 const resistenciasTermicasSuperficie = [
@@ -20,8 +21,8 @@ function aporteInterno(ocupantes, superficie, horasIluminacion) {
 
     let valor = 0;
 
-    for(let dias of diasMeses){
-        valor +=(aportes)*dias;
+    for(let i = periodo[0]; i < periodo[1]; i++){
+        valor +=(aportes)*diasMeses[i];
     }
 
     return valor;
@@ -30,7 +31,16 @@ function aporteInterno(ocupantes, superficie, horasIluminacion) {
 function gradosDias(temperaturasMes, temperaturaConfort){
     let gd = 0;
     for(let i = 0 ; i < diasMeses.length ; i++){
-        gd = gd + (temperaturaConfort - temperaturasMes[i])*diasMeses[i];
+        if((temperaturaConfort - temperaturasMes[i]) > 0){
+            if(periodo === []){
+                periodo.push(i);
+            }
+            gd = gd + (temperaturaConfort - temperaturasMes[i])*diasMeses[i];
+        }else{
+            if(periodo.length === 1){
+                periodo.push(i-1);
+            }
+        }
     }
 
     return gd;
@@ -347,6 +357,6 @@ function calcularRbParedes(paredes, latitud, longitud, sunTimes) {
     return paredes;
 }
 
-export {perdidasConduccion, puenteTermico, cambioTransmitanciaSuperficie, transmitanciaSuperficie, calcularGammaParedes , aporteInterno , gradosDias, perdidasVentilacion, calcularF,
+export {perdidasConduccion, puenteTermico, cambioTransmitanciaSuperficie, transmitanciaSuperficie , aporteInterno , gradosDias, perdidasVentilacion, calcularF,
     calcularIgb, calcularAngulos, calcularHoraIncidencia, calcularOmegaPared, calcularRB,
     calcularGammasPared, hourAngleToDate, getHourAngle, calcularAporteSolar, calcularRbParedes};

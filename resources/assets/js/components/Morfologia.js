@@ -1364,19 +1364,6 @@ class Morfologia extends Component {
         }
     }
 
-    // for (let pared of this.paredes){
-    //   var orientacionRaycaster = new THREE.Raycaster();
-    //   orientacionRaycaster.set(pared.position,pared.orientacion);
-    //   var inter = orientacionRaycaster.intersectObjects(this.paredes);
-    //   if(inter.length > 0){
-    //     pared.orientacion.multiplyScalar(-1);
-    //     console.log("nueva orientacion",pared.orientacion);
-    //   }
-    //   var hex = 0xffff00;
-    //   var arrowHelper = new THREE.ArrowHelper( pared.orientacion, pared.position, 5, hex );
-    //   this.escena.add( arrowHelper );
-    // }
-
     render() {
         return (
             <div
