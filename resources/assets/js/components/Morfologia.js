@@ -94,8 +94,10 @@ class Morfologia extends Component {
         for (let i = 0; i < data.length; i++) {
             this.temperaturasMes[i] = data[i].valor;
         }
-        let gradoDias = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
-        this.managerCasas.setGradosDias(gradoDias);
+        let res = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
+        let gradoDias = res[0];
+        let periodo = res[1];
+        this.managerCasas.setGradosDias(gradoDias, periodo);
     }
 
     onSunpositionChanged() {

@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import Morfologia from "../components/Morfologia";
 var SunCalc = require('suncalc');
 
-var periodo = [];
+//var periodo = [];
 const diasMeses = [31,28,31,30,31,30,31,31,30,31,30,31];
 const uso = 1407.12;
 const resistenciasTermicasSuperficie = [
@@ -14,7 +14,7 @@ const resistenciasTermicasSuperficie = [
 const transmitanciaLineal = [1.4 , 1.2 , 1.0];
 
 //se simplifico el calculo del uso ya que es constante el multiplicar el perfilde uso con el coeficiente de usuario
-function aporteInterno(ocupantes, superficie, horasIluminacion) {
+function aporteInterno(ocupantes, superficie, horasIluminacion, periodo) {
     const ilumuinacion = 1.5 * horasIluminacion * superficie;
     const aporte_usuarios = uso * ocupantes;
     const aportes = ilumuinacion + aporte_usuarios;
@@ -43,7 +43,7 @@ function gradosDias(temperaturasMes, temperaturaConfort){
         }
     }
 
-    return gd;
+    return [gd,periodo];
 }
 
 function transmitanciaSuperficie(elemento) {

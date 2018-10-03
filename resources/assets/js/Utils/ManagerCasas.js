@@ -18,6 +18,7 @@ class ManagerCasas {
         this.horasIluminacion = horasIluminacion;
         this.aireRenovado = aireRenovado;
         this.gradoDias = 0;
+        this.periodo = [];
 
         this.info_ventana = [];
         this.info_material = [];
@@ -170,8 +171,10 @@ class ManagerCasas {
         }
     }
 
-    setGradosDias(gradoDias) {
+    setGradosDias(gradoDias, periodo) {
         this.gradoDias = gradoDias;
+        this.periodo = periodo;
+        this.casa.userData.periodo = periodo;
     }
 
     setStartHabitacion(start, raycaster) {
@@ -579,7 +582,7 @@ class ManagerCasas {
 
         //console.log(techo.userData.transSup);
 
-        let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion);
+        let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
 
         let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, puenteTermico);
@@ -955,7 +958,8 @@ class ManagerCasas {
         let aporteInterno = BalanceEnergetico.aporteInterno(
             this.ocupantes,
             piso.userData.superficie,
-            this.horasIluminacion);
+            this.horasIluminacion,
+            this.periodo);
 
         this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
         this.casa.userData.aporteInterno -= habitacion.userData.aporteInterno;
