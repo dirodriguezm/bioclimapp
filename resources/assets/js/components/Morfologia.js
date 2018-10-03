@@ -94,8 +94,10 @@ class Morfologia extends Component {
         for (let i = 0; i < data.length; i++) {
             this.temperaturasMes[i] = data[i].valor;
         }
-        let gradoDias = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
-        this.managerCasas.setGradosDias(gradoDias);
+        let res = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
+        let gradoDias = res[0];
+        let periodo = res[1];
+        this.managerCasas.setGradosDias(gradoDias, periodo);
     }
 
     onSunpositionChanged() {
@@ -421,7 +423,7 @@ class Morfologia extends Component {
 
 
         //Indicador de la pared
-        const geomeIndPared = new THREE.CylinderBufferGeometry(0.05, 0.05, 2, 32);
+        const geomeIndPared = new THREE.CylinderBufferGeometry(0.05, 0.05, 5, 32);
         const materialIndPared = new THREE.MeshBasicMaterial({color: 0xff0000, opacity: 0.5, transparent: true});
         var indicadorPared = new THREE.Mesh(geomeIndPared, materialIndPared);
         indicadorPared.visible = false;
@@ -451,23 +453,23 @@ class Morfologia extends Component {
         });
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
-            color: '#00ff00',
-            opacity: 0.7,
+            color: '#33ebed',
+            opacity: 0.4,
             transparent: true,
-            side : THREE.DoubleSide,
+            side: THREE.DoubleSide,
         });
 
         this.materialParedConstruida = new THREE.MeshLambertMaterial({
-            color: '#433F81',
-            side : THREE.DoubleSide,
+            color: '#eaedc7',
+            side: THREE.DoubleSide,
 
         });
 
-        this.materialVentanaConstruida = new THREE.MeshLambertMaterial({
-            color: '#00ff00',
-            opacity: 0.7,
+        this.materialVentanaConstruida = new THREE.MeshBasicMaterial({
+            color: '#33ebed',
+            opacity: 0.4,
             transparent: true,
-            side : THREE.DoubleSide,
+            side: THREE.DoubleSide,
         });
 
 
@@ -498,8 +500,8 @@ class Morfologia extends Component {
         this.startNewPared = null;
         this.endNewPared = null;
 
-        this.widthWall = 4;
-        this.heightWall = 1;
+        this.widthWall = 10;
+        this.heightWall = 2.5;
 
         this.indicadores = this.crearIndicadores(this.widthWall, this.heightWall);
         for (let indicador of this.indicadores) {
@@ -1363,19 +1365,6 @@ class Morfologia extends Component {
             this.props.onVentanasChanged(this.ventanas);
         }
     }
-
-    // for (let pared of this.paredes){
-    //   var orientacionRaycaster = new THREE.Raycaster();
-    //   orientacionRaycaster.set(pared.position,pared.orientacion);
-    //   var inter = orientacionRaycaster.intersectObjects(this.paredes);
-    //   if(inter.length > 0){
-    //     pared.orientacion.multiplyScalar(-1);
-    //     console.log("nueva orientacion",pared.orientacion);
-    //   }
-    //   var hex = 0xffff00;
-    //   var arrowHelper = new THREE.ArrowHelper( pared.orientacion, pared.position, 5, hex );
-    //   this.escena.add( arrowHelper );
-    // }
 
     render() {
         return (

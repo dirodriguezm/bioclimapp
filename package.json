@@ -19,8 +19,8 @@
     "laravel-mix": "^2.0",
     "lodash": "^4.17.10",
     "popper.js": "^1.12",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
+    "react": "^16.5.2",
+    "react-dom": "^16.5.2"
   },
   "dependencies": {
     "@material-ui/core": "^1.4.3",
