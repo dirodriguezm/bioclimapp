@@ -58,7 +58,7 @@ class ManagerCasas {
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
             color: '#33ebed',
-            opacity: 0.7,
+            opacity: 0.4,
             transparent: true,
             side: THREE.DoubleSide,
         });
@@ -243,6 +243,11 @@ class ManagerCasas {
             this.escena.remove(arrow);
         }
 
+        let paredes = habitacion.getObjectByName("Paredes");
+        for(let pared of paredes.children){
+            pared.userData.choques = {};
+        }
+
         this.ray.far = lenZ + 0.2;
         origin.z = z - 0.1;
         for(let i = x+0.5; i <= x+lenX; i++){
@@ -264,6 +269,25 @@ class ManagerCasas {
                         this.escena.add(arrow);
                         return true;
                     }else{
+                        let paredes = habitacion.getObjectByName("Paredes");
+                        if(distance === 0){
+                            let paredNueva = paredes.children[0];
+                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
+                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            }else{
+                                paredNueva.userData.choques[pared.object.uuid].push(i);
+
+                            }
+                        }else{
+                            let paredNueva = paredes.children[2];
+                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
+                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            }else{
+                                if(paredNueva.userData.choques[pared.object.uuid].indexOf(i) === -1){
+                                    paredNueva.userData.choques[pared.object.uuid].push(i);
+                                }
+                            }
+                        }
                         this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
                         arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
@@ -296,6 +320,26 @@ class ManagerCasas {
                         this.escena.add(arrow);
                         return true;
                     }else{
+                        let paredes = habitacion.getObjectByName("Paredes");
+                        if(distance === 0){
+                            let paredNueva = paredes.children[1];
+                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
+                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            }else{
+                                if(paredNueva.userData.choques[pared.object.uuid].indexOf(i) === -1){
+                                    paredNueva.userData.choques[pared.object.uuid].push(i);
+                                }
+                            }
+                        }else{
+                            let paredNueva = paredes.children[3];
+                            if(paredNueva.userData.choques[pared.object.uuid] === undefined){
+                                paredNueva.userData.choques[pared.object.uuid] = [i];
+                            }else{
+                                if(paredNueva.userData.choques[pared.object.uuid].indexOf(i) === -1){
+                                    paredNueva.userData.choques[pared.object.uuid].push(i);
+                                }
+                            }
+                        }
                         this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
                         arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
@@ -334,6 +378,22 @@ class ManagerCasas {
             pared.userData.superficie = pared.userData.width * pared.userData.height;
 
             //TODO: DETERMINAR CUALES SON EXTERIORES, TANTO PARA PAREDES COMO PARA PISO TECHO VENTANA Y PUERTAS.
+
+            console.log(pared.userData.choques);
+
+            let keys = Object.keys(pared.userData.choques);
+            if(keys.length > 0){
+                for(let key of keys){
+                    let choques = pared.userData.choques[key];
+                    let from = choques[0];
+                    let to = choques[choques.length];
+                    if(pared.userData.orientacion.z !== 0){
+
+                    }else{
+
+                    }
+                }
+            }
 
 
             pared.userData.separacion = Morfologia.separacion.EXTERIOR;
@@ -486,16 +546,35 @@ class ManagerCasas {
             //ventana.userData.orientacion = pared.userData.orientacion;
             ventana.userData.pos = new THREE.Vector3();
             ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
-            ventana.material = this.materialVentanaConstruida.clone();
+            //ventana.material = this.materialVentanaConstruida.clone();
+            //ventana.visible = false;
             ventana.geometry.computeBoundingBox();
             ventana.userData.superficie = ventana.userData.width * ventana.userData.height;
 
             pared.add(ventana);
             pared.worldToLocal(ventana.position);
 
-            pared.holes.push(ventana);
-            pared.extrude( e)
+            let bound = ventana.geometry.boundingBox;
 
+            let vertices = [
+                new THREE.Vector2(bound.min.x + ventana.position.x, bound.min.y + ventana.position.y),
+                new THREE.Vector2(bound.min.x + ventana.position.x, bound.max.y + ventana.position.y),
+                new THREE.Vector2(bound.max.x + ventana.position.x, bound.max.y + ventana.position.y),
+                new THREE.Vector2(bound.max.x + ventana.position.x, bound.min.y + ventana.position.y),
+
+            ];
+            //TODO: revisar superposicion de hoyos
+
+            let hole = new THREE.Path(vertices);
+
+            var shape = pared.geometry.userData.shape.clone();
+            shape.holes.push(hole);
+
+            pared.geometry.dispose();
+            pared.geometry.dynamic = true;
+            pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+            pared.geometry.userData.shape = shape;
+            pared.geometry.verticesNeedUpdate = true;
 
             ventana.userData.tipo = Morfologia.tipos.VENTANA;
             ventana.userData.info_material = {
@@ -876,6 +955,7 @@ class ManagerCasas {
         pared1.userData.orientacion = new THREE.Vector3(0,0,-1);
         pared1.userData.width = width;
         pared1.userData.height = height;
+        pared1.userData.choques = {};
 
         var pared2 = this.crearMeshPared(width, height);
         pared2.rotation.y = Math.PI / 2;
@@ -884,6 +964,7 @@ class ManagerCasas {
         pared2.userData.orientacion = new THREE.Vector3(-1,0,0);
         pared2.userData.width = width;
         pared2.userData.height = height;
+        pared2.userData.choques = {};
 
         var pared3 = this.crearMeshPared(width, height);
         pared3.rotation.y = Math.PI;
@@ -892,6 +973,7 @@ class ManagerCasas {
         pared3.userData.orientacion = new THREE.Vector3(0,0,1);
         pared3.userData.width = width;
         pared3.userData.height = height;
+        pared3.userData.choques = {};
 
         var pared4 = this.crearMeshPared(width, height);
         pared4.rotation.y = -Math.PI / 2;
@@ -900,6 +982,7 @@ class ManagerCasas {
         pared4.userData.orientacion = new THREE.Vector3(1,0,0);
         pared4.userData.width = width;
         pared4.userData.height = height;
+        pared4.userData.choques = {};
 
         var piso = this.crearMeshPiso(width, depth);
         piso.name = "Piso";
@@ -933,10 +1016,29 @@ class ManagerCasas {
 
     }
 
-    crearGeometriaPared(width, height) {
-        let geometria = new THREE.Geometry();
+    crearShapePared(width, height){
 
+    }
+
+    crearGeometriaPared(width, height) {
         let x1 = width / -2, x2 = width / 2, y1 = 0, y2 = height;
+        let vertices = [
+            new THREE.Vector2(x1,y1),
+            new THREE.Vector2(x1,y2),
+            new THREE.Vector2(x2,y2),
+            new THREE.Vector2(x2,y1),
+
+        ];
+        let ParedShape = new THREE.Shape(vertices);
+        ParedShape.holes = [];
+
+
+        let geometria = new THREE.ShapeBufferGeometry(ParedShape);
+        geometria.userData.shape = ParedShape;
+       /* geometria.faces.push(new THREE.Face3(0, 2, 1));
+        geometria.faces.push(new THREE.Face3(1, 2, 3));*/
+
+        /*let x1 = width / -2, x2 = width / 2, y1 = 0, y2 = height;
 
         geometria.vertices.push(new THREE.Vector3(x1, y1, 0));
         geometria.vertices.push(new THREE.Vector3(x1, y2, 0));
@@ -944,10 +1046,10 @@ class ManagerCasas {
         geometria.vertices.push(new THREE.Vector3(x2, y2, 0));
 
         geometria.faces.push(new THREE.Face3(0, 2, 1));
-        geometria.faces.push(new THREE.Face3(1, 2, 3));
+        geometria.faces.push(new THREE.Face3(1, 2, 3));*/
 
-        geometria.computeFaceNormals();
-        geometria.computeVertexNormals();
+       /* geometria.computeFaceNormals();
+        geometria.computeVertexNormals();*/
 
         return geometria;
     }
@@ -985,7 +1087,21 @@ class ManagerCasas {
     }
 
     crearGeometriaVentana(width, height) {
-        let geometria = new THREE.Geometry();
+        let x1 = width / -2, x2 = width / 2, y1 = 0, y2 = height;
+        let vertices = [
+            new THREE.Vector2(x1,y1),
+            new THREE.Vector2(x1,y2),
+            new THREE.Vector2(x2,y2),
+            new THREE.Vector2(x2,y1),
+
+        ];
+        let VentanaShape = new THREE.Shape(vertices);
+        VentanaShape.holes = [];
+
+
+        let geometria = new THREE.ShapeBufferGeometry(VentanaShape);
+        geometria.userData.shape = VentanaShape;
+        /*let geometria = new THREE.Geometry();
 
         let x1 = 0, x2 = width, y1 = 0, y2 = height;
         let z_offset = 0.01;
@@ -1009,7 +1125,7 @@ class ManagerCasas {
         geometria.faces.push(face2);
         geometria.faces.push(face3);
         geometria.faces.push(face4);
-
+*/
         return geometria;
     }
 
@@ -1018,6 +1134,8 @@ class ManagerCasas {
 
         return new THREE.Mesh(geometria, this.materialParedConstruccion.clone());
     }
+
+
 
     crearMeshPiso(width, depth) {
         //piso representa el numero de piso donde se encuentra el piso

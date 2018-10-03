@@ -421,7 +421,7 @@ class Morfologia extends Component {
 
 
         //Indicador de la pared
-        const geomeIndPared = new THREE.CylinderBufferGeometry(0.05, 0.05, 2, 32);
+        const geomeIndPared = new THREE.CylinderBufferGeometry(0.05, 0.05, 5, 32);
         const materialIndPared = new THREE.MeshBasicMaterial({color: 0xff0000, opacity: 0.5, transparent: true});
         var indicadorPared = new THREE.Mesh(geomeIndPared, materialIndPared);
         indicadorPared.visible = false;
@@ -451,23 +451,23 @@ class Morfologia extends Component {
         });
 
         this.materialVentanaConstruccion = new THREE.MeshBasicMaterial({
-            color: '#00ff00',
-            opacity: 0.7,
+            color: '#33ebed',
+            opacity: 0.4,
             transparent: true,
-            side : THREE.DoubleSide,
+            side: THREE.DoubleSide,
         });
 
         this.materialParedConstruida = new THREE.MeshLambertMaterial({
-            color: '#433F81',
-            side : THREE.DoubleSide,
+            color: '#eaedc7',
+            side: THREE.DoubleSide,
 
         });
 
-        this.materialVentanaConstruida = new THREE.MeshLambertMaterial({
-            color: '#00ff00',
-            opacity: 0.7,
+        this.materialVentanaConstruida = new THREE.MeshBasicMaterial({
+            color: '#33ebed',
+            opacity: 0.4,
             transparent: true,
-            side : THREE.DoubleSide,
+            side: THREE.DoubleSide,
         });
 
 
@@ -498,8 +498,8 @@ class Morfologia extends Component {
         this.startNewPared = null;
         this.endNewPared = null;
 
-        this.widthWall = 4;
-        this.heightWall = 1;
+        this.widthWall = 10;
+        this.heightWall = 2.5;
 
         this.indicadores = this.crearIndicadores(this.widthWall, this.heightWall);
         for (let indicador of this.indicadores) {
