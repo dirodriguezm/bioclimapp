@@ -1099,6 +1099,7 @@ class Morfologia extends Component {
         if(this.dragging && this.props.rotando){
             this.dragging = false;
             console.log("rotado", this.angleRotated);
+            let ventanas = [];
             for(let pared of this.paredes){
                 let resultAngle = pared.userData.gamma + this.angleRotated;
                 if(resultAngle > 180){
@@ -1113,11 +1114,13 @@ class Morfologia extends Component {
                 for(let child of pared.children){
                     if(child.userData.tipo === Morfologia.tipos.VENTANA){
                         child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotated * Math.PI / 180);
+                        ventanas.push(child);
                     }
                 }
             }
             this.angleRotated = 0;
             this.props.onParedesChanged(this.paredes);
+            if(ventanas.length > 0) this.props.onVentanasChanged(ventanas);
             console.log("cambio", this.paredes);
         }
     }

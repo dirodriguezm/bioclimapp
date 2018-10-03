@@ -21,7 +21,7 @@ import GeoInfoPanel from "./GeoInfoPanel";
 import MapContainer from "./MapContainer";
 import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import DashboardIcon from '@material-ui/icons/Dashboard';
+import PieChart from '@material-ui/icons/PieChart';
 import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 
 function TabContainer(props) {
@@ -368,7 +368,7 @@ class TabPanel extends Component {
                             onClick={this.handleDashboardOpen}
                             className={classNames(classes.menuButton)}
                         >
-                            <DashboardIcon />
+                            <PieChart />
                         </IconButton>
                         <Tabs value={value} onChange={this.handleChange}  centered>
                             <Tab label="Contexto"/>

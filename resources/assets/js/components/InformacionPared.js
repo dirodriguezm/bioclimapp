@@ -652,10 +652,7 @@ class InformacionPared extends Component {
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography className={classes.heading}>Radiación Solar</Typography>
                             </ExpansionPanelSummary>
-                            <div>
-                                holaaaaa {seleccionado != null ? seleccionado.userData.gamma : "nada"}
                             {this.info_rb}
-                            </div>
 
                         </ExpansionPanel>
 

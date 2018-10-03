@@ -5,8 +5,10 @@ import {withStyles} from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Konva from 'konva';
+import { render } from 'react-dom';
+import { Stage, Layer, Text, Label, Tag } from 'react-konva';
 import {Parser as HtmlToReactParser} from 'html-to-react';
-import Button from "@material-ui/core/Button/Button";
 
 const htmlToReactParser = new HtmlToReactParser();
 
@@ -43,22 +45,27 @@ function Legend(props) {
         porcentaje[i] = Math.round(props.data.datasets[0].data[i] * 100 / total);
     }
     return(
-        <div>
-            <Typography variant="title" gutterBottom style={{color:'grey'}}>
-                % de influencia
-            </Typography>
+        <Grid container spacing={8} direction="row"
+              justify="center"
+              alignItems="center">
+            <Grid item xs={12}>
+                <Typography variant="title" gutterBottom style={{color:'grey'}}>
+                    % de influencia
+                </Typography>
+            </Grid>
             {props.data.labels.map((label, index) => (
-                <Grid key={index} container spacing={8}>
-                    <Grid item xs={4}>
-                        <div style={{background: props.data.datasets[0].backgroundColor[index], padding: 0, width: 36, height:12}}></div>
-                        {/*<div style={{color: props.data.datasets[0].backgroundColor[index]}}></div>*/}
+                <Grid key={index} container spacing={8} direction="row"
+                      justify="center"
+                      alignItems="center">
+                    <Grid item xs={4} >
+                        <div style={{background: props.data.datasets[0].backgroundColor[index], width: 36, height:12}}></div>
                     </Grid>
                     <Grid item xs={8}>
                         {label} : {props.data.datasets[0].data[index] ? porcentaje[index] : 0}
                     </Grid>
                 </Grid>
             ))}
-        </div>
+        </Grid>
     );
 }
 
@@ -66,6 +73,11 @@ function Chart(props){
     return (
         <Paper>
             <Grid container spacing={24}>
+                <Grid item xs={12}>
+                    <Typography variant="title" style={{color: '#3a3b3d'}}>
+                        {props.title}
+                    </Typography>
+                </Grid>
                 <Grid item xs={8}>
                     <Doughnut
                         data={props.data}
@@ -79,6 +91,211 @@ function Chart(props){
                 </Grid>
             </Grid>
         </Paper>
+    );
+}
+
+function Grades(props){
+    return (
+        <Stage width={500} height={250} >
+            <Layer>
+                <Label x={120} y={20}>
+                    <Tag
+                        fill= '#00b23b'
+                        pointerDirection= 'right'
+                        pointerWidth={20}
+                        pointerHeight={28}
+                        lineJoin= 'round'
+                        shadowColor= '#00b23b'
+                    />
+                    <Text
+                        width={90}
+                        text='A'
+                        align='right'
+                        fontStyle="bold"
+                        fontSize={18}
+                        padding={5}
+                        fill='white'
+                    />
+                </Label>
+                <Text
+                    y={5}
+                    x={8}
+                    text='< 10'
+                    align='left'
+                    fontSize={18}
+                    padding={5}
+                    fill='white'
+                />
+                <Label x={140} y={55}>
+                    <Tag
+                        fill= '#00ca2f'
+                        pointerDirection= 'right'
+                        pointerWidth={20}
+                        pointerHeight={28}
+                        lineJoin= 'round'
+                        shadowColor= '#00ca2f'
+                    />
+                    <Text
+                        width={110}
+                        text='B'
+                        align='right'
+                        fontStyle="bold"
+                        fontSize={18}
+                        padding={5}
+                        fill='white'
+                    />
+                </Label>
+                <Text
+                    y={40}
+                    x={8}
+                    text='10 - 30'
+                    align='left'
+                    fontSize={18}
+                    padding={5}
+                    fill='white'
+                />
+                <Label x={160} y={90}>
+                    <Tag
+                        fill= '#91f300'
+                        pointerDirection= 'right'
+                        pointerWidth={20}
+                        pointerHeight={28}
+                        lineJoin= 'round'
+                        shadowColor= '#91f300'
+                    />
+                    <Text
+                        width={130}
+                        text='C'
+                        align='right'
+                        fontStyle="bold"
+                        fontSize={18}
+                        padding={5}
+                        fill='white'
+                    />
+                </Label>
+                <Text
+                    y={75}
+                    x={8}
+                    text='30 - 50'
+                    align='left'
+                    fontSize={18}
+                    padding={5}
+                    fill='white'
+                />
+                <Label x={180} y={125}>
+                    <Tag
+                        fill= '#f3ff00'
+                        pointerDirection= 'right'
+                        pointerWidth={20}
+                        pointerHeight={28}
+                        lineJoin= 'round'
+                        shadowColor= '#f3ff00'
+                    />
+                    <Text
+                        width={150}
+                        text='D'
+                        align='right'
+                        fontStyle="bold"
+                        fontSize={18}
+                        padding={5}
+                        fill='white'
+                    />
+                </Label>
+                <Text
+                    y={110}
+                    x={8}
+                    text='50 - 70'
+                    align='left'
+                    fontSize={18}
+                    padding={5}
+                    fill='white'
+                />
+                <Label x={200} y={160}>
+                    <Tag
+                        fill= '#fabf00'
+                        pointerDirection= 'right'
+                        pointerWidth={20}
+                        pointerHeight={28}
+                        lineJoin= 'round'
+                        shadowColor= '#fabf00'
+                    />
+                    <Text
+                        width={170}
+                        text='E'
+                        align='right'
+                        fontStyle="bold"
+                        fontSize={18}
+                        padding={5}
+                        fill='white'
+                    />
+                </Label>
+                <Text
+                    y={145}
+                    x={8}
+                    text='70 - 90'
+                    align='left'
+                    fontSize={18}
+                    padding={5}
+                    fill='white'
+                />
+                <Label x={220} y={195}>
+                    <Tag
+                        fill= '#ff4300'
+                        pointerDirection= 'right'
+                        pointerWidth={20}
+                        pointerHeight={28}
+                        lineJoin= 'round'
+                        shadowColor= '#ff4300'
+                    />
+                    <Text
+                        width={190}
+                        text='F'
+                        align='right'
+                        fontStyle="bold"
+                        fontSize={18}
+                        padding={5}
+                        fill='white'
+                    />
+                </Label>
+                <Text
+                    y={180}
+                    x={8}
+                    text='90 - 110'
+                    align='left'
+                    fontSize={18}
+                    padding={5}
+                    fill='white'
+                />
+                <Label x={240} y={230}>
+                    <Tag
+                        fill= '#ff0000'
+                        pointerDirection= 'right'
+                        pointerWidth={20}
+                        pointerHeight={28}
+                        lineJoin= 'round'
+                        shadowColor= '#ff0000'
+                    />
+                    <Text
+                        width={210}
+                        text='G'
+                        align='right'
+                        fontStyle="bold"
+                        fontSize={18}
+                        padding={5}
+                        fill='white'
+                    />
+                </Label>
+                <Text
+                    y={215}
+                    x={8}
+                    text='> 110'
+                    align='left'
+                    fontSize={18}
+                    padding={5}
+                    fill='white'
+                />
+            </Layer>
+        </Stage>
     );
 }
 
@@ -201,17 +418,22 @@ class DetalleBalance extends Component {
                 </Typography>
                 <Grid container spacing={32}>
                     <Grid item xs={12}>
+                        <Grades/>
+                    </Grid>
+                    <Grid item xs={12}>
                         <Chart
                             data={this.state.dataAportes}
                             options={this.options}
-                            height={200}
+                            height={150}
+                            title={"Aportes"}
                         />
                     </Grid>
                     <Grid item xs={12}>
                         <Chart
                             data={this.state.dataPerdidas}
                             options={this.options}
-                            height={200}
+                            height={150}
+                            title={"Pérdidas"}
                         />
                     </Grid>
                 </Grid>
