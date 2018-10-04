@@ -30,7 +30,7 @@ export default class MapContainer extends Component {
                         lng: this.state.lng,
                         comuna: response.data[0],
                         sunPosition: this.getSunPosition(this.state.lat, this.state.lng),
-                        sunTimes: this.getSolarTimes(this.state.lat, this.state.lng),
+                        //sunTimes: this.getSolarTimes(this.state.lat, this.state.lng),
                         sunPath: this.getSunPath(this.state.lat, this.state.lng),
                     });
                     this.createMarker(this.state.lat, this.state.lng);
@@ -56,8 +56,8 @@ export default class MapContainer extends Component {
         let start = new Date(now.getFullYear(),0,0)
         let invierno = new Date(now.getFullYear(),5,21);
         let verano = new Date(now.getFullYear(),11,21);
-        let diff_invierno = (invierno - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
-        let diff_verano = (verano - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
+        let diff_invierno = (invierno - start) + ((start.getTimezoneOffset() - invierno.getTimezoneOffset()) * 60 * 1000);
+        let diff_verano = (verano - start) + ((start.getTimezoneOffset() - verano.getTimezoneOffset()) * 60 * 1000);
         let oneDay = 1000 * 60 * 60 * 24;
         let day_invierno = Math.floor(diff_invierno / oneDay);
         let day_verano = Math.floor(diff_verano / oneDay);
@@ -79,8 +79,13 @@ export default class MapContainer extends Component {
         return new Date(date.setDate(day)); // add the number of days
     }
 
-    getSolarTimes(lat, lng, date = new Date()) {
-        return SunCalc.getTimes(date, lat, lng);
+    getSolarTimes(lat, lng) {
+        let now = new Date().getFullYear();
+        let sunTimes=[];
+        for(let date = new Date(now,0,1); date <= new Date(now,11,31); date.setDate(date.getDate()+1)){
+            sunTimes.push(SunCalc.getTimes(date,lat,lng));
+        }
+        return sunTimes;
     }
 
     createMarker(lat, lng) {
@@ -101,7 +106,7 @@ export default class MapContainer extends Component {
                         lng: e.latlng.lng,
                         comuna: response.data[0],
                         sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng),
-                        sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng),
+                        //sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng),
                         sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
                     });
                     this.props.onComunaChanged(this.state);
@@ -122,7 +127,7 @@ export default class MapContainer extends Component {
                         lng: lng,
                         comuna: response.data[0],
                         sunPosition: this.getSunPosition(lat, lng),
-                        sunTimes: this.getSolarTimes(lat, lng),
+                        //sunTimes: this.getSolarTimes(lat, lng),
                     });
                     this.props.onComunaChanged(this.state);
                 }

@@ -271,7 +271,7 @@ class Morfologia extends Component {
         camara2D.updateProjectionMatrix ();
         this.camara2D = camara2D;
         //CAMARA 3D
-        let camara3D = new THREE.PerspectiveCamera(50, width / height, 1, 50);
+        let camara3D = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
         camara3D.position.set(0, 8, 27);
         camara3D.lookAt(new THREE.Vector3());
         this.camara3D = camara3D;
@@ -962,8 +962,6 @@ class Morfologia extends Component {
             //console.log(casa);
             this.escena.add(casa);
         }
-        //calcularGammaParedes(this.paredes);
-        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
         this.props.onParedesChanged(this.paredes);
     }
 
@@ -1029,7 +1027,6 @@ class Morfologia extends Component {
         pared.tipo =  Morfologia.tipos.PARED;
         this.paredes.push(pared);
         this.allObjects.push(pared);
-        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
         this.props.onParedesChanged(this.paredes);
 
     }
@@ -1090,8 +1087,6 @@ class Morfologia extends Component {
                 let perdida_conduccion = casa.userData.perdidaPorConduccion;
 
                 this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
-
-                //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
 
@@ -1122,8 +1117,8 @@ class Morfologia extends Component {
             }
             this.angleRotated = 0;
             this.props.onParedesChanged(this.paredes);
+            console.log("asdad")
             if(ventanas.length > 0) this.props.onVentanasChanged(ventanas);
-            console.log("cambio", this.paredes);
         }
     }
 

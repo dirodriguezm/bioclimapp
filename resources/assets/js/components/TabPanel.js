@@ -240,15 +240,15 @@ class TabPanel extends Component {
             comuna: mapState.comuna,
             latitud: mapState.lat,
             longitud: mapState.lng,
-            sunTimes: mapState.sunTimes,
             sunPosition: mapState.sunPosition,
             sunPath: mapState.sunPath,
         });
     }
 
     onParedesChanged(paredes) {
-        let paredes_calculadas = BalanceEnergetico.calcularRbParedes(paredes.slice(), this.state.latitud, this.state.longitud, this.state.sunTimes);
+        let paredes_calculadas = BalanceEnergetico.calcularRbParedes(paredes.slice(), this.state.latitud, this.state.longitud);
         this.setState({paredes: paredes_calculadas});
+        console.log("espera ?")
     }
 
     onVentanasChanged(ventanas){
