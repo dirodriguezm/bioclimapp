@@ -110,10 +110,9 @@ class Context extends Component {
             this.agregarContexto = false;
             this.borrando = true;
         }
-        if(this.props.ventanas.length > 0 && this.ventanas !== this.props.ventanas){
-            this.ventanas = this.props.ventanas.slice();
+        if(this.props.ventanas.length > 0 && this.ventanas !== this.props.ventanas && this.props.ventanas !== prevProps.ventanas){
+            this.ventanas = this.props.ventanas;
             this.calcularFAR(this.ventanas);
-
         }
 
         if(this.props.width !== prevProps.width ){

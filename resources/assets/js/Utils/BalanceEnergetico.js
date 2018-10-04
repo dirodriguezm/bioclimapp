@@ -30,9 +30,10 @@ function aporteInterno(ocupantes, superficie, horasIluminacion, periodo) {
 
 function gradosDias(temperaturasMes, temperaturaConfort){
     let gd = 0;
-    for(let i = 0 ; i < diasMeses.length ; i++){
+    let periodo = [];
+    for(let i = 0 ; i < temperaturasMes.length - 1 ; i++){
         if((temperaturaConfort - temperaturasMes[i]) > 0){
-            if(periodo === []){
+            if(periodo.length === 0){
                 periodo.push(i);
             }
             gd = gd + (temperaturaConfort - temperaturasMes[i])*diasMeses[i];
@@ -41,6 +42,9 @@ function gradosDias(temperaturasMes, temperaturaConfort){
                 periodo.push(i-1);
             }
         }
+    }
+    if(periodo.length === 1){
+        periodo.push(temperaturasMes.length - 2);
     }
 
     return [gd,periodo];

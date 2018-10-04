@@ -20,9 +20,7 @@ class Morfologia extends Component {
         this.onMouseUp = this.onMouseUp.bind(this);
         this.onClick = this.onClick.bind(this);
         this.onDrag = this.onDrag.bind(this);
-        this.agregarPared = this.agregarPared.bind(this);
         this.onChangeCamera = this.onChangeCamera.bind(this);
-        this.crearIndicadores = this.crearIndicadores.bind(this);
 
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
         this.temperaturaConfort = 19;
@@ -81,15 +79,22 @@ class Morfologia extends Component {
         if(this.props.sunPathClicked !== prevProps.sunPathClicked){
             this.handleSunPathClicked(this.props.sunPathClicked);
         }
+
+        if(this.props.casaPredefinida !== prevProps.casaPredefinida && this.props.casaPredefinida !== -1){
+            this.handleCasaPredefinida(this.props.casaPredefinida);
+        }
     }
 
     onComunaChanged() {
+        console.log("asd");
         axios.get("http://127.0.0.1:8000/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
 
     }
 
     getJson(response) {
+        console.log("dsa");
+
         let data = response.data.slice();
         for (let i = 0; i < data.length; i++) {
             this.temperaturasMes[i] = data[i].valor;
@@ -131,6 +136,26 @@ class Morfologia extends Component {
         else {
             this.escena.add(this.sunPath);
         }
+    }
+
+    handleCasaPredefinida(casaPredefinida) {
+        this.managerCasas.handleCasaPredefinida(casaPredefinida);
+        this.props.onCasaPredefinidaChanged(-1);
+        this.props.onParedesChanged(this.paredes);
+        this.props.onVentanasChanged(this.ventanas);
+
+
+        console.log("ventanas",this.ventanas);
+
+        this.managerCasas.agregarHabitacionDibujada();
+        let casa = this.managerCasas.getCasa();
+        let aporte_interno = casa.userData.aporteInterno;
+        let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+        let perdida_conduccion = casa.userData.perdidaPorConduccion;
+
+        this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
+
+
     }
 
     getSunPath(){
@@ -250,6 +275,8 @@ class Morfologia extends Component {
         this.horasIluminacion = 5;
         this.aireRenovado = 5;
 
+        this.heightWall = 2.5;
+
         this.managerCasas = new ManagerCasas(
             this.escena,
             this.paredes,
@@ -258,7 +285,8 @@ class Morfologia extends Component {
             this.allObjects,
             this.ocupantes,
             this.horasIluminacion,
-            this.aireRenovado
+            this.aireRenovado,
+            this.heightWall,
         );
 
         //Camaras
@@ -350,7 +378,10 @@ class Morfologia extends Component {
         }
 
 
-        let plano = new THREE.Mesh(planoGeometria, new THREE.MeshBasicMaterial({visible: true}));
+        let plano = new THREE.Mesh(planoGeometria, new THREE.MeshLambertMaterial({
+            color: '#3D7B00',
+            side: THREE.DoubleSide,
+        }));
         plano.receiveShadow = true;
         plano.castShadow = false;
         escena.add(plano);
@@ -479,11 +510,6 @@ class Morfologia extends Component {
 
         });
 
-        //pared que dibuja nuevas paredes
-        this.paredConstruccion = this.crearMeshPared(0, this.heightWall);
-        this.paredConstruccion.visible = false;
-        escena.add(this.paredConstruccion);
-
         var light = new THREE.AmbientLight(0x404040); // soft white light
         escena.add(light);
 
@@ -501,14 +527,10 @@ class Morfologia extends Component {
         this.endNewPared = null;
 
         this.widthWall = 10;
-        this.heightWall = 2.5;
 
-        this.indicadores = this.crearIndicadores(this.widthWall, this.heightWall);
-        for (let indicador of this.indicadores) {
-            escena.add(indicador);
-        }
 
-        this.indicador_dibujado = null;
+        this.indicador_dibujado = this.crearIndicadorConstruccionPared(this.heightWall, 0.05);
+        escena.add(this.indicador_dibujado);
 
         this.mount.appendChild(this.renderer.domElement);
         this.start();
@@ -751,54 +773,6 @@ class Morfologia extends Component {
         return indicadorPared;
     }
 
-    crearIndicadorConstruccionVentana(widthWindow, heightWindow, heightWall) {
-        const geometria = new THREE.Geometry();
-
-        let x1 = 0, x2 = widthWindow, y1 = heightWall / 4, y2 = heightWall / 4 + heightWindow;
-        let z_offset = 0.01;
-
-        geometria.vertices.push(new THREE.Vector3(x1, y1, z_offset));
-        geometria.vertices.push(new THREE.Vector3(x1, y2, z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y1, z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y2, z_offset));
-
-        geometria.vertices.push(new THREE.Vector3(x1, y1, -z_offset));
-        geometria.vertices.push(new THREE.Vector3(x1, y2, -z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y1, -z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y2, -z_offset));
-
-        let face = new THREE.Face3(0, 2, 1);
-        let face2 = new THREE.Face3(1, 2, 3);
-        let face3 = new THREE.Face3(4, 6, 5);
-        let face4 = new THREE.Face3(5, 6, 7);
-
-        geometria.faces.push(face);
-        geometria.faces.push(face2);
-        geometria.faces.push(face3);
-        geometria.faces.push(face4);
-
-        var indicadorVentana = new THREE.Mesh(geometria, this.materialVentanaConstruccion);
-        indicadorVentana.visible = false;
-
-        return indicadorVentana;
-
-    }
-
-    crearIndicadores(widthWall, heightWall) {
-        //arreglo con todos los indicadores
-        var indicadores = [];
-        var radius = 0.05;
-
-        indicadores.push(this.crearCasaSimple(widthWall, heightWall));
-        indicadores.push(this.crearCasaDoble(widthWall, heightWall));
-        indicadores.push(this.crearCasaSimpleDosPisos(widthWall, heightWall));
-        indicadores.push(this.crearCasaDobleDosPisos(widthWall, heightWall));
-        indicadores.push(this.crearIndicadorConstruccionPared(heightWall, radius));
-        indicadores.push(this.crearIndicadorConstruccionVentana(widthWall / 4, heightWall / 2, heightWall));
-
-        return indicadores;
-    }
-
     componentWillUnmount() {
         this.stop();
         this.mount.removeChild(this.renderer.domElement);
@@ -967,73 +941,6 @@ class Morfologia extends Component {
         this.props.onParedesChanged(this.paredes);
     }
 
-    agregarPared() {
-        this.construyendo = false;
-
-        var pared = this.paredConstruccion.clone();
-        pared.material = this.materialParedConstruida.clone();
-        pared.castShadow = true;
-        pared.receiveShadow = false;
-
-        this.paredConstruccion.visible = false;
-
-        pared.startPoint = this.startNewPared.clone();
-        pared.endPoint = this.indicador_dibujado.position.clone();
-
-        let xStart = pared.startPoint.x + 25, zStart = pared.startPoint.z + 25;
-        let xEnd = pared.endPoint.x + 25, zEnd = pared.endPoint.z + 25;
-
-        this.grafoParedes.addVertex(pared.id);
-
-        let ids = this.positionParedes[xStart][zStart];
-
-        for (let id of ids) {
-            this.grafoParedes.addEdge(pared.id, id);
-        }
-
-        this.positionParedes[xStart][zStart].push(pared.id);
-
-        ids = this.positionParedes[xEnd][zEnd];
-
-        for (let id of ids) {
-            this.grafoParedes.addEdge(pared.id, id);
-        }
-
-        this.positionParedes[xEnd][zEnd].push(pared.id);
-
-        var cycles = this.grafoParedes.getCycle();
-
-        if (cycles.length > 0) {
-            for(let cycle of cycles ){
-                let keys = cycle.keys();
-
-                let paredesCiclo = [];
-
-                for(let key of keys){
-                    if(cycle.get(key)){
-                        var paredCiclo = this.escena.getObjectById(key);
-                        if(paredCiclo){
-                            paredesCiclo.push(paredCiclo);
-                        }
-
-                    }
-                }
-                paredesCiclo.push(pared);
-
-                this.crearCasaParedes(paredesCiclo);
-            }
-        }else{
-            this.escena.add(pared);
-        }
-
-        pared.tipo =  Morfologia.tipos.PARED;
-        this.paredes.push(pared);
-        this.allObjects.push(pared);
-        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
-        this.props.onParedesChanged(this.paredes);
-
-    }
-
     onChangeCamera(event) {
         this.setState({camara: event.target.value})
     }
@@ -1046,7 +953,7 @@ class Morfologia extends Component {
         this.raycaster.setFromCamera(this.mouse, this.camara);
 
         //seleccionado construccion de pared
-        if (this.props.dibujando == 4) {
+        if (this.props.dibujando === 0) {
             if (event.button === 0) {
                 this.construyendo = true;
                 let intersects = this.raycaster.intersectObjects(this.objetos);
@@ -1055,13 +962,6 @@ class Morfologia extends Component {
                     let startHabitacion = (intersect.point).add(intersect.face.normal).clone();
                     startHabitacion = startHabitacion.round();
                     this.managerCasas.setStartHabitacion(startHabitacion, this.raycaster);
-
-
-                    /*let intersect = intersects[0];
-                    this.startNewPared = (intersect.point).add(intersect.face.normal).clone();
-                    this.paredConstruccion.geometry = this.crearGeometriaPared(0, this.heightWall);
-                    this.startNewPared.round();
-                    this.paredConstruccion.visible = true;*/
                 }
             }
         }
@@ -1080,7 +980,7 @@ class Morfologia extends Component {
         this.raycaster.setFromCamera(this.mouse, this.camara);
 
         //seleccionado construccion de pared
-        if (this.props.dibujando == 4) {
+        if (this.props.dibujando === 0) {
             //click derecho
             if (event.button === 0) {
                 this.managerCasas.agregarHabitacionDibujada();
@@ -1088,6 +988,8 @@ class Morfologia extends Component {
                 let aporte_interno = casa.userData.aporteInterno;
                 let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
                 let perdida_conduccion = casa.userData.perdidaPorConduccion;
+
+                console.log(casa);
 
                 this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
 
@@ -1180,80 +1082,55 @@ class Morfologia extends Component {
         }
 
         //Si se está dibujando
-        if (this.props.dibujando !== -1 && this.props.dibujando < 7) {
-            //se actualiza el indicador dependiendo que se esté dibujando
+        if (this.props.dibujando !== -1 && this.props.dibujando < 4) {
             let index = parseInt(this.props.dibujando);
-            if (this.indicador_dibujado !== this.indicadores[index]) {
-                if (this.indicador_dibujado != null) {
-                    this.indicador_dibujado.visible = false;
-                }
-                this.indicador_dibujado = this.indicadores[index];
-                this.indicador_dibujado.visible = true;
-            }
             let intersect;
-            //si se dibujan casas pre-definidas, se intersecta con el plano.
-            if (this.props.dibujando < 5) {
+            //si se dibujan paredes
+            if (this.props.dibujando === 0) {
+                console.log("YES");
                 let intersects = this.raycaster.intersectObjects(this.objetos);
                 if (intersects.length > 0) {
                     intersect = intersects[0];
-
+                    this.indicador_dibujado.visible = true;
                     this.indicador_dibujado.position.copy(intersect.point).add(intersect.face.normal);
                     this.indicador_dibujado.position.round();
                     //si es pared
-                    if (this.props.dibujando == 4) {
+
                         this.indicador_dibujado.position.y = this.heightWall / 2;
                         if (this.construyendo) {
                             var nextPosition = (intersect.point).add(intersect.face.normal).clone();
                             nextPosition.round();
-                            //this.managerCasas.setEndHabitacion(nextPosition, this.raycaster);
                             this.managerCasas.crecerHabitacion(nextPosition);
-
-
-
-                            /*var dir = nextPosition.clone().sub(this.startNewPared);
-                            var widthPared = this.startNewPared.distanceTo(nextPosition);
-                            this.paredConstruccion.geometry = this.crearGeometriaPared(widthPared, this.heightWall);
-                            var len = dir.length();
-                            dir = dir.normalize().multiplyScalar(len * 0.5);
-                            let pos = this.startNewPared.clone().add(dir);
-                            this.paredConstruccion.position.copy(pos);
-                            var angleRadians = Math.atan2(nextPosition.z - this.startNewPared.z, nextPosition.x - this.startNewPared.x);
-                            this.paredConstruccion.rotation.y = -angleRadians;
-                            this.paredConstruccion.position.y = 0;*/
                         }
-                    } else {
-                        this.indicador_dibujado.position.y = 0;
-                    }
+
 
                 }
             }
-            //si se dibuja una ventana, se intersecta con paredes.
-            else if (this.props.dibujando === 5 || this.props.dibujando === 6 ) {
+            //si se dibuja una ventana o pared, se intersecta con paredes.
+            else if (this.props.dibujando === 1 || this.props.dibujando === 2 ) {
                 let intersects = this.raycaster.intersectObjects(this.paredes);
                 if (intersects.length > 0) {
                     intersect = intersects[0];
                     let pared = intersect.object;
                     let pos = intersect.point.clone();
-                    if(this.props.dibujando === 5){
-                        this.managerCasas.moverVentanaConstruccion(pared, pos, intersect.point);
+                    if(this.props.dibujando === 1){
+                        this.managerCasas.moverVentanaConstruccion(pared, pos);
                     }else{
-                        this.managerCasas.moverPuertaConstruccion(pared, pos, intersect.point);
+                        this.managerCasas.moverPuertaConstruccion(pared, pos);
                     }
 
                 }else{
-                    if(this.props.dibujando === 5){
+                    if(this.props.dibujando === 1){
                         this.managerCasas.ocultarVentanaConstruccion();
                     }else{
                         this.managerCasas.ocultarPuertaConstruccion();
                     }
-
                 }
             }
         }
         else{
             if(this.indicador_dibujado != null){
                 this.indicador_dibujado.visible = false;
-                this.indicador_dibujado = null;
             }
         }
 
@@ -1270,37 +1147,6 @@ class Morfologia extends Component {
             //this.light.position.set(this.sol.position.x, this.sol.position.y, this.sol.position.z);
 
         }
-
-        /*if (this.dibujando != -1 && this.dibujando < 4) {
-            var index = parseInt(this.dibujando);
-            if (this.indicador_dibujado != this.indicadores[index]) {
-                if (this.indicador_dibujado != null) {
-                    this.escena.remove(this.indicador_dibujado);
-                }
-                this.indicador_dibujado = this.indicadores[index];
-                this.escena.add(this.indicador_dibujado);
-            }
-            this.indicador_dibujado.position.copy(intersect.point).add(intersect.face.normal);
-            this.indicador_dibujado.position.floor();
-
-            /*
-            este codigo se usaba para hacer crecer las paredes
-            todo: mover de aca
-            var nexPosition = this.indicadorPared.position.clone();
-            var dir = nexPosition.clone().sub(this.startPosition);
-            this.orientacion = dir.clone();
-            var widthPared = this.startPosition.distanceTo(nexPosition);
-            var geomeIndPared = new THREE.BoxBufferGeometry(widthPared, 2, 0.05);
-            this.paredFantasma.geometry = geomeIndPared
-            var len = dir.length();
-            dir = dir.normalize().multiplyScalar(len * 0.5);
-            var pos = this.startPosition.clone().add(dir);
-            this.paredFantasma.position.copy(pos);
-            var angleRadians = Math.atan2(nexPosition.z - this.startPosition.z, nexPosition.x - this.startPosition.x);
-            this.paredFantasma.rotation.y = -
-
-
-        }*/
     }
 
     transformDegreeToGamma(degree) {
@@ -1317,17 +1163,13 @@ class Morfologia extends Component {
 
     onClick(event) {
         event.preventDefault();
-        if (this.props.dibujando < 4 && this.props.dibujando !== -1) {
-            this.agregarCasa();
-        }
 
-        if (this.props.dibujando === 5 && this.props.dibujando !== -1) {
-            console.log("Asdsa");
+        if (this.props.dibujando === 1 && this.props.dibujando !== -1) {
             this.managerCasas.agregarVentana();
-            this.props.onVentanasChanged(this.managerCasas.getVentanas());
+            this.props.onVentanasChanged(this.ventanas);
         }
 
-        if (this.props.dibujando === 6 && this.props.dibujando !== -1) {
+        if (this.props.dibujando === 2 && this.props.dibujando !== -1) {
             this.managerCasas.agregarPuerta();
         }
 
@@ -1392,6 +1234,7 @@ Morfologia.propTypes = {
     onSeleccionadoChanged: PropTypes.func,
     dimensionesPared: PropTypes.object,
     onCapaReady: PropTypes.func,
+    onCasaPredefinidaChanged: PropTypes.func,
 
 };
 
