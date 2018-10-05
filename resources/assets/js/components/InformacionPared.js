@@ -61,10 +61,12 @@ const styles = theme => ({
         flexDirection: 'column',
         textAlign: 'center',
         overflow: 'hidden',
+        elevation:24
     },
     paperAdd: {
         height: 300,
         overflow: 'hidden',
+        elevation:24
     },
 
 });
@@ -183,6 +185,19 @@ class InformacionPared extends Component {
         }
     }
 
+    hexToRGB(hex, alpha) {
+        var r = parseInt(hex.slice(1, 3), 16),
+            g = parseInt(hex.slice(3, 5), 16),
+            b = parseInt(hex.slice(5, 7), 16);
+
+        if (alpha) {
+            return "rgba(" + r + ", " + g + ", " + b + ", " + alpha + ")";
+        } else {
+            return "rgb(" + r + ", " + g + ", " + b + ")";
+        }
+    }
+
+
 
     getJson(response) {
 
@@ -198,7 +213,8 @@ class InformacionPared extends Component {
                 },
             });
             this.info_material[i].textColor = theme.palette.primary.contrastText;
-            this.info_material[i].colorSelected = theme.palette.primary.dark;
+            this.info_material[i].colorSelected = "#fc0f4f";
+
 
             if (this.info_material[i].hasOwnProperty('tipos')) {
                 for (let j = 0; j < this.info_material[i].tipos.length; j++) {
@@ -393,7 +409,9 @@ class InformacionPared extends Component {
                                                         <Paper className={classes.paper}
                                                                style={{backgroundColor: this.info_material[capa.material].colorSelected}}
                                                                value={capa.index}
-                                                               onClick={this.clickCapa}>
+                                                               onClick={this.clickCapa}
+                                                               elevation={0}
+                                                        >
                                                             <IconButton style={{color: this.info_material[capa.material].textColor}}
                                                                         className={classes.button}
                                                                         value={capa.index}
@@ -417,7 +435,9 @@ class InformacionPared extends Component {
                                                         <Paper className={classes.paper}
                                                                style={{backgroundColor: this.info_material[capa.material].color}}
                                                                value={capa.index}
-                                                               onClick={this.clickCapa}>
+                                                               onClick={this.clickCapa}
+                                                                elevation={10}
+                                                        >
                                                             <IconButton style={{color: this.info_material[capa.material].textColor}}
                                                                         className={classes.button}
                                                                         value={capa.index}
@@ -471,8 +491,8 @@ class InformacionPared extends Component {
                                     </Grid>
 
                                     {capaS !== null ?
-                                        <Grid item xs={12}>
-                                            <Grid item xs={12}>
+                                        <Grid container spacing={8}>
+                                            <Grid item xs>
                                                 <FormControl className={classes.formControl}>
                                                     <InputLabel htmlFor="material-simple">Material</InputLabel>
                                                     <Select
@@ -489,7 +509,7 @@ class InformacionPared extends Component {
                                                 </FormControl>
                                             </Grid>
                                             {hasTipos ?
-                                                <Grid item xs={12}>
+                                                <Grid item xs>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="tipo-simple">Tipo</InputLabel>
                                                         <Select
@@ -517,7 +537,8 @@ class InformacionPared extends Component {
                                                         >
                                                             {this.info_material[material].tipos[tipo].propiedades.map(propiedades => (
                                                                 <MenuItem value={propiedades.index}>
-                                                                    {propiedades.densidad}
+                                                                    {propiedades.densidad != -1 ? propiedades.densidad
+                                                                    : "No tiene"}
                                                                 </MenuItem>
                                                             ))}
                                                         </Select>
@@ -543,7 +564,7 @@ class InformacionPared extends Component {
                                                     </FormControl>
                                                 </Grid> : <div/>
                                             }
-                                            {!hasTipos ?
+                                            {!hasTipos?
                                                 <Grid item xs={12}>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="conductividad-simple">Densidad</InputLabel>
@@ -554,7 +575,8 @@ class InformacionPared extends Component {
                                                         >
                                                             {this.info_material[material].propiedades.map(propiedades => (
                                                                 <MenuItem value={propiedades.index}>
-                                                                    {propiedades.densidad}
+                                                                    {propiedades.densidad != -1 ? propiedades.densidad
+                                                                        : "No tiene"}
                                                                 </MenuItem>
                                                             ))}
                                                         </Select>
@@ -652,10 +674,7 @@ class InformacionPared extends Component {
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography className={classes.heading}>Radiación Solar</Typography>
                             </ExpansionPanelSummary>
-                            <div>
-                                gamma: {seleccionado.userData.gamma}
-                                orientacion: {seleccionado.userData.orientacion.x},{seleccionado.userData.orientacion.z}
-                            </div>
+
                             {this.info_rb}
 
                         </ExpansionPanel>

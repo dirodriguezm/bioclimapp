@@ -257,8 +257,8 @@ class TabPanel extends Component {
         this.setState({ventanas: ventanas});
     }
 
-    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
-        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion});
+    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion,volumen, area){
+        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion, volumen: volumen, area: area});
     }
 
     agregarContexto() {
@@ -399,6 +399,8 @@ class TabPanel extends Component {
                         aporte_interno={this.state.aporte_interno}
                         perdida_conduccion={this.state.perdida_conduccion}
                         perdida_ventilacion={this.state.perdida_ventilacion}
+                        volumen={this.state.volumen}
+                        area={this.state.area}
                     />
                 </Drawer>
                 <SwipeableViews
