@@ -29,13 +29,13 @@ class ManagerCasas {
         this.info_material = [];
         this.info_marcos = [];
 
-        axios.get("http://0.0.0.0:8000/api/info_materiales")
+        axios.get("http://152.74.52.185:8000/api/info_materiales")
             .then(response => this.getJsonMateriales(response));
 
-        axios.get("http://0.0.0.0:8000/api/info_ventanas")
+        axios.get("http://152.74.52.185:8000/api/info_ventanas")
             .then(response => this.getJsonVentanas(response));
 
-        axios.get("http://0.0.0.0:8000/api/info_marcos")
+        axios.get("http://152.74.52.185:8000/api/info_marcos")
             .then(response => this.getJsonMarcos(response));
 
         this.crearCasaVacia();
