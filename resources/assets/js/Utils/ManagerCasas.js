@@ -582,7 +582,8 @@ class ManagerCasas {
         this.casa.userData.aporteInterno += aporteInterno;
         this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
         this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
-
+        this.casa.userData.area += habitacion.userData.depth * habitacion.userData.width;
+        this.casa.userData.volumen += habitacion.userData.volumen;
         this.casa.updateMatrixWorld();
     }
 
@@ -632,7 +633,7 @@ class ManagerCasas {
                 }
             }
         }
-
+        console.log("habitacion",habitacion)
         this.agregarHabitacion(habitacion);
 
         //Se borra la habitacion de dibujo
@@ -656,8 +657,8 @@ class ManagerCasas {
         this.puertas.splice(0, this.puertas.length);
         this.pisos.splice(0, this.pisos.length);
         this.allObjects.splice(0, this.allObjects.length);
-
-        this.escena.remove(this.casa);
+        let casa = this.escena.getObjectByName("casa");
+        this.escena.remove(casa);
         this.crearCasaVacia();
         switch(casaPredefinida) {
             case 0:
@@ -1098,7 +1099,10 @@ class ManagerCasas {
 
         if (oldHeight !== height) {
             habitacion.userData.height = height;
+            let oldVolume = habitacion.userData.volumen;
+            this.casa.userData.volumen -= oldVolume;
             habitacion.userData.volumen = habitacion.userData.height * habitacion.userData.width * habitacion.userData.depth;
+            this.casa.userData.volumen += habitacion.userData.volumen;
 
             let paredes = habitacion.getObjectByName("Paredes");
 
@@ -1136,6 +1140,7 @@ class ManagerCasas {
             this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
         }
         if (oldWidth !== width) {
+
 
             let paredes = habitacion.getObjectByName("Paredes");
 
@@ -1224,10 +1229,13 @@ class ManagerCasas {
         let widths = [width, depth, width, depth];
         let height = habitacion.userData.height;
 
+        let oldVolume = habitacion.userData.volumen;
+        this.casa.userData.volumen -= oldVolume;
         habitacion.userData.volumen = width * height * depth;
         habitacion.userData.height = height;
         habitacion.userData.width = width;
         habitacion.userData.depth = depth;
+        this.casa.userData.volumen += habitacion.userData.volumen;
 
         let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
 
@@ -1261,10 +1269,12 @@ class ManagerCasas {
         }
 
         let piso = habitacion.getObjectByName("Piso");
+        this.casa.userData.area -= piso.userData.width * piso.userData.depth;
         piso.geometry = this.crearGeometriaPiso(width, depth);
         piso.userData.width = width;
         piso.userData.depth = depth;
         piso.userData.superficie = piso.userData.width * piso.userData.depth;
+        this.casa.userData.area += piso.userData.superficie;
         piso.userData.perimetro = piso.userData.width * 2 + piso.userData.depth * 2;
         piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
 
@@ -1317,7 +1327,7 @@ class ManagerCasas {
         this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
     }
 
-        crecerHabitacion(nextPosition) {
+    crecerHabitacion(nextPosition) {
         let start = this.habitacionConstruccion.userData.start.clone();
         this.habitacionConstruccion.userData.end = nextPosition.clone();
         let end = nextPosition.clone();
@@ -1402,8 +1412,9 @@ class ManagerCasas {
     }
 
     crearCasaVacia()    {
+        this.casa != null ? this.casa.children = [] : this.casa;
         var casa = new THREE.Group();
-
+        casa.name = "casa";
         var nivel = new THREE.Group();
 
         casa.add(nivel);
@@ -1413,9 +1424,11 @@ class ManagerCasas {
         casa.userData.aporteInterno = 0;
         casa.userData.perdidaPorVentilacion = 0;
         casa.userData.perdidaPorConduccion = 0;
+        casa.userData.volumen = 0;
+        casa.userData.area = 0;
 
         this.casa = casa;
-        this.casa.periodo = this.periodo;
+        this.casa.userData.periodo = this.periodo;
     }
 
 
@@ -1502,7 +1515,6 @@ class ManagerCasas {
         habitacion.userData.height = height;
         habitacion.userData.width = width;
         habitacion.userData.depth = depth;
-
         habitacion.userData.nivel = nivel;
 
         return habitacion;

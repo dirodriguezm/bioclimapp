@@ -23,7 +23,7 @@ class Morfologia extends Component {
         this.onChangeCamera = this.onChangeCamera.bind(this);
 
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
-        this.temperaturaConfort = 19;
+        this.temperaturaConfort = 14;
         this.angleRotated = 0;
 
         this.state  = {
@@ -58,7 +58,8 @@ class Morfologia extends Component {
             let aporte_interno = casa.userData.aporteInterno;
             let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
+            console.log("casa:", casa);
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
         }
         if(this.props.width !== prevProps.width ){
             this.renderer.setSize(this.props.width, this.props.height);
@@ -73,7 +74,8 @@ class Morfologia extends Component {
             let aporte_interno = casa.userData.aporteInterno;
             let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
+            console.log("casa:", casa);
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
             this.props.onCapaReady();
         }
         if(this.props.sunPathClicked !== prevProps.sunPathClicked){
@@ -93,8 +95,6 @@ class Morfologia extends Component {
     }
 
     getJson(response) {
-        console.log("dsa");
-
         let data = response.data.slice();
         for (let i = 0; i < data.length; i++) {
             this.temperaturasMes[i] = data[i].valor;
@@ -152,8 +152,8 @@ class Morfologia extends Component {
         let aporte_interno = casa.userData.aporteInterno;
         let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
         let perdida_conduccion = casa.userData.perdidaPorConduccion;
-
-        this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
+        console.log("casa:",casa);
+        this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
 
 
     }
@@ -936,8 +936,6 @@ class Morfologia extends Component {
             //console.log(casa);
             this.escena.add(casa);
         }
-        //calcularGammaParedes(this.paredes);
-        //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
         this.props.onParedesChanged(this.paredes);
     }
 
@@ -988,12 +986,8 @@ class Morfologia extends Component {
                 let aporte_interno = casa.userData.aporteInterno;
                 let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
                 let perdida_conduccion = casa.userData.perdidaPorConduccion;
-
-                console.log(casa);
-
-                this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion);
-
-                //BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+                console.log("casa: ", casa);
+                this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
                 this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
 
@@ -1025,7 +1019,6 @@ class Morfologia extends Component {
             this.angleRotated = 0;
             this.props.onParedesChanged(this.paredes);
             if(ventanas.length > 0) this.props.onVentanasChanged(ventanas);
-            console.log("cambio", this.paredes);
         }
     }
 

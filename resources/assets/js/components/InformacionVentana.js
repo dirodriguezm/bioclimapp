@@ -135,7 +135,8 @@ class InformacionVentana extends Component {
         this.props.seleccionado.fm = FM;
         this.props.seleccionado.fs = FS;
         this.props.um = Um;
-        let aporte_solar = BalanceEnergetico.calcularAporteSolar(this.props.ventanas,this.difusa,this.directa);
+        let periodo = this.props.ventanas[0].parent.parent.parent.parent.parent.userData.periodo;
+        let aporte_solar = BalanceEnergetico.calcularAporteSolar(periodo,this.props.ventanas,this.difusa,this.directa);
         this.props.onAporteSolarChanged(aporte_solar);
     }
 

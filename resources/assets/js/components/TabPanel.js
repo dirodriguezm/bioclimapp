@@ -242,23 +242,23 @@ class TabPanel extends Component {
             comuna: mapState.comuna,
             latitud: mapState.lat,
             longitud: mapState.lng,
-            sunTimes: mapState.sunTimes,
             sunPosition: mapState.sunPosition,
             sunPath: mapState.sunPath,
         });
     }
 
     onParedesChanged(paredes) {
-        let paredes_calculadas = BalanceEnergetico.calcularRbParedes(paredes.slice(), this.state.latitud, this.state.longitud, this.state.sunTimes);
+        let paredes_calculadas = BalanceEnergetico.calcularRbParedes(paredes.slice(), this.state.latitud, this.state.longitud);
         this.setState({paredes: paredes_calculadas});
+        console.log("espera ?")
     }
 
     onVentanasChanged(ventanas){
         this.setState({ventanas: ventanas});
     }
 
-    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion){
-        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion});
+    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion,volumen, area){
+        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion, volumen: volumen, area: area});
     }
 
     agregarContexto() {
@@ -275,7 +275,8 @@ class TabPanel extends Component {
 
     onFarChanged(ventanas) {
         let month = new Date().getMonth();
-        let aporte_solar = BalanceEnergetico.calcularAporteSolar(ventanas,this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
+        let periodo = ventanas[0].parent.parent.parent.parent.parent.userData.periodo;
+        let aporte_solar = BalanceEnergetico.calcularAporteSolar(periodo,ventanas,this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
         this.setState({ventanas: ventanas, aporte_solar:aporte_solar});
     }
 
@@ -398,6 +399,8 @@ class TabPanel extends Component {
                         aporte_interno={this.state.aporte_interno}
                         perdida_conduccion={this.state.perdida_conduccion}
                         perdida_ventilacion={this.state.perdida_ventilacion}
+                        volumen={this.state.volumen}
+                        area={this.state.area}
                     />
                 </Drawer>
                 <SwipeableViews

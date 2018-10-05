@@ -257,12 +257,13 @@ class DetalleBalance extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.aporte_solar !== prevProps.aporte_solar || this.props.aporte_interno !== prevProps.aporte_interno) {
+            console.log("Aporte solar", this.props.aporte_solar);
             this.setState({
                 dataAportes: {
                     labels: ['Aportes Solares', 'Aportes Internos'],
                     datasets: [
                         {
-                            data: [this.props.aporte_solar * 10000, this.props.aporte_interno],
+                            data: [Math.round(this.props.aporte_solar * 1000), Math.round(this.props.aporte_interno)],
                             backgroundColor: ['#F19C00', '#F16600'],
                             borderColor: ['#F19C00', '#F16600'],
                             label: 'Aportes'
@@ -278,7 +279,7 @@ class DetalleBalance extends Component {
                     labels: ['Pérdidas por Conducción', 'Pérdidas por Ventilación'],
                     datasets: [
                         {
-                            data: [this.props.perdida_conduccion, this.props.perdida_ventilacion],
+                            data: [Math.round(this.props.perdida_conduccion), Math.round(this.props.perdida_ventilacion)],
                             backgroundColor: ['#009688', '#1043A0'],
                             borderColor: ['#009688', '#1043A0'],
                             label: 'Perdidas'
@@ -286,8 +287,8 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
-
         }
+
     }
 
     render() {
@@ -299,7 +300,25 @@ class DetalleBalance extends Component {
                 </Typography>
                 <Grid container spacing={32}>
                     <Grid item xs={12}>
-                        <Grades balance = {20}/>
+                        <Paper>
+                            <Grid container spacing={32}>
+                                <Grid item xs={4}>
+                                    {this.props.area != null ? <Typography>Balance:
+                                            {Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
+                                            this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )} KWh/m<sup>2</sup></Typography>
+                                        : "Balance:"}
+                                </Grid>
+                                <Grid item xs={4}>
+                                    {this.props.area != null ? <Typography>Area Vivienda : {this.props.area} m<sup>2</sup></Typography>
+                                    : "Área vivienda:"}
+
+                                </Grid>
+                                <Grid item xs={4}>
+                                    {this.props.volumen != null ? <Typography>Volumen Vivienda : {this.props.volumen} m<sup>3</sup></Typography>
+                                        : "Volumen vivienda:"}
+                                </Grid>
+                            </Grid>
+                        </Paper>
                     </Grid>
                     <Grid item xs={12}>
                         <Chart
@@ -316,6 +335,9 @@ class DetalleBalance extends Component {
                             height={150}
                             title={"Pérdidas"}
                         />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Grades balance = {20}/>
                     </Grid>
                 </Grid>
             </div>
