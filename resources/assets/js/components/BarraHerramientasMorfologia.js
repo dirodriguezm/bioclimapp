@@ -226,10 +226,11 @@ class BarraHerramientasMorfologia extends Component {
     constructor(props) {
         super(props);
 
-        var dibujandoStatesButtons = new Array(8).fill(false);
+        var dibujandoStatesButtons = new Array(4).fill(false);
 
         this.state = {
             spacing: '16',
+            casaPredefinida: props.casaPredefinida,
             click2D: props.click2D,
             dibujando: props.dibujando,
             dibujandoStatesButtons: dibujandoStatesButtons,
@@ -241,7 +242,7 @@ class BarraHerramientasMorfologia extends Component {
         };
 
 
-
+        this.handleCasaPredefinida = this.handleCasaPredefinida.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
         this.handleClose = this.handleClose.bind(this);
         this.handlePerspective = this.handlePerspective.bind(this);
@@ -283,6 +284,16 @@ class BarraHerramientasMorfologia extends Component {
             click2D: !prevState.click2D
         }));
         this.props.onPerspectiveChanged();
+    }
+
+    handleCasaPredefinida(event){
+        this.handleClose();
+        this.handleCloseCasa();
+        let casaPredefinida = parseInt(event.currentTarget.value);
+        this.setState({
+            casaPredefinida: casaPredefinida,
+        });
+        this.props.onCasaPredefinidaChanged(casaPredefinida);
     }
 
     handleDibujo(event) {
@@ -452,15 +463,15 @@ class BarraHerramientasMorfologia extends Component {
                     elevation={9}
                 >
                     <Tooltip title="Pared"
-                             disableFocusListener={!dibujandoStatesButtons[4]}
+                             disableFocusListener={!dibujandoStatesButtons[0]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
-                                  disabled={dibujandoStatesButtons[4]}>
+                                  disabled={dibujandoStatesButtons[0]}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="AgregarPared"
-                                value={4}
-                                disabled={dibujandoStatesButtons[4]}
+                                value={0}
+                                disabled={dibujandoStatesButtons[0]}
                                 onClick={this.handleDibujo}>
                                 <WallIcon/>
                             </IconButton>
@@ -468,15 +479,15 @@ class BarraHerramientasMorfologia extends Component {
                     </Tooltip>
 
                     <Tooltip title="Ventana"
-                             disableFocusListener={!dibujandoStatesButtons[5]}
+                             disableFocusListener={!dibujandoStatesButtons[1]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
-                                  disabled={dibujandoStatesButtons[5]}>
+                                  disabled={dibujandoStatesButtons[1]}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="AgregarVentana"
-                                value={5}
-                                disabled={dibujandoStatesButtons[5]}
+                                value={1}
+                                disabled={dibujandoStatesButtons[1]}
                                 onClick={this.handleDibujo}>
                                 <WindowIcon/>
                             </IconButton>
@@ -484,15 +495,15 @@ class BarraHerramientasMorfologia extends Component {
                     </Tooltip>
 
                     <Tooltip title="Puerta"
-                             disableFocusListener={!dibujandoStatesButtons[6]}
+                             disableFocusListener={!dibujandoStatesButtons[2]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
-                                  disabled={dibujandoStatesButtons[6]}>
+                                  disabled={dibujandoStatesButtons[2]}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="AgregarPuerta"
-                                value={6}
-                                disabled={dibujandoStatesButtons[6]}
+                                value={2}
+                                disabled={dibujandoStatesButtons[2]}
                                 onClick={this.handleDibujo}>
                                 <DoorIcon/>
                             </IconButton>
@@ -500,15 +511,15 @@ class BarraHerramientasMorfologia extends Component {
                     </Tooltip>
 
                     <Tooltip title="Piso"
-                             disableFocusListener={!dibujandoStatesButtons[7]}
+                             disableFocusListener={!dibujandoStatesButtons[3]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
-                                  disabled={dibujandoStatesButtons[7]}>
+                                  disabled={dibujandoStatesButtons[3]}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="AgregarPiso"
-                                value={7}
-                                disabled={dibujandoStatesButtons[7]}
+                                value={3}
+                                disabled={dibujandoStatesButtons[3]}
                                 onClick={this.handleDibujo}>
                                 <FloorIcon/>
                             </IconButton>
@@ -542,64 +553,52 @@ class BarraHerramientasMorfologia extends Component {
                     elevation={9}
                 >
                     <Tooltip title="Simple"
-                             disableFocusListener={!dibujandoStatesButtons[0]}
                              placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}
-                                  disabled={dibujandoStatesButtons[0]}>
+                        <MenuItem onClick={this.handleCloseCasa}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="Simple"
                                 value={0}
-                                disabled={dibujandoStatesButtons[0]}
-                                onClick={this.handleDibujo}>
+                                onClick={this.handleCasaPredefinida}>
                                 <SimpleIcon/>
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
 
                     <Tooltip title="Doble"
-                             disableFocusListener={!dibujandoStatesButtons[1]}
                              placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}
-                                  disabled={dibujandoStatesButtons[1]}>
+                        <MenuItem onClick={this.handleCloseCasa}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="Double"
                                 value={1}
-                                disabled={dibujandoStatesButtons[1]}
-                                onClick={this.handleDibujo}>
+                                onClick={this.handleCasaPredefinida}>
                                 <DoubleIcon/>
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
 
                     <Tooltip title="Simple dos pisos"
-                             disableFocusListener={!dibujandoStatesButtons[2]}
                              placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}
-                                  disabled={dibujandoStatesButtons[2]}>
+                        <MenuItem onClick={this.handleCloseCasa}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="Simple dos pisos"
                                 value={2}
-                                disabled={dibujandoStatesButtons[2]}
-                                onClick={this.handleDibujo}>
+                                onClick={this.handleCasaPredefinida}>
                                 <SimpleTwoFloorIcon/>
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
 
                     <Tooltip title="Doble dos pisos"
-                             disableFocusListener={!dibujandoStatesButtons[3]}
                              placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}
-                                  disabled={dibujandoStatesButtons[3]}>
+                        <MenuItem onClick={this.handleCloseCasa}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="Simple"
                                 value={3}
-                                disabled={dibujandoStatesButtons[3]}
-                                onClick={this.handleDibujo}>
+                                onClick={this.handleCasaPredefinida}>
                                 <DoubleTwoFloorIcon/>
                             </IconButton>
                         </MenuItem>
@@ -645,6 +644,7 @@ BarraHerramientasMorfologia.propTypes = {
     onSeleccionandoMorfChanged: PropTypes.func,
     onBorrandoMorfChanged: PropTypes.func,
     onDibujandoMorfChanged: PropTypes.func,
+    onCasaPredefinidaChanged: PropTypes.func,
 };
 
 export default withStyles(styles)(BarraHerramientasMorfologia);

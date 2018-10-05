@@ -113,6 +113,7 @@ class Context extends Component {
         if( this.ventanas !== this.props.ventanas && prevProps.ventanas !== this.props.ventanas){
             this.ventanas = this.props.ventanas.slice();
             this.calcularFAR(this.ventanas);
+
         }
 
         if(this.props.width !== prevProps.width ){

@@ -158,6 +158,7 @@ class TabPanel extends Component {
             sunPathClicked: false,
             paredCapaChange: false,
             rotando: false,
+            casaPredefinida: -1,
             ventanas: []
         };
         this.handleChange = this.handleChange.bind(this);
@@ -186,6 +187,7 @@ class TabPanel extends Component {
         this.onCapaChanged = this.onCapaChanged.bind(this);
         this.onCapaReady = this.onCapaReady.bind(this);
         this.onRotationClicked = this.onRotationClicked.bind(this);
+        this.onCasaPredefinidaChanged = this.onCasaPredefinidaChanged.bind(this);
     }
 
     handleDrawerOpen() {
@@ -347,6 +349,11 @@ class TabPanel extends Component {
     onRotationClicked(rotando){
         this.setState({rotando: rotando});
     }
+    onCasaPredefinidaChanged(casaPredefinida){
+        this.setState({
+            casaPredefinida : casaPredefinida,
+        })
+    }
 
 
     render() {
@@ -483,6 +490,8 @@ class TabPanel extends Component {
                                         seleccionadoMorf={seleccionadoMorf}
                                         sunPathClicked={this.state.sunPathClicked}
                                         rotando={this.state.rotando}
+                                        casaPredefinida={this.state.casaPredefinida}
+                                        onCasaPredefinidaChanged={this.onCasaPredefinidaChanged}
                                     />:
                                     <div></div>
                                 }
@@ -493,12 +502,14 @@ class TabPanel extends Component {
                                         borrando={borrandoMorf}
                                         seleccionando={seleccionandoMorf}
                                         rotando={this.state.rotando}
+                                        casaPredefinida={this.state.casaPredefinida}
                                         onPerspectiveChanged={this.onPerspectiveChanged}
                                         onSeleccionandoMorfChanged={this.onSeleccionandoMorfChanged}
                                         onBorrandoMorfChanged={this.onBorrandoMorfChanged}
                                         onDibujandoMorfChanged={this.onDibujandoMorfChanged}
                                         onSunPathClicked={this.onSunPathClicked}
                                         onRotationClicked={this.onRotationClicked}
+                                        onCasaPredefinidaChanged={this.onCasaPredefinidaChanged}
                                     />
                                 </Paper>
                             </TabContainer>
