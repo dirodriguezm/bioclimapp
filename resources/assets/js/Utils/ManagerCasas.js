@@ -586,6 +586,26 @@ class ManagerCasas {
         this.casa.updateMatrixWorld();
     }
 
+    aumentarNivelHabitacion(habitacion){
+        console.log(habitacion);
+        let pos = habitacion.position.clone();
+        let prevNivel = habitacion.userData.nivel;
+        habitacion.userData.nivel = prevNivel + 1;
+        //habitacion.position.y = (nivel - 1) *habitacion.userData.height;
+
+        let nivel = habitacion.parent;
+        nivel.remove(habitacion);
+
+        nivel = new THREE.Group();
+        this.casa.add(nivel);
+
+        nivel.position.y = (habitacion.userData.nivel - 1) * habitacion.userData.height;
+        nivel.add(habitacion);
+
+
+        this.casa.updateMatrixWorld();
+
+    }
 
     agregarHabitacionDibujada() {
 
@@ -647,18 +667,20 @@ class ManagerCasas {
                 this.crearCasaDoble();
                 break;
             case 2:
+                this.crearCasaSimpleDosPisos();
                 break;
             case 3:
+                this.crearCasaDobleDosPisos();
                 break;
-
         }
+
     }
 
     crearCasaDoble(){
         let habitacion1 = this.crearCasaSimple();
         let paredes1 = habitacion1.getObjectByName("Paredes");
 
-        let pared = paredes1.children[1];
+        let pared = paredes1.children[3];
 
         let ventanas = pared.children;
 
@@ -670,9 +692,7 @@ class ManagerCasas {
 
         }
 
-        for(let ventana of ventanas){
-            ventana.parent.remove(ventana);
-        }
+        pared.children = [];
 
         pared.userData.separacion = Morfologia.separacion.INTERIOR;
 
@@ -685,12 +705,11 @@ class ManagerCasas {
         pared.geometry.userData.shape = shape;
         pared.geometry.verticesNeedUpdate = true;
 
-
         let habitacion2 = this.crearCasaSimple();
 
         let paredes2 = habitacion2.getObjectByName("Paredes");
 
-        pared = paredes2.children[3];
+        pared = paredes2.children[1];
 
         ventanas = pared.children;
 
@@ -709,6 +728,70 @@ class ManagerCasas {
         habitacion1.position.x = habitacion1.position.x - this.widthPredefinida/2 + 0.5;
         habitacion2.position.x = habitacion2.position.x + this.widthPredefinida/2 + 0.5;
 
+        return [habitacion1, habitacion2];
+        //habitacion2.rotation.y = Math.PI ;
+
+    }
+
+    crearCasaDobleDosPisos(){
+        let habitaciones = this.crearCasaDoble();
+
+        let habitacion = habitaciones[0];
+
+        for(let habitacion of habitaciones){
+            let techo = habitacion.getObjectByName("Techo");
+            habitacion.remove(techo);
+
+        }
+
+        let nuevaHabitacion = this.crearCasaDoble();
+
+        for(let habitacion of nuevaHabitacion){
+            for(let pared of habitacion.getObjectByName("Paredes").children){
+                for(let objeto of pared.children){
+                    if(objeto.userData.tipo === Morfologia.tipos.PUERTA){
+                        this.quitarObjetoPuerta(objeto);
+                    }
+                }
+            }
+
+            this.aumentarNivelHabitacion(habitacion);
+        }
+
+    }
+
+    crearCasaSimpleDosPisos(){
+        let habitacion = this.crearCasaSimple();
+
+        let techo = habitacion.getObjectByName("Techo");
+        habitacion.remove(techo);
+
+        habitacion = this.crearCasaSimple();
+
+        let pared = habitacion.getObjectByName("Paredes").children[2];
+        for(let objeto of pared.children){
+            if(objeto.userData.tipo === Morfologia.tipos.PUERTA){
+                this.quitarObjetoPuerta(objeto);
+            }
+        }
+        this.aumentarNivelHabitacion(habitacion);
+
+    }
+
+    quitarObjetoPuerta(objeto){
+        let hole = objeto.userData.hole;
+        let pared = objeto.parent;
+
+        var shape = pared.geometry.userData.shape.clone();
+        shape.holes.splice(shape.holes.indexOf(hole));
+
+        pared.remove(objeto);
+
+        pared.geometry.dispose();
+        pared.geometry.dynamic = true;
+        pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+        pared.geometry.userData.shape = shape;
+        pared.geometry.verticesNeedUpdate = true;
     }
 
     crearCasaSimple(){
@@ -732,6 +815,10 @@ class ManagerCasas {
                     this.moverVentanaConstruccion(pared, point);
                     this.agregarVentana();
 
+                    point = new THREE.Vector3(0,1,-this.depthPredefinida/2);
+                    this.moverPuertaConstruccion(pared, point);
+                    this.agregarPuerta();
+
                     point = point = new THREE.Vector3(-(Math.floor(this.widthPredefinida/2)-1),1,-this.depthPredefinida/2);
                 }else{
                     let point = new THREE.Vector3(Math.floor(this.widthPredefinida/2)-1,1,this.depthPredefinida/2);
@@ -742,11 +829,7 @@ class ManagerCasas {
                     this.moverVentanaConstruccion(pared, point);
                     this.agregarVentana();
 
-                    point = new THREE.Vector3(0,1,this.depthPredefinida/2);
-                    this.moverPuertaConstruccion(pared, point);
-                    this.agregarPuerta();
 
-                    this.ocultarPuertaConstruccion();
                 }
             }else{
                 if(pared.userData.orientacion.x === 1){
@@ -786,6 +869,7 @@ class ManagerCasas {
             this.ocultarPuertaConstruccion();
             this.ocultarVentanaConstruccion();
         }
+        habitacion.rotation.y = Math.PI ;
         return habitacion;
     }
 
@@ -813,6 +897,8 @@ class ManagerCasas {
             //TODO: revisar superposicion de hoyos
 
             let hole = new THREE.Path(vertices);
+
+            puerta.userData.hole = hole;
 
             var shape = pared.geometry.userData.shape.clone();
             shape.holes.push(hole);
@@ -1231,7 +1317,7 @@ class ManagerCasas {
         this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
     }
 
-    crecerHabitacion(nextPosition) {
+        crecerHabitacion(nextPosition) {
         let start = this.habitacionConstruccion.userData.start.clone();
         this.habitacionConstruccion.userData.end = nextPosition.clone();
         let end = nextPosition.clone();
@@ -1315,7 +1401,7 @@ class ManagerCasas {
         this.habitacionConstruccion.userData.depth = depth;
     }
 
-    crearCasaVacia() {
+    crearCasaVacia()    {
         var casa = new THREE.Group();
 
         var nivel = new THREE.Group();
@@ -1331,6 +1417,7 @@ class ManagerCasas {
         this.casa = casa;
         this.casa.userData.periodo = this.periodo;
     }
+
 
     crearHabitacion(width, height, depth, nivel) {
         var habitacion = new THREE.Group();
