@@ -23,7 +23,7 @@ export default class MapContainer extends Component {
     }
 
     componentWillMount(){
-        axios.get("http://152.74.52.85:8000/api/comuna/" + this.state.lat + "/" + this.state.lng)
+        axios.get("http://152.74.52.185:8000/api/comuna/" + this.state.lat + "/" + this.state.lng)
             .then(response => {
                     this.setState({
                         lat: this.state.lat,
@@ -99,7 +99,7 @@ export default class MapContainer extends Component {
 
     mapClicked(e) {
         this.createMarker(e.latlng.lat, e.latlng.lng);
-        axios.get("http://152.74.52.85:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
+        axios.get("http://152.74.52.185:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
             .then(response => {
                     this.setState({
                         lat: e.latlng.lat,
@@ -120,7 +120,7 @@ export default class MapContainer extends Component {
         let lat = parseFloat(e.location.y);
         //console.log(lat + "," + lng);
         this.createMarker(lat, lng);
-        axios.get("http://152.74.52.85:8000/api/comuna/" + lat + "/" + lng)
+        axios.get("http://152.74.52.185:8000/api/comuna/" + lat + "/" + lng)
             .then(response => {
                     this.setState({
                         lat: lat,

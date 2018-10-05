@@ -88,7 +88,7 @@ class Morfologia extends Component {
     }
 
     onComunaChanged() {
-        axios.get("http://152.74.52.85:8000/api/temperaturas/"+this.props.comuna.id)
+        axios.get("http://152.74.52.185:8000/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
 
     }
