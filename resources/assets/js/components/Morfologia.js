@@ -23,7 +23,7 @@ class Morfologia extends Component {
         this.onChangeCamera = this.onChangeCamera.bind(this);
 
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
-        this.temperaturaConfort = 19;
+        this.temperaturaConfort = 14;
         this.angleRotated = 0;
 
         this.state  = {
@@ -296,7 +296,7 @@ class Morfologia extends Component {
         camara2D.updateProjectionMatrix ();
         this.camara2D = camara2D;
         //CAMARA 3D
-        let camara3D = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+        let camara3D = new THREE.PerspectiveCamera(20, width / height, 1, 1000);
         camara3D.position.set(0, 8, 27);
         camara3D.lookAt(new THREE.Vector3());
         this.camara3D = camara3D;

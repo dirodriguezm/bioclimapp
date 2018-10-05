@@ -1329,6 +1329,7 @@ class ManagerCasas {
         casa.userData.perdidaPorConduccion = 0;
 
         this.casa = casa;
+        this.casa.userData.periodo = this.periodo;
     }
 
     crearHabitacion(width, height, depth, nivel) {

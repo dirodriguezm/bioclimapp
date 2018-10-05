@@ -216,8 +216,8 @@ class Context extends Component {
             fillStyle: '#000000',
             antialias: false
         });
-        sprite.scale.setX(0.03);
-        sprite.scale.setY(0.03);
+        sprite.scale.setX(0.1);
+        sprite.scale.setY(0.1);
         sprite.position.set(0, 0.3, 50);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
@@ -227,8 +227,8 @@ class Context extends Component {
             fillStyle: '#000000',
             antialias: false
         });
-        sprite.scale.setX(0.03);
-        sprite.scale.setY(0.03);
+        sprite.scale.setX(0.1);
+        sprite.scale.setY(0.1);
         sprite.position.set(0, 0.3, -50);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
@@ -238,8 +238,8 @@ class Context extends Component {
             fillStyle: '#000000',
             antialias: false
         });
-        sprite.scale.setX(0.03);
-        sprite.scale.setY(0.03);
+        sprite.scale.setX(0.1);
+        sprite.scale.setY(0.1);
         sprite.position.set(50, 0.3, 0);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
@@ -249,8 +249,8 @@ class Context extends Component {
             fillStyle: '#000000',
             antialias: false
         });
-        sprite.scale.setX(0.03);
-        sprite.scale.setY(0.03);
+        sprite.scale.setX(0.1);
+        sprite.scale.setY(0.1);
         sprite.position.set(-50, 0.3, 0);
         sprite.rotateX(-Math.PI / 2);
         this.escena.add(sprite);
@@ -477,7 +477,7 @@ class Context extends Component {
                 if (!obstruccionesVentana.includes(current)) {
                     obstruccionesVentana.push(current);
                 }
-                let arrowHelper = new THREE.ArrowHelper(angle, ventana.userData.pos, 50, 0x00ff00);
+                let arrowHelper = new THREE.ArrowHelper(angle, ventana.userData.pos, 50, 0x00ff00, 0,0);
                 this.escena.add(arrowHelper);
                 //pasamos al siguiente angulo
                 angle.applyAxisAngle(axisY, -Math.PI / 180);
@@ -513,7 +513,7 @@ class Context extends Component {
             -Math.round(this.mousePoint.y));
         let dir = puntoActual.sub(this.puntoInicial);
         let largo = dir.length();
-        this.obstruccionFantasma.geometry = new THREE.BoxBufferGeometry(largo, 1, 0.5);
+        this.obstruccionFantasma.geometry = new THREE.BoxBufferGeometry(largo, 3, 0.5);
         dir = dir.normalize().multiplyScalar(largo / 2);
         let pos = this.puntoInicial.clone().add(dir);
         this.obstruccionFantasma.position.set(pos.x, 0, pos.z);

@@ -129,7 +129,7 @@ class InformacionPared extends Component {
                             Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.rb}
+                            RB: {this.props.seleccionado.userData.omegas.rb}
                         </ExpansionPanelDetails>
                     </div>
                 }
@@ -143,7 +143,7 @@ class InformacionPared extends Component {
                             Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.rb}
+                            RB: {this.props.seleccionado.userData.omegas.rb}
                         </ExpansionPanelDetails>
                     </div>
                 }
@@ -163,7 +163,7 @@ class InformacionPared extends Component {
                             Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.rb}
+                            RB: {this.props.seleccionado.userData.omegas.rb}
                         </ExpansionPanelDetails>
                     </div>
                 }
@@ -173,7 +173,7 @@ class InformacionPared extends Component {
                             La pared no recibe sol.
                         </ExpansionPanelDetails>
                         <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.rb}
+                            RB: {this.props.seleccionado.userData.omegas.rb}
                         </ExpansionPanelDetails>
                     </div>
 
@@ -652,6 +652,10 @@ class InformacionPared extends Component {
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography className={classes.heading}>Radiación Solar</Typography>
                             </ExpansionPanelSummary>
+                            <div>
+                                gamma: {seleccionado.userData.gamma}
+                                orientacion: {seleccionado.userData.orientacion.x},{seleccionado.userData.orientacion.z}
+                            </div>
                             {this.info_rb}
 
                         </ExpansionPanel>

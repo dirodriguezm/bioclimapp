@@ -257,12 +257,13 @@ class DetalleBalance extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.aporte_solar !== prevProps.aporte_solar || this.props.aporte_interno !== prevProps.aporte_interno) {
+            console.log("Aporte solar", this.props.aporte_solar);
             this.setState({
                 dataAportes: {
                     labels: ['Aportes Solares', 'Aportes Internos'],
                     datasets: [
                         {
-                            data: [this.props.aporte_solar * 10000, this.props.aporte_interno],
+                            data: [Math.round(this.props.aporte_solar * 1000), Math.round(this.props.aporte_interno)],
                             backgroundColor: ['#F19C00', '#F16600'],
                             borderColor: ['#F19C00', '#F16600'],
                             label: 'Aportes'
@@ -278,7 +279,7 @@ class DetalleBalance extends Component {
                     labels: ['Pérdidas por Conducción', 'Pérdidas por Ventilación'],
                     datasets: [
                         {
-                            data: [this.props.perdida_conduccion, this.props.perdida_ventilacion],
+                            data: [Math.round(this.props.perdida_conduccion), Math.round(this.props.perdida_ventilacion)],
                             backgroundColor: ['#009688', '#1043A0'],
                             borderColor: ['#009688', '#1043A0'],
                             label: 'Perdidas'

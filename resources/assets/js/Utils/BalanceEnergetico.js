@@ -146,10 +146,10 @@ function sign(x) {
     if (x === 0) return 0;
 }
 
-function calcularAngulos(gamma, beta, latitud) {
+function calcularAngulos(periodo, beta, latitud) {
     let now = new Date().getFullYear();
     let angulos=[];
-    for(let date = new Date(now,0,15); date <= new Date(now,11,15); date.setMonth(date.getMonth()+1)){
+    for(let date = new Date(now,periodo[0],15); date <= new Date(now,periodo[1],15); date.setMonth(date.getMonth()+1)){
         //console.log("calculando angulos para", date);
         let phi = latitud;
         let delta = 23.45 * Math.sin(toRadians(360 * (284 + getDayOfYear(date)) / 365));
@@ -292,28 +292,22 @@ function toDegrees(angle) {
     return angle * (180 / Math.PI);
 }
 
-function calcularF(ventana){
-    let fm = ventana.userData.info_marco.fs;
-    let fs = ventana.userData.info_material.fs;
-    let um = ventana.userData.info_marco.u;
-    return ventana.userData.far * ((1-fm) * fs + (fm * 0.04 * um * 0.35));
-}
 
-function calcularIgb(difusa, directa, rb){
-    return difusa * ((1+Math.cos(toRadians(90)))/2 ) + directa * rb;
-}
 
 
 function calcularRbParedes(paredes, latitud, longitud) {
-    let angulos = calcularAngulos(null, 90,  latitud);
+    let periodo = paredes[0].parent.parent.parent.parent.userData.periodo;
+    let angulos = calcularAngulos( periodo, 90,  latitud);
     for (let [index,pared] of paredes.entries()) {
-        let rbPared = 0;
+        let rbPared = [];
         let gammas = calcularGammasPared(pared.userData.gamma);
         for(let angulo of angulos){
             let omega_mna = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma1,  latitud,  longitud);
             let omega_tde = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma2,  latitud,  longitud);
             console.log("comparando pared", pared.userData.gamma, omega_mna, omega_tde, angulo.w1, angulo.w2)
             let omegas = calcularHoraIncidencia(pared.userData.gamma, angulo.w1, angulo.w2, omega_mna, omega_tde);
+            let Rb = calcularRB(angulo, pared.userData.gamma, omegas);
+            rbPared.push(Rb);
             if(angulo.date.getMonth() === new Date().getMonth() ){
                 let omegasDate = {
                     wm: {
@@ -331,19 +325,19 @@ function calcularRbParedes(paredes, latitud, longitud) {
                         hasta: omegas.wt[1] >= angulo.w1 && omegas.wt[1] <= angulo.w2 ?
                             hourAngleToDate(angulo.date, omegas.wt[1],latitud,longitud) : null,
                         //new Date((omegas.wt[1] / 15) * 36e5): null
-                    }
+                    },
+                    rb: Rb
                 };
                 pared.userData.omegas = omegasDate;
             }
-            let Rb = calcularRB(angulo, pared.userData.gamma, omegas);
-            rbPared += Rb;
+
         }
         pared.userData.rb = rbPared;
     }
     return paredes;
 }
 
-function calcularAporteSolar(ventanas, difusa, directa){
+function calcularAporteSolar(periodo, ventanas, difusa, directa){
     let aporte_solar = 0;
     let igb_suma = 0;
     let area_ventanas_suma = 0;
@@ -352,7 +346,10 @@ function calcularAporteSolar(ventanas, difusa, directa){
         let f = calcularF(ventana);
         f_suma += f;
         let pared = ventana.parent;
-        let Igb = calcularIgb(difusa, directa, pared.userData.rb);
+        let Igb = 0;
+        for(let i = 0; i < (periodo[1]-periodo[0]); i++){
+            Igb += calcularIgb(difusa,directa,pared.userData.rb[i]);
+        }
         igb_suma += Igb;
         let area_ventana = Math.abs( (ventana.geometry.boundingBox.max.x - ventana.geometry.boundingBox.min.x) *
             (ventana.geometry.boundingBox.max.y - ventana.geometry.boundingBox.min.y) );
@@ -367,6 +364,17 @@ function calcularAporteSolar(ventanas, difusa, directa){
     //     'Area de Ventanas': area_ventanas_suma,
     //     'Factor de Asoleamiento': f_suma
     // };
+}
+
+function calcularF(ventana){
+    let fm = ventana.userData.info_marco.fs;
+    let fs = ventana.userData.info_material.fs;
+    let um = ventana.userData.info_marco.u;
+    return ventana.userData.far * ((1-fm) * fs + (fm * 0.04 * um * 0.35));
+}
+
+function calcularIgb(difusa, directa, rb){
+    return difusa * ((1+Math.cos(toRadians(90)))/2 ) + directa * rb;
 }
 
 export {perdidasConduccion, puenteTermico, cambioTransmitanciaSuperficie, transmitanciaSuperficie , aporteInterno , gradosDias, perdidasVentilacion, calcularF,
