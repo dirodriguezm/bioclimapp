@@ -30,13 +30,16 @@ class ManagerCasas {
         this.info_marcos = [];
 
         axios.get("https://bioclimapp.host/api/info_materiales")
-            .then(response => this.getJsonMateriales(response));
+            .then(response => this.getJsonMateriales(response))
+            .catch(response => this.getJsonMateriales(response));
 
         axios.get("https://bioclimapp.host/api/info_ventanas")
-            .then(response => this.getJsonVentanas(response));
+            .then(response => this.getJsonVentanas(response))
+            .catch(response => this.getJsonVentanas(response));
 
         axios.get("https://bioclimapp.host/api/info_marcos")
-            .then(response => this.getJsonMarcos(response));
+            .then(response => this.getJsonMarcos(response))
+            .catch(response => this.getJsonVentanas(response));
 
         this.crearCasaVacia();
 
