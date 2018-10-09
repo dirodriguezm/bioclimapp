@@ -30,14 +30,14 @@ class ManagerCasas {
         this.info_marcos = [];
         this.zona = zona;
 
-        axios.get("http://127.0.0.1:8000/api/info_materiales")
-            .then(response => this.getJsonMateriales(response));
+        axios.get("https://bioclimapp.host/api/info_materiales")
+            .then(response => this.getJsonMateriales(response))
 
-        axios.get("http://127.0.0.1:8000/api/info_ventanas")
-            .then(response => this.getJsonVentanas(response));
+        axios.get("https://bioclimapp.host/api/info_ventanas")
+            .then(response => this.getJsonVentanas(response))
 
-        axios.get("http://127.0.0.1:8000/api/info_marcos")
-            .then(response => this.getJsonMarcos(response));
+        axios.get("https://bioclimapp.host/api/info_marcos")
+            .then(response => this.getJsonMarcos(response))
 
         this.crearCasaVacia();
 
