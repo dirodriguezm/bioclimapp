@@ -88,8 +88,9 @@ class Morfologia extends Component {
     }
 
     onComunaChanged() {
-        axios.get("http://152.74.52.185:8000/api/temperaturas/"+this.props.comuna.id)
+        axios.get("http://127.0.0.1:8000/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
+        this.managerCasas.setZona(this.props.comuna.zona);
 
     }
 
@@ -286,6 +287,7 @@ class Morfologia extends Component {
             this.horasIluminacion,
             this.aireRenovado,
             this.heightWall,
+            this.props.zona,
         );
 
         //Camaras
@@ -418,7 +420,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, -10, 0.3);
+        sprite.position.set(0, -10, 0.0);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("N", {
             align: textAlign.center,
@@ -428,7 +430,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, 10, 0.3);
+        sprite.position.set(0, 11.2, 0.0);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("E", {
             align: textAlign.center,
@@ -438,7 +440,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(10, 0.3, 0);
+        sprite.position.set(10.5, 0.3, 0);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("O", {
             align: textAlign.center,
@@ -448,7 +450,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(-10, 0.3, 0);
+        sprite.position.set(-10.5, 0.3, 0);
         cardinalPointsCircle.add(sprite);
 
 

@@ -477,8 +477,8 @@ class Context extends Component {
                 if (!obstruccionesVentana.includes(current)) {
                     obstruccionesVentana.push(current);
                 }
-                let arrowHelper = new THREE.ArrowHelper(angle, ventana.userData.pos, 50, 0x00ff00, 0,0);
-                this.escena.add(arrowHelper);
+                //let arrowHelper = new THREE.ArrowHelper(angle, ventana.userData.pos, 50, 0x00ff00, 0,0);
+                //this.escena.add(arrowHelper);
                 //pasamos al siguiente angulo
                 angle.applyAxisAngle(axisY, -Math.PI / 180);
             }
@@ -504,7 +504,7 @@ class Context extends Component {
             }
             ventana.userData.far = f1 + f2;
         }
-        this.props.onFarChanged(ventanas);
+        if (ventanas.length > 0) this.props.onFarChanged(ventanas);
     }
 
 

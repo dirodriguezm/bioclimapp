@@ -12,7 +12,9 @@ const resistenciasTermicasSuperficie = [
     [0.14 , 0.10] ,
     [0.22 , 0.34] ];
 const transmitanciaLineal = [1.4 , 1.2 , 1.0];
-
+const uObjetivoMuro = [4,3,1.9,1.7,1.6,1.1,0.6];
+const uObjetivoTecho = [0.84,0.6,0.47,0.38,0.33,0.28,0.25];
+const uObjetivoPiso = [3.6,0.87,0.7,0.6,0.5,0.39,0.32];
 //se simplifico el calculo del uso ya que es constante el multiplicar el perfilde uso con el coeficiente de usuario
 function aporteInterno(ocupantes, superficie, horasIluminacion, periodo) {
     const ilumuinacion = 1.5 * horasIluminacion * superficie;
@@ -50,7 +52,7 @@ function gradosDias(temperaturasMes, temperaturaConfort){
     return [gd,periodo];
 }
 
-function transmitanciaSuperficie(elemento) {
+function transmitanciaSuperficie(elemento,zona) {
     let transmitancia = 0,u;
     switch (elemento.userData.tipo) {
         case Morfologia.tipos.PARED:
@@ -60,7 +62,9 @@ function transmitanciaSuperficie(elemento) {
             transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
             u = 1 / transmitancia;
             elemento.userData.transmitancia = u;
+            elemento.userData.transmitanciaObjetivo = uObjetivoMuro[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;
+            elemento.userData.transSupObjetivo = uObjetivoMuro[zona-1] * elemento.userData.superficie;
             break;
         case Morfologia.tipos.TECHO:
             for(let capa of elemento.userData.capas){
@@ -69,9 +73,27 @@ function transmitanciaSuperficie(elemento) {
             transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
             u = 1 / transmitancia;
             elemento.userData.transmitancia = u;
+            elemento.userData.transmitanciaObjetivo = uObjetivoTecho[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;
+            elemento.userData.transSupObjetivo = uObjetivoTecho[zona-1] * elemento.userData.superficie;
             break;
         case Morfologia.tipos.VENTANA:
+            /*let casa = elemento.parent.parent.parent.parent.parent;
+            let superficieParedes  = 0;
+            let superficieVentanas = 0;
+            for(let nivel of casa.children){
+                for(let habitacion of nivel.children){
+                    for(let paredes of habitacion.children){
+                        for (let pared of paredes.children){
+                            superficieParedes += pared.userData.superficie;
+                            for(let ventana of pared.children){
+                                superficieVentanas += ventana.superficie;
+                            }
+                        }
+                    }
+                }
+            }*/
+            elemento.userData.transSupObjetivo = 5.8 * elemento.userData.superficie;
             elemento.userData.transSup = elemento.userData.info_material.u * elemento.userData.superficie;
             break;
 
@@ -82,7 +104,9 @@ function transmitanciaSuperficie(elemento) {
             u = 1 / transmitancia;
 
             elemento.userData.transmitancia = u;
+            elemento.userData.transmitanciaObjetivo = uObjetivoMuro[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;
+            elemento.userData.transSupObjetivo = uObjetivoMuro[zona-1] * elemento.userData.superficie;
             break;
     }
 
@@ -299,40 +323,40 @@ function calcularRbParedes(paredes, latitud, longitud) {
     let periodo = paredes[0].parent.parent.parent.parent.userData.periodo;
     let angulos = calcularAngulos( periodo, 90,  latitud);
     for (let [index,pared] of paredes.entries()) {
-        let rbPared = [];
-        let gammas = calcularGammasPared(pared.userData.gamma);
-        for(let angulo of angulos){
-            let omega_mna = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma1,  latitud,  longitud);
-            let omega_tde = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma2,  latitud,  longitud);
-            console.log("comparando pared", pared.userData.gamma, omega_mna, omega_tde, angulo.w1, angulo.w2)
-            let omegas = calcularHoraIncidencia(pared.userData.gamma, angulo.w1, angulo.w2, omega_mna, omega_tde);
-            let Rb = calcularRB(angulo, pared.userData.gamma, omegas);
-            rbPared.push(Rb);
-            if(angulo.date.getMonth() === new Date().getMonth() ){
-                let omegasDate = {
-                    wm: {
-                        desde: omegas.wm[0] >= angulo.w1 && omegas.wm[0] <= angulo.w2 ?
-                            hourAngleToDate(angulo.date, omegas.wm[0],latitud,longitud) : null,
-                        //new Date((omegas.wm[0] / 15) * 36e5) : null,
-                        hasta: omegas.wt[0] >= angulo.w1 && omegas.wt[0] <= angulo.w2 ?
-                            hourAngleToDate(angulo.date, omegas.wt[0],latitud,longitud) : null,
-                        //new Date((omegas.wt[0] / 15) * 36e5) : null
-                    },
-                    wt: {
-                        desde: omegas.wm[1] >= angulo.w1 && omegas.wm[1] <= angulo.w2 ?
-                            hourAngleToDate(angulo.date, omegas.wm[1],latitud,longitud) : null,
-                        //new Date((omegas.wm[1] / 15) * 36e5): null,
-                        hasta: omegas.wt[1] >= angulo.w1 && omegas.wt[1] <= angulo.w2 ?
-                            hourAngleToDate(angulo.date, omegas.wt[1],latitud,longitud) : null,
-                        //new Date((omegas.wt[1] / 15) * 36e5): null
-                    },
-                    rb: Rb
-                };
-                pared.userData.omegas = omegasDate;
+        if(pared.userData.separacion === Morfologia.separacion.EXTERIOR) {
+            let rbPared = [];
+            let gammas = calcularGammasPared(pared.userData.gamma);
+            for (let angulo of angulos) {
+                let omega_mna = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma1, latitud, longitud);
+                let omega_tde = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma2, latitud, longitud);
+                let omegas = calcularHoraIncidencia(pared.userData.gamma, angulo.w1, angulo.w2, omega_mna, omega_tde);
+                let Rb = calcularRB(angulo, pared.userData.gamma, omegas);
+                rbPared.push(Rb);
+                if (angulo.date.getMonth() === new Date().getMonth()) {
+                    let omegasDate = {
+                        wm: {
+                            desde: omegas.wm[0] >= angulo.w1 && omegas.wm[0] <= angulo.w2 ?
+                                hourAngleToDate(angulo.date, omegas.wm[0], latitud, longitud) : null,
+                            //new Date((omegas.wm[0] / 15) * 36e5) : null,
+                            hasta: omegas.wt[0] >= angulo.w1 && omegas.wt[0] <= angulo.w2 ?
+                                hourAngleToDate(angulo.date, omegas.wt[0], latitud, longitud) : null,
+                            //new Date((omegas.wt[0] / 15) * 36e5) : null
+                        },
+                        wt: {
+                            desde: omegas.wm[1] >= angulo.w1 && omegas.wm[1] <= angulo.w2 ?
+                                hourAngleToDate(angulo.date, omegas.wm[1], latitud, longitud) : null,
+                            //new Date((omegas.wm[1] / 15) * 36e5): null,
+                            hasta: omegas.wt[1] >= angulo.w1 && omegas.wt[1] <= angulo.w2 ?
+                                hourAngleToDate(angulo.date, omegas.wt[1], latitud, longitud) : null,
+                            //new Date((omegas.wt[1] / 15) * 36e5): null
+                        },
+                        rb: Rb
+                    };
+                    pared.userData.omegas = omegasDate;
+                }
             }
-
+            pared.userData.rb = rbPared;
         }
-        pared.userData.rb = rbPared;
     }
     return paredes;
 }

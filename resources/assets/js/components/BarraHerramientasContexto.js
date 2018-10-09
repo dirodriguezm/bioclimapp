@@ -93,16 +93,6 @@ class BarraHerramientasContexto extends Component {
         return (
             <div className={classes.root} align="center">
 
-                <Tooltip title="Deshacer">
-                    <IconButton className={classes.button} aria-label="Undo">
-                        <Undo/>
-                    </IconButton>
-                </Tooltip>
-                <Tooltip title="Rehacer">
-                    <IconButton className={classes.button} aria-label="Redo">
-                        <Redo/>
-                    </IconButton>
-                </Tooltip>
                 <Tooltip title="Seleccionar">
                     <IconButton className={classes.button} aria-label="Seleccionar"
                                 onClick={this.handleSeleccionar}>

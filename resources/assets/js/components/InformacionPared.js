@@ -90,7 +90,7 @@ class InformacionPared extends Component {
         this.vaciosArray = [];
         this.info_material = [];
         this.themes = [];
-        axios.get("http://152.74.52.185:8000/api/info_materiales")
+        axios.get("http://127.0.0.1:8000/api/info_materiales")
             .then(response => this.getJson(response));
         this.handleChange = this.handleChange.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
@@ -120,67 +120,68 @@ class InformacionPared extends Component {
                     height: this.props.seleccionado.userData.height,
                     width: this.props.seleccionado.userData.width,
                 });
-                this.info_rb = <div/>;
-                if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde == null) {
-                    this.info_rb = <div>
-                        <ExpansionPanelDetails>
-                            La pared recibe sol
-                            desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.omegas.rb}
-                        </ExpansionPanelDetails>
-                    </div>
-                }
-                else if (this.props.seleccionado.userData.omegas.wm.desde == null && this.props.seleccionado.userData.omegas.wt.desde != null) {
-                    this.info_rb = <div>
-                        <ExpansionPanelDetails>
-                            La pared recibe sol
-                            desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.omegas.rb}
-                        </ExpansionPanelDetails>
-                    </div>
-                }
-                else if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde != null) {
-                    this.info_rb = <div>
-                        <ExpansionPanelDetails>
-                            La pared recibe sol
-                            desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            Y luego desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.omegas.rb}
-                        </ExpansionPanelDetails>
-                    </div>
-                }
-                else {
-                    this.info_rb = <div>
-                        <ExpansionPanelDetails>
-                            La pared no recibe sol.
-                        </ExpansionPanelDetails>
-                        <ExpansionPanelDetails>
-                            RB: {this.props.seleccionado.userData.omegas.rb}
-                        </ExpansionPanelDetails>
-                    </div>
+                if(this.props.seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR) {
+                    this.info_rb = <div/>;
+                    if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde == null) {
+                        this.info_rb = <div>
+                            <ExpansionPanelDetails>
+                                La pared recibe sol
+                                desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                RB: {this.props.seleccionado.userData.omegas.rb}
+                            </ExpansionPanelDetails>
+                        </div>
+                    }
+                    else if (this.props.seleccionado.userData.omegas.wm.desde == null && this.props.seleccionado.userData.omegas.wt.desde != null) {
+                        this.info_rb = <div>
+                            <ExpansionPanelDetails>
+                                La pared recibe sol
+                                desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                RB: {this.props.seleccionado.userData.omegas.rb}
+                            </ExpansionPanelDetails>
+                        </div>
+                    }
+                    else if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde != null) {
+                        this.info_rb = <div>
+                            <ExpansionPanelDetails>
+                                La pared recibe sol
+                                desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                Y luego desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                RB: {this.props.seleccionado.userData.omegas.rb}
+                            </ExpansionPanelDetails>
+                        </div>
+                    }
+                    else {
+                        this.info_rb = <div>
+                            <ExpansionPanelDetails>
+                                La pared no recibe sol.
+                            </ExpansionPanelDetails>
+                            <ExpansionPanelDetails>
+                                RB: {this.props.seleccionado.userData.omegas.rb}
+                            </ExpansionPanelDetails>
+                        </div>
 
+                    }
                 }
-
             }
         }
     }
@@ -386,13 +387,13 @@ class InformacionPared extends Component {
         }
         return (
             <div>
-                {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.PARED ?
+                {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.PARED?
                     <div className={classes.root}>
                         <Typography
                             variant={"title"}
                             className={classes.titulo}
                         >
-                            {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
+                            Configuración Pared
                         </Typography>
 
                         <ExpansionPanel>
@@ -509,7 +510,7 @@ class InformacionPared extends Component {
                                                 </FormControl>
                                             </Grid>
                                             {hasTipos ?
-                                                <Grid item xs>
+                                                <Grid item xs={6}>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="tipo-simple">Tipo</InputLabel>
                                                         <Select
@@ -670,6 +671,7 @@ class InformacionPared extends Component {
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
+                        {seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR &&
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography className={classes.heading}>Radiación Solar</Typography>
@@ -678,6 +680,7 @@ class InformacionPared extends Component {
                             {this.info_rb}
 
                         </ExpansionPanel>
+                        }
 
 
                     </div>

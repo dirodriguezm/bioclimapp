@@ -372,18 +372,6 @@ class BarraHerramientasMorfologia extends Component {
         return (
             <div className={classes.root} align="center">
 
-                <Tooltip title="Deshacer">
-                    <IconButton className={classes.button} aria-label="Undo">
-                        <Undo/>
-                    </IconButton>
-                </Tooltip>
-
-                <Tooltip title="Rehacer">
-                    <IconButton className={classes.button} aria-label="Redo">
-                        <Redo/>
-                    </IconButton>
-                </Tooltip>
-
                 <Tooltip title="Camara 2D"
                          disableFocusListener={!click2D}
                 >

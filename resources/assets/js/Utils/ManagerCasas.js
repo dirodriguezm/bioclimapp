@@ -4,7 +4,7 @@ import axios from "axios";
 import Morfologia from "../components/Morfologia";
 
 class ManagerCasas {
-    constructor(escena, paredes, ventanas, puertas, allObjects, ocupantes, horasIluminacion, aireRenovado, heightWall) {
+    constructor(escena, paredes, ventanas, puertas, allObjects, ocupantes, horasIluminacion, aireRenovado, heightWall, zona) {
         this.escena = escena;
         this.paredes = paredes;
         this.paredesX = [];
@@ -28,14 +28,15 @@ class ManagerCasas {
         this.info_ventana = [];
         this.info_material = [];
         this.info_marcos = [];
+        this.zona = zona;
 
-        axios.get("http://152.74.52.185:8000/api/info_materiales")
+        axios.get("http://127.0.0.1:8000/api/info_materiales")
             .then(response => this.getJsonMateriales(response));
 
-        axios.get("http://152.74.52.185:8000/api/info_ventanas")
+        axios.get("http://127.0.0.1:8000/api/info_ventanas")
             .then(response => this.getJsonVentanas(response));
 
-        axios.get("http://152.74.52.185:8000/api/info_marcos")
+        axios.get("http://127.0.0.1:8000/api/info_marcos")
             .then(response => this.getJsonMarcos(response));
 
         this.crearCasaVacia();
@@ -183,6 +184,10 @@ class ManagerCasas {
         }
     }
 
+    setZona(zona){
+        this.zona = zona;
+    }
+
     setGradosDias(gradoDias, periodo) {
         this.gradoDias = gradoDias;
         this.periodo = periodo;
@@ -228,10 +233,9 @@ class ManagerCasas {
         let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
 
         transmitanciaSuperficies -= elemento.userData.transSup;
-        BalanceEnergetico.transmitanciaSuperficie(elemento);
+        BalanceEnergetico.transmitanciaSuperficie(elemento,this.zona);
         transmitanciaSuperficies += elemento.userData.transSup;
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
-
         this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
         this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
 
@@ -490,6 +494,7 @@ class ManagerCasas {
 
     agregarHabitacion(habitacion){
         let transmitanciaSuperficies = 0;
+        let transmitanciaSuperficiesObjetivo = 0;
 
         let paredes = habitacion.getObjectByName("Paredes");
 
@@ -521,8 +526,9 @@ class ManagerCasas {
             pared.userData.capas = capas.slice();
 
 
-            BalanceEnergetico.transmitanciaSuperficie(pared);
+            BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
             transmitanciaSuperficies += pared.userData.transSup;
+            transmitanciaSuperficiesObjetivo += pared.userData.transSupObjetivo;
 
             this.paredes.push(pared);
             if(pared.userData.orientacion.z !== 0){
@@ -561,15 +567,18 @@ class ManagerCasas {
                     }
                 ];
 
-            BalanceEnergetico.transmitanciaSuperficie(techo);
+            BalanceEnergetico.transmitanciaSuperficie(techo,this.zona);
             transmitanciaSuperficies += techo.userData.transSup;
+            transmitanciaSuperficiesObjetivo += techo.userData.transSup;
         }
 
         let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
 
         let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, puenteTermico);
-
+        //TODO llamar a perdidasConduccion con puenteTermico objetivo
+        //TODO llamar a perdidaPorVentilacion con airerenovado objetivo
+        let perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficiesObjetivo,this.gradoDias,puenteTermico);
         habitacion.userData.puenteTermico = puenteTermico;
         habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
         habitacion.userData.aporteInterno = aporteInterno;
@@ -926,7 +935,7 @@ class ManagerCasas {
 
             this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
 
-            BalanceEnergetico.transmitanciaSuperficie(puerta);
+            BalanceEnergetico.transmitanciaSuperficie(puerta,this.zona);
             habitacion.transmitanciaSuperficies += puerta.userData.transSup;
             habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
                 habitacion.transmitanciaSuperficies,
@@ -1016,7 +1025,7 @@ class ManagerCasas {
 
             this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
 
-            BalanceEnergetico.transmitanciaSuperficie(ventana);
+            BalanceEnergetico.transmitanciaSuperficie(ventana,this.zona);
             habitacion.transmitanciaSuperficies += ventana.userData.transSup;
             habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
                 habitacion.transmitanciaSuperficies,
@@ -1114,7 +1123,7 @@ class ManagerCasas {
                 pared.userData.superficie = paredWidth * height;
 
                 transmitanciaSuperficies -= pared.userData.transSup;
-                BalanceEnergetico.transmitanciaSuperficie(pared);
+                BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
                 transmitanciaSuperficies += pared.userData.transSup;
             }
 
@@ -1248,7 +1257,7 @@ class ManagerCasas {
             pared.userData.superficie = widths[i] * height;
 
             transmitanciaSuperficies -= pared.userData.transSup;
-            BalanceEnergetico.transmitanciaSuperficie(pared);
+            BalanceEnergetico.transmitanciaSuperficie(pared.this.zona);
             transmitanciaSuperficies += pared.userData.transSup;
 
             switch (i) {
@@ -1288,7 +1297,7 @@ class ManagerCasas {
             techo.userData.superficie = width * depth;
 
             transmitanciaSuperficies -= techo.userData.transSup;
-            BalanceEnergetico.transmitanciaSuperficie(techo);
+            BalanceEnergetico.transmitanciaSuperficie(techo, this.zona);
             transmitanciaSuperficies += techo.userData.transSup;
         }
 

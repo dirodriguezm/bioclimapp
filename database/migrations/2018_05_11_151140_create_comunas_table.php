@@ -18,6 +18,7 @@ class CreateComunasTable extends Migration
             $table->increments('id');
             $table->string('nombre');
             $table->multiPolygon('geometria');
+            $table->smallInteger('zona');
             $table->timestamps();
         });
     }

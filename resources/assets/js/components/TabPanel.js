@@ -72,7 +72,7 @@ const styles = theme => ({
     },
     drawerPaper: {
         position: 'relative',
-        height: '90vh',
+        height: '100vh',
         width: drawerWidth,
     },
     drawerRightPaper:{
@@ -364,7 +364,7 @@ class TabPanel extends Component {
 
             <div className={classes.appFrame} ref={(tab) => {
                 this.tab = tab
-            }}>
+            }} style={{margin:0, padding:0}}>
                 <AppBar  className={classNames(classes.appBar, {
                     [classes.appBarShift]: this.state.openDashboard,
                     [classes.appBarShiftLeft]: this.state.openDashboard,
@@ -379,7 +379,7 @@ class TabPanel extends Component {
                             <PieChart />
                         </IconButton>
                         <Tabs value={value} onChange={this.handleChange}  centered>
-                            <Tab label="Contexto"/>
+                            <Tab label="Emplazamiento"/>
                             <Tab label="Morfología"/>
                         </Tabs>
                     </Toolbar>
@@ -393,8 +393,6 @@ class TabPanel extends Component {
                     }}
                 >
                     <DetalleBalance
-                        width={this.state.width}
-                        height={230}
                         aporte_solar={this.state.aporte_solar}
                         aporte_interno={this.state.aporte_interno}
                         perdida_conduccion={this.state.perdida_conduccion}

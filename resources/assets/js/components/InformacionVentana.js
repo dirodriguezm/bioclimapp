@@ -41,6 +41,9 @@ const styles = theme => ({
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
     },
+    titulo:{
+        margin: theme.spacing.unit,
+    },
 
 });
 
@@ -62,9 +65,9 @@ class InformacionVentana extends Component {
         };
         this.info_material = [];
         this.info_marcos = [];
-        axios.get("http://152.74.52.185:8000/api/info_ventanas")
+        axios.get("http://127.0.0.1:8000/api/info_ventanas")
             .then(response => this.getJson(response));
-        axios.get("http://152.74.52.185:8000/api/info_marcos")
+        axios.get("http://127.0.0.1:8000/api/info_marcos")
             .then(response => this.getJsonMarcos(response));
         this.difusa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,2,new Date().getMonth() + 1) : null;
         this.directa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,3,new Date().getMonth() + 1) : null;
@@ -109,7 +112,7 @@ class InformacionVentana extends Component {
     }
 
     getFilteredRadiation(comuna,tipo,mes){
-        axios.get("http://152.74.52.185:8000/api/radiaciones/"+comuna+"/"+tipo+"/"+mes)
+        axios.get("http://127.0.0.1:8000/api/radiaciones/"+comuna+"/"+tipo+"/"+mes)
             .then(response => {
                 tipo === 2 ? this.difusa = response.data.valor : null;
                 tipo === 3 ? this.directa = response.data.valor : null;
@@ -151,8 +154,9 @@ class InformacionVentana extends Component {
                     <div className={classes.root}>
                         <Typography
                             variant={"title"}
+                            className={classes.titulo}
                         >
-                            {Morfologia.tipos_texto[seleccionado.userData.tipo] + ' ' + seleccionado.id}
+                            Configuración Ventana
                         </Typography>
 
                         <ExpansionPanel>
@@ -161,9 +165,7 @@ class InformacionVentana extends Component {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
-
-
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <FormControl className={classes.formControl}>
                                             <InputLabel htmlFor="material-ventana">Material</InputLabel>
                                             <Select
@@ -179,7 +181,7 @@ class InformacionVentana extends Component {
                                             </Select>
                                         </FormControl>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <FormControl className={classes.formControl}>
                                             <InputLabel htmlFor="tipo-ventana">Tipo</InputLabel>
                                             <Select
@@ -195,7 +197,7 @@ class InformacionVentana extends Component {
                                             </Select>
                                         </FormControl>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <FormControl className={classes.formControl}>
                                             <InputLabel htmlFor="U-ventana">U</InputLabel>
                                             <Select
@@ -209,7 +211,7 @@ class InformacionVentana extends Component {
                                             </Select>
                                         </FormControl>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <FormControl className={classes.formControl}>
                                             <InputLabel htmlFor="FS-ventana">FS</InputLabel>
                                             <Select
@@ -234,109 +236,121 @@ class InformacionVentana extends Component {
                                 <Typography className={classes.heading}>Material Marco</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <Grid container spacing={8}>
-                                    <Grid item xs={12}>
-                                        <FormControl className={classes.formControl}>
-                                            <InputLabel htmlFor="material-marco">Material</InputLabel>
-                                            <Select
-                                                value={marco}
-                                                onChange={this.handleChange}
-                                                input={<Input name="marco" id="material-marco"/>}
-                                            >
-                                                {this.info_marcos.map(marco => (
-                                                    <MenuItem value={marco.index}>
-                                                        {marco.material}
+                                {this.info_marcos[marco].hasOwnProperty('tipos') ?
+                                    <Grid container spacing={8}>
+                                        <Grid item xs={6}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="material-marco">Material</InputLabel>
+                                                <Select
+                                                    value={marco}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="marco" id="material-marco"/>}
+                                                >
+                                                    {this.info_marcos.map(marco => (
+                                                        <MenuItem value={marco.index}>
+                                                            {marco.material}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="tipo-marco">Tipo</InputLabel>
+                                                <Select
+                                                    value={tipo_marco}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="tipo_marco" id="tipo-marco"/>}
+                                                >
+                                                    {this.info_marcos[marco].tipos.map(tipo => (
+                                                        <MenuItem value={tipo.index}>
+                                                            {tipo.nombre}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="U-marco">U</InputLabel>
+                                                <Select
+                                                    value={U_marco}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="U_marco" id="U-marco"/>}
+                                                >
+                                                    <MenuItem value={0}>
+                                                        {this.info_marcos[marco].tipos[tipo_marco].propiedad.U}
                                                     </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="FM-marco">FM</InputLabel>
+                                                <Select
+                                                    value={FM}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="FM" id="FM-marco"/>}
+                                                >
+                                                    <MenuItem value={0}>
+                                                        {this.info_marcos[marco].tipos[tipo_marco].propiedad.FS}
+                                                    </MenuItem>
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
                                     </Grid>
-                                    {this.info_marcos[marco].hasOwnProperty('tipos') ?
-                                        <div>
-                                            <Grid item xs={12}>
-                                                <FormControl className={classes.formControl}>
-                                                    <InputLabel htmlFor="tipo-marco">Tipo</InputLabel>
-                                                    <Select
-                                                        value={tipo_marco}
-                                                        onChange={this.handleChange}
-                                                        input={<Input name="tipo_marco" id="tipo-marco"/>}
-                                                    >
-                                                        {this.info_marcos[marco].tipos.map(tipo => (
-                                                            <MenuItem value={tipo.index}>
-                                                                {tipo.nombre}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <FormControl className={classes.formControl}>
-                                                    <InputLabel htmlFor="U-marco">U</InputLabel>
-                                                    <Select
-                                                        value={U_marco}
-                                                        onChange={this.handleChange}
-                                                        input={<Input name="U_marco" id="U-marco"/>}
-                                                    >
-                                                        <MenuItem value={0}>
-                                                            {this.info_marcos[marco].tipos[tipo_marco].propiedad.U}
+                                    :
+                                    <Grid container spacing={8}>
+                                        <Grid item xs={12}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="material-marco">Material</InputLabel>
+                                                <Select
+                                                    value={marco}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="marco" id="material-marco"/>}
+                                                >
+                                                    {this.info_marcos.map(marco => (
+                                                        <MenuItem value={marco.index}>
+                                                            {marco.material}
                                                         </MenuItem>
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <FormControl className={classes.formControl}>
-                                                    <InputLabel htmlFor="FM-marco">FM</InputLabel>
-                                                    <Select
-                                                        value={FM}
-                                                        onChange={this.handleChange}
-                                                        input={<Input name="FM" id="FM-marco"/>}
-                                                    >
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="U-marco">U</InputLabel>
+                                                <Select
+                                                    value={U_marco}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="U_marco" id="U-marco"/>}
+                                                >
+                                                    {this.info_marcos[marco].propiedades.map(propiedad => (
                                                         <MenuItem value={0}>
-                                                            {this.info_marcos[marco].tipos[tipo_marco].propiedad.FS}
+                                                            {propiedad.U}
                                                         </MenuItem>
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
-                                        </div>:
-                                        <div>
-                                            <Grid item xs={12}>
-                                                <FormControl className={classes.formControl}>
-                                                    <InputLabel htmlFor="U-marco">U</InputLabel>
-                                                    <Select
-                                                        value={U_marco}
-                                                        onChange={this.handleChange}
-                                                        input={<Input name="U_marco" id="U-marco"/>}
-                                                    >
-                                                        {this.info_marcos[marco].propiedades.map(propiedad => (
-                                                            <MenuItem value={0}>
-                                                                {propiedad.U}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
-                                            <Grid item xs={12}>
-                                                <FormControl className={classes.formControl}>
-                                                    <InputLabel htmlFor="FM-marco">FM</InputLabel>
-                                                    <Select
-                                                        value={FM}
-                                                        onChange={this.handleChange}
-                                                        input={<Input name="FM" id="FM-marco"/>}
-                                                    >
-                                                        {this.info_marcos[marco].propiedades.map(propiedad => (
-                                                            <MenuItem value={0}>
-                                                                {propiedad.FS}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
-                                        </div>
-
-                                    }
-
-
-                                </Grid>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                        <Grid item xs={6}>
+                                            <FormControl className={classes.formControl}>
+                                                <InputLabel htmlFor="FM-marco">FM</InputLabel>
+                                                <Select
+                                                    value={FM}
+                                                    onChange={this.handleChange}
+                                                    input={<Input name="FM" id="FM-marco"/>}
+                                                >
+                                                    {this.info_marcos[marco].propiedades.map(propiedad => (
+                                                        <MenuItem value={0}>
+                                                            {propiedad.FS}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </FormControl>
+                                        </Grid>
+                                    </Grid>
+                                }
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
@@ -348,10 +362,10 @@ class InformacionVentana extends Component {
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
                                     <Grid item xs={12}>
-                                        Ancho: {seleccionado.geometry.boundingBox.max.x}
+                                        Ancho: {seleccionado.geometry.boundingBox.max.x.toFixed(3)}
                                     </Grid>
                                     <Grid item xs={12}>
-                                        Alto: {seleccionado.geometry.boundingBox.max.y}
+                                        Alto: {seleccionado.geometry.boundingBox.max.y.toFixed(3)}
                                     </Grid>
                                 </Grid>
                             </ExpansionPanelDetails>
@@ -366,8 +380,7 @@ class InformacionVentana extends Component {
                                     <Grid item xs={12}>
                                         <FormControl className={classes.formControl}>
                                             <Typography>
-                                                FAR de la ventana: {seleccionado.userData.far} <br/>
-                                                orientacion: {seleccionado.userData.orientacion.x}, {seleccionado.userData.orientacion.z}
+                                                FAR de la ventana: {seleccionado.userData.far}
                                             </Typography>
                                             {seleccionado.userData.obstrucciones != null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
                                                 <ExpansionPanel>

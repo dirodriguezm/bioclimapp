@@ -15,23 +15,19 @@ const htmlToReactParser = new HtmlToReactParser();
 
 const styles = theme => ({
     root: {
-        flexGrow: 1,
+        //flexGrow: 1,
         background: '#F0F0F0'
     },
     paper: {
-        padding: theme.spacing.unit * 2,
+        //padding: theme.spacing.unit * 2,
         textAlign: 'center',
         color: theme.palette.text.secondary,
-        background: '#fdfdfd'
+        background: '#fdfdfd',
     },
     title: {
         textAlign: 'center',
         color: 'black',
         padding: theme.spacing.unit,
-    },
-    button: {
-        width: 64, height: 64,
-        padding: 0,
     },
 });
 
@@ -45,40 +41,36 @@ function Legend(props) {
         porcentaje[i] = Math.round(props.data.datasets[0].data[i] * 100 / total);
     }
     return(
-        <Grid container spacing={8} direction="row"
-              justify="center"
-              alignItems="center">
-            <Grid item xs={12}>
-                <Typography variant="title" gutterBottom style={{color:'grey'}}>
-                    % de influencia
-                </Typography>
-            </Grid>
+        <div >
             {props.data.labels.map((label, index) => (
-                <Grid key={index} container spacing={8} direction="row"
-                      justify="center"
-                      alignItems="center">
-                    <Grid item xs={4} >
-                        <div style={{background: props.data.datasets[0].backgroundColor[index], width: 36, height:12}}></div>
+                <Grid key={index} container spacing={0}
+                      direction={"row"}
+                      justify="flex-end"
+                      alignItems="center"
+                      style={{margin:0}}
+                >
+                    <Grid item xs={2}>
+                        <div style={{background: props.data.datasets[0].backgroundColor[index], width: 36, height:12}}/>
                     </Grid>
-                    <Grid item xs={8}>
-                        {label} : {props.data.datasets[0].data[index] ? porcentaje[index] : 0}
+                    <Grid item xs={10}>
+                        {label} : {props.data.datasets[0].data[index] ? porcentaje[index]  : 0} %
                     </Grid>
                 </Grid>
             ))}
-        </Grid>
+        </div>
     );
 }
 
 function Chart(props){
     return (
         <Paper>
-            <Grid container spacing={24}>
+            <Grid container spacing={24} alignItems="center" style={{margin:0}}>
                 <Grid item xs={12}>
-                    <Typography variant="title" style={{color: '#3a3b3d'}}>
+                    <Typography variant="title" align="center" style={{color: '#3a3b3d'}}>
                         {props.title}
                     </Typography>
                 </Grid>
-                <Grid item xs={8}>
+                <Grid item xs={12}>
                     <Doughnut
                         data={props.data}
                         options={props.options}
@@ -86,7 +78,7 @@ function Chart(props){
                         height={props.height}
                     />
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={12}>
                     <Legend data={props.data} />
                 </Grid>
             </Grid>
@@ -109,15 +101,15 @@ function Grades(props){
     else if(props.balance >= 110) grade = 'G';
     return (
         <Paper>
-            <Stage width={500} height={250} >
+            <Stage width={400} height={210} >
                 {grades.map((grade, index ) => (
                     <Layer key={index}>
-                        <Label x={startPosition[0] + (index*20)} y={startPosition[1] + (index * 35)}>
+                        <Label x={startPosition[0] + (index*20)} y={startPosition[1] + (index * 28)}>
                             <Tag
                                 fill={colors[index]}
                                 pointerDirection='right'
                                 pointerWidth={20}
-                                pointerHeight={28}
+                                pointerHeight={24}
                                 lineJoin='round'
                                 shadowColor='#000000'
                             />
@@ -126,13 +118,13 @@ function Grades(props){
                                 text={grade}
                                 align='right'
                                 fontStyle='bold'
-                                fontSize={18}
+                                fontSize={14}
                                 padding={5}
                                 fill='white'
                             />
                         </Label>
                         <Text
-                            y={5 + (35*index)}
+                            y={5 + (28*index)}
                             x={8}
                             text={ranges[index]}
                             align='left'
@@ -152,12 +144,12 @@ function Grades(props){
                 </Layer>
                 {grade != null ?
                     <Layer>
-                        <Label x={300} y={startPosition[1] + (35 * grades.indexOf(grade))}>
+                        <Label x={300} y={startPosition[1] + (28 * grades.indexOf(grade))}>
                             <Tag
                                 fill='#000000'
                                 pointerDirection='left'
                                 pointerWidth={20}
-                                pointerHeight={28}
+                                pointerHeight={24}
                                 lineJoin='round'
                                 shadowColor='#000000'
                             />
@@ -166,7 +158,7 @@ function Grades(props){
                                 text={grade}
                                 align='left'
                                 fontStyle='bold'
-                                fontSize={18}
+                                fontSize={14}
                                 padding={5}
                                 fill='white'
                             />
@@ -186,7 +178,7 @@ class DetalleBalance extends Component {
         this.state = {
             clicked: null,
             dataAportes: {
-                labels: ['Aportes Solares', 'Aportes Internos'],
+                labels: ['Solares', 'Internos'],
                 datasets: [
                     {
                         data: [0, 0],
@@ -197,7 +189,7 @@ class DetalleBalance extends Component {
                 ]
             },
             dataPerdidas: {
-                labels: ['Pérdidas por Conducción', 'Pérdidas por Ventilación'],
+                labels: ['Por Conducción', 'Por Ventilación'],
                 datasets: [
                     {
                         data: [0, 0],
@@ -236,20 +228,29 @@ class DetalleBalance extends Component {
             // maintainAspectRatio: false,
             // responsive: false,
             cutoutPercentage: 50,
-            legendCallback: function (chart) {
-                var ul = document.createElement('ul');
-                var borderColor = chart.data.datasets[0].borderColor;
-                chart.data.labels.forEach(function (label, index) {
-                    ul.innerHTML += `
-                        <li>
-                        <span style=" display:inline-block; background-color: ${borderColor[index]}; width:36px; height:12px"></span>
-                            ${label} : ${Math.round(chart.data.datasets[0].data[index])}
-                        </li>`; // ^ ES6 Template String
-                });
-                return ul.outerHTML;
-            },
             legend: {
                 display: false,
+            },
+            tooltips: {
+                callbacks: {
+                    title: function (tooltipItem, data) {
+                        return data['labels'][tooltipItem[0]['index']];
+                    },
+                    label: function (tooltipItem, data) {
+                        return data['datasets'][0]['data'][tooltipItem['index']] + " Wh";
+                    },
+                    // afterLabel: function (tooltipItem, data) {
+                    //     var dataset = data['datasets'][0];
+                    //     var percent = Math.round((dataset['data'][tooltipItem['index']] / dataset["_meta"][0]['total']) * 100)
+                    //     return '(' + percent + '%)';
+                    // }
+                },
+                backgroundColor: '#FFF',
+                titleFontSize: 16,
+                titleFontColor: '#0066ff',
+                bodyFontColor: '#000',
+                bodyFontSize: 14,
+                displayColors: false
             }
         };
 
@@ -260,7 +261,7 @@ class DetalleBalance extends Component {
             console.log("Aporte solar", this.props.aporte_solar);
             this.setState({
                 dataAportes: {
-                    labels: ['Aportes Solares', 'Aportes Internos'],
+                    labels: ['Solares', 'Internos'],
                     datasets: [
                         {
                             data: [Math.round(this.props.aporte_solar * 1000), Math.round(this.props.aporte_interno)],
@@ -276,7 +277,7 @@ class DetalleBalance extends Component {
         if (this.props.perdida_conduccion !== prevProps.perdida_conduccion || this.props.perdida_ventilacion !== prevProps.perdida_ventilacion) {
             this.setState({
                 dataPerdidas: {
-                    labels: ['Pérdidas por Conducción', 'Pérdidas por Ventilación'],
+                    labels: ['Por Conducción', 'Por Ventilación'],
                     datasets: [
                         {
                             data: [Math.round(this.props.perdida_conduccion), Math.round(this.props.perdida_ventilacion)],
@@ -294,53 +295,53 @@ class DetalleBalance extends Component {
     render() {
         const {classes} = this.props;
         return (
-            <div className={classes.root}>
-                <Typography variant="headline" gutterBottom className={classes.title}>
-                    Balance Energético
-                </Typography>
-                <Grid container spacing={32}>
-                    <Grid item xs={12}>
-                        <Paper>
-                            <Grid container spacing={32}>
-                                <Grid item xs={4}>
-                                    {this.props.area != null ? <Typography>Balance:
-                                            {Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
-                                            this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )} KWh/m<sup>2</sup></Typography>
-                                        : "Balance:"}
-                                </Grid>
-                                <Grid item xs={4}>
-                                    {this.props.area != null ? <Typography>Area Vivienda : {this.props.area} m<sup>2</sup></Typography>
-                                    : "Área vivienda:"}
-
-                                </Grid>
-                                <Grid item xs={4}>
-                                    {this.props.volumen != null ? <Typography>Volumen Vivienda : {this.props.volumen} m<sup>3</sup></Typography>
-                                        : "Volumen vivienda:"}
-                                </Grid>
+            <Grid container spacing={16} className={classes.root} style={{
+                margin: 0,
+                width: '100%',
+                padding: 16
+            }}>
+                <Grid item xs={12}>
+                    <Paper>
+                        <Grid container spacing={16} justify="center"
+                              alignItems="center">
+                            <Grid item xs={12}>
+                                {this.props.area != null ? <Typography align="center" variant="title" style={{color: '#3a3b3d'}}>
+                                        Balance Energético: {Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
+                                        this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )} KWh/m<sup>2</sup></Typography>
+                                    : <Typography align="center" variant="title" style={{color: '#3a3b3d'}} >Balance Energético:</Typography>}
                             </Grid>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Chart
-                            data={this.state.dataAportes}
-                            options={this.options}
-                            height={150}
-                            title={"Aportes"}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Chart
-                            data={this.state.dataPerdidas}
-                            options={this.options}
-                            height={150}
-                            title={"Pérdidas"}
-                        />
-                    </Grid>
-                    <Grid item xs={12}>
-                        <Grades balance = {20}/>
-                    </Grid>
+                            <Grid item xs={6}>
+                                {this.props.area != null ? <Typography align="center">Area Vivienda : {this.props.area} m<sup>2</sup></Typography>
+                                :  <Typography align="center">Área Vivienda:</Typography>}
+
+                            </Grid>
+                            <Grid item xs={6}>
+                                {this.props.volumen != null ? <Typography align="center">Volumen Vivienda : {this.props.volumen} m<sup>3</sup></Typography>
+                                    :  <Typography align="center">Volumen Vivienda:</Typography>}
+                            </Grid>
+                        </Grid>
+                    </Paper>
                 </Grid>
-            </div>
+                <Grid item xs={6} >
+                    <Chart
+                        data={this.state.dataAportes}
+                        options={this.options}
+                        height={160}
+                        title={"Aportes"}
+                    />
+                </Grid>
+                <Grid item xs={6} >
+                    <Chart
+                        data={this.state.dataPerdidas}
+                        options={this.options}
+                        height={160}
+                        title={"Pérdidas"}
+                    />
+                </Grid>
+                <Grid item xs={12}>
+                    <Grades balance = {20}/>
+                </Grid>
+            </Grid>
         );
     }
 }
