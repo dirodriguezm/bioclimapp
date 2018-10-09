@@ -28,7 +28,7 @@ En caso de error, hace falta preparar react en laravel:
   - `sudo npm install`   (en caso de error de escritura usar 
    `sudo npm install --unsafe-perm=true --allow-root`)
    
-   
+Copiar archivo de configuracion del servidor bioclimapp.conf a /etc/nginx/sites-available/ y crear un enlace simbólico en /etc/nginx/sites-enabled/   
 
 
 # Paquetes
