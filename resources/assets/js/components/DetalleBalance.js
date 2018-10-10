@@ -87,21 +87,22 @@ function Chart(props){
 }
 
 function Grades(props){
-    let grades = ['A','B','C','D','E','F','G'];
-    let colors = ['#00b23b','#00ca2f','#91f300','#f3ff00','#fabf00','#ff4300','#ff0000'];
+    let grades = ['A+','A','B','C','D','E','F','G'];
+    let colors = ['#00b23b','#00ca2f','#91f300','#f3ff00','#fabf00','#ff4300','#ff0000','7d009c'];
     let startPosition = [120,20];
-    let ranges = ['< 10','10 - 30','30 - 50','50 - 70','70 - 90','90 - 110','> 110'];
+    let ranges = ['> 85%','70 - 85','55 - 70','40 - 55','20 - 40','10 - 20','-35 - -10','< -35%'];
     let grade = null;
-    if(props.balance < 10) grade = 'A';
-    else if(props.balance >= 10 && props.balance < 30) grade = 'B';
-    else if(props.balance >= 30 && props.balance < 50) grade = 'C';
-    else if(props.balance >= 50 && props.balance < 70) grade = 'D';
-    else if(props.balance >= 70 && props.balance < 90) grade = 'E';
-    else if(props.balance >= 90 && props.balance < 110) grade = 'F';
-    else if(props.balance >= 110) grade = 'G';
+    if(props.balance > 85) grade = 'A+';
+    else if(props.balance <= 85 && props.balance > 70) grade = 'A';
+    else if(props.balance <= 70 && props.balance > 55) grade = 'B';
+    else if(props.balance <= 55 && props.balance > 40) grade = 'C';
+    else if(props.balance <= 40 && props.balance > 20) grade = 'D';
+    else if(props.balance <= 20 && props.balance > 10) grade = 'E';
+    else if(props.balance <= -10 && props.balance > -35) grade = 'F';
+    else if(props.balance <= -35) grade = 'G';
     return (
         <Paper>
-            <Stage width={400} height={210} >
+            <Stage width={400} height={240} >
                 {grades.map((grade, index ) => (
                     <Layer key={index}>
                         <Label x={startPosition[0] + (index*20)} y={startPosition[1] + (index * 28)}>
@@ -200,6 +201,13 @@ class DetalleBalance extends Component {
                 ]
             }
         };
+        this.aporte_interno_objetivo = 0;
+        this.aporte_solar_objetivo = 0;
+        this.perdida_conduccion_objetivo = 0;
+        this.perdida_ventilacion_objetivo = 0;
+        this.aporte_solar = 0;
+        this.perdida_ventilacion = 0;
+        this.perdida_conduccion = 0;
         this.handleClick = this.handleClick.bind(this);
     }
 
@@ -257,14 +265,13 @@ class DetalleBalance extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.aporte_solar !== prevProps.aporte_solar || this.props.aporte_interno !== prevProps.aporte_interno) {
-            
+        if (this.props.aporte_solar !== prevProps.aporte_solar) {
             this.setState({
                 dataAportes: {
                     labels: ['Solares', 'Internos'],
                     datasets: [
                         {
-                            data: [Math.round(this.props.aporte_solar * 1000), Math.round(this.props.aporte_interno)],
+                            data: [Math.round(this.props.aporte_solar * 1000), Math.round(this.aporte_interno_objetivo)], //el objetivo es el mismo
                             backgroundColor: ['#F19C00', '#F16600'],
                             borderColor: ['#F19C00', '#F16600'],
                             label: 'Aportes'
@@ -272,15 +279,31 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
-
+            this.aporte_solar = this.props.aporte_solar;
         }
-        if (this.props.perdida_conduccion !== prevProps.perdida_conduccion || this.props.perdida_ventilacion !== prevProps.perdida_ventilacion) {
+        if (this.props.aporte_interno !== prevProps.aporte_interno) {
+            this.setState({
+                dataAportes: {
+                    labels: ['Solares', 'Internos'],
+                    datasets: [
+                        {
+                            data: [Math.round(this.aporte_solar * 1000), Math.round(this.props.aporte_interno)],
+                            backgroundColor: ['#F19C00', '#F16600'],
+                            borderColor: ['#F19C00', '#F16600'],
+                            label: 'Aportes'
+                        }
+                    ]
+                }
+            });
+            this.aporte_interno_objetivo = this.props.aporte_interno;
+        }
+        if (this.props.perdida_conduccion !== prevProps.perdida_conduccion) {
             this.setState({
                 dataPerdidas: {
                     labels: ['Por Conducción', 'Por Ventilación'],
                     datasets: [
                         {
-                            data: [Math.round(this.props.perdida_conduccion), Math.round(this.props.perdida_ventilacion)],
+                            data: [Math.round(this.props.perdida_conduccion), Math.round(this.perdida_ventilacion)],
                             backgroundColor: ['#009688', '#1043A0'],
                             borderColor: ['#009688', '#1043A0'],
                             label: 'Perdidas'
@@ -288,12 +311,53 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
+            this.perdida_conduccion = this.props.perdida_conduccion;
         }
-
+        if (this.props.perdida_ventilacion !== prevProps.perdida_ventilacion) {
+            this.setState({
+                dataPerdidas: {
+                    labels: ['Por Conducción', 'Por Ventilación'],
+                    datasets: [
+                        {
+                            data: [Math.round(this.perdida_conduccion), Math.round(this.props.perdida_ventilacion)],
+                            backgroundColor: ['#009688', '#1043A0'],
+                            borderColor: ['#009688', '#1043A0'],
+                            label: 'Perdidas'
+                        }
+                    ]
+                }
+            });
+            this.perdida_ventilacion = this.props.perdida_ventilacion;
+        }
+        if(this.props.perdida_conduccion_objetivo !== prevProps.perdida_conduccion_objetivo){
+            this.perdida_conduccion_objetivo = this.props.perdida_conduccion_objetivo;
+            let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
+            -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/(1000*this.props.area);
+            this.setState({balanceObjetivo: balanceObjetivo});
+        }
+        if(this.props.perdida_ventilacion_objetivo !== prevProps.perdida_ventilacion_objetivo){
+            this.perdida_ventilacion_objetivo = this.props.perdida_ventilacion_objetivo;
+            let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
+                -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/(1000*this.props.area);
+            this.setState({balanceObjetivo: balanceObjetivo});
+        }
+        if(this.props.aporte_solar_objetivo !== prevProps.aporte_solar_objetivo){
+            this.aporte_solar_objetivo = this.props.aporte_solar_objetivo;
+            let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
+                -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/(1000*this.props.area);
+            this.setState({balanceObjetivo: balanceObjetivo});
+        }
     }
 
     render() {
         const {classes} = this.props;
+        let balance = Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
+            this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )
+        console.log("balance",balance);
+        console.log("balance objetivo", this.state.balanceObjetivo);
+        let ahorro = balance * 100 / this.state.balanceObjetivo;
+        console.log("ahorro",ahorro);
+
         return (
             <Grid container spacing={16} className={classes.root} style={{
                 margin: 0,
@@ -306,8 +370,7 @@ class DetalleBalance extends Component {
                               alignItems="center">
                             <Grid item xs={12}>
                                 {this.props.area != null ? <Typography align="center" variant="title" style={{color: '#3a3b3d'}}>
-                                        Balance Energético: {Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
-                                        this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )} KWh/m<sup>2</sup></Typography>
+                                        Balance Energético: {balance} KWh/m<sup>2</sup></Typography>
                                     : <Typography align="center" variant="title" style={{color: '#3a3b3d'}} >Balance Energético:</Typography>}
                             </Grid>
                             <Grid item xs={6}>
@@ -339,7 +402,7 @@ class DetalleBalance extends Component {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <Grades balance = {20}/>
+                    <Grades balance = {ahorro}/>
                 </Grid>
             </Grid>
         );

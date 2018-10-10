@@ -57,9 +57,10 @@ class Morfologia extends Component {
             let casa = this.managerCasas.getCasa();
             let aporte_interno = casa.userData.aporteInterno;
             let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
         }
         if(this.props.width !== prevProps.width ){
             this.renderer.setSize(this.props.width, this.props.height);
@@ -73,9 +74,10 @@ class Morfologia extends Component {
             let casa = this.managerCasas.getCasa();
             let aporte_interno = casa.userData.aporteInterno;
             let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
             this.props.onCapaReady();
         }
         if(this.props.sunPathClicked !== prevProps.sunPathClicked){
@@ -151,10 +153,10 @@ class Morfologia extends Component {
         let casa = this.managerCasas.getCasa();
         let aporte_interno = casa.userData.aporteInterno;
         let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+        let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
         let perdida_conduccion = casa.userData.perdidaPorConduccion;
-        
-        this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
-
+        let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+        this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
 
     }
 
@@ -986,9 +988,10 @@ class Morfologia extends Component {
                 let casa = this.managerCasas.getCasa();
                 let aporte_interno = casa.userData.aporteInterno;
                 let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+                let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
                 let perdida_conduccion = casa.userData.perdidaPorConduccion;
-                
-                this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
+                let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+                this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
                 this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
 

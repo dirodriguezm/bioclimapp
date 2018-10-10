@@ -257,8 +257,25 @@ class TabPanel extends Component {
         this.setState({ventanas: ventanas});
     }
 
-    onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion,volumen, area){
-        this.setState({aporte_interno: aporte_interno, perdida_ventilacion: perdida_ventilacion, perdida_conduccion: perdida_conduccion, volumen: volumen, area: area});
+    onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion,perdida_conduccion_objetivo,volumen, area){
+        this.setState({
+            aporte_interno: aporte_interno,
+            perdida_ventilacion: perdida_ventilacion,
+            perdida_ventilacion_objetivo: perdida_ventilacion_objetivo,
+            perdida_conduccion: perdida_conduccion,
+            perdida_conduccion_objetivo: perdida_conduccion_objetivo,
+            volumen: volumen,
+            area: area,
+        });
+        console.log("onCasaChanged",{
+            aporte_interno: aporte_interno,
+            perdida_ventilacion: perdida_ventilacion,
+            perdida_ventilacion_objetivo: perdida_ventilacion_objetivo,
+            perdida_conduccion: perdida_conduccion,
+            perdida_conduccion_objetivo: perdida_conduccion_objetivo,
+            volumen: volumen,
+            area: area,
+        })
     }
 
     agregarContexto() {
@@ -277,7 +294,7 @@ class TabPanel extends Component {
         let month = new Date().getMonth();
         let periodo = ventanas[0].parent.parent.parent.parent.parent.userData.periodo;
         let aporte_solar = BalanceEnergetico.calcularAporteSolar(periodo,ventanas,this.state.radiaciones.difusa[month].valor, this.state.radiaciones.directa[month].valor);
-        this.setState({ventanas: ventanas, aporte_solar:aporte_solar});
+        this.setState({ventanas: ventanas, aporte_solar:aporte_solar.normal, aporte_solar_objetivo: aporte_solar.objetivo});
     }
 
     onAporteSolarChanged(aporte_solar){
@@ -394,9 +411,12 @@ class TabPanel extends Component {
                 >
                     <DetalleBalance
                         aporte_solar={this.state.aporte_solar}
+                        aporte_solar_objetivo={this.state.aporte_solar_objetivo}
                         aporte_interno={this.state.aporte_interno}
                         perdida_conduccion={this.state.perdida_conduccion}
+                        perdida_conduccion_objetivo={this.state.perdida_conduccion_objetivo}
                         perdida_ventilacion={this.state.perdida_ventilacion}
+                        perdida_ventilacion_objetivo={this.state.perdida_ventilacion_objetivo}
                         volumen={this.state.volumen}
                         area={this.state.area}
                     />

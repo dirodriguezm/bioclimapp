@@ -15,6 +15,7 @@ const transmitanciaLineal = [1.4 , 1.2 , 1.0];
 const uObjetivoMuro = [4,3,1.9,1.7,1.6,1.1,0.6];
 const uObjetivoTecho = [0.84,0.6,0.47,0.38,0.33,0.28,0.25];
 const uObjetivoPiso = [3.6,0.87,0.7,0.6,0.5,0.39,0.32];
+const rtObjetivoPiso = [0.28,1.15,1.43,1.67,2,2.56,3.13];
 //se simplifico el calculo del uso ya que es constante el multiplicar el perfilde uso con el coeficiente de usuario
 function aporteInterno(ocupantes, superficie, horasIluminacion, periodo) {
     const ilumuinacion = 1.5 * horasIluminacion * superficie;
@@ -78,21 +79,6 @@ function transmitanciaSuperficie(elemento,zona) {
             elemento.userData.transSupObjetivo = uObjetivoTecho[zona-1] * elemento.userData.superficie;
             break;
         case Morfologia.tipos.VENTANA:
-            /*let casa = elemento.parent.parent.parent.parent.parent;
-            let superficieParedes  = 0;
-            let superficieVentanas = 0;
-            for(let nivel of casa.children){
-                for(let habitacion of nivel.children){
-                    for(let paredes of habitacion.children){
-                        for (let pared of paredes.children){
-                            superficieParedes += pared.userData.superficie;
-                            for(let ventana of pared.children){
-                                superficieVentanas += ventana.superficie;
-                            }
-                        }
-                    }
-                }
-            }*/
             elemento.userData.transSupObjetivo = 5.8 * elemento.userData.superficie;
             elemento.userData.transSup = elemento.userData.info_material.u * elemento.userData.superficie;
             break;
@@ -118,8 +104,14 @@ function cambioTransmitanciaSuperficie(tramitanciaSuperficie, elementoCambio) {
 
 }
 
-function puenteTermico(piso){
-    return piso.userData.perimetro * transmitanciaLineal[piso.userData.aislacion];
+function puenteTermico(piso,zona){
+    let aislacionObjetivo = Morfologia.aislacionPiso.CORRIENTE;
+    if(rtObjetivoPiso[zona-1] > 0.6) aislacionObjetivo = Morfologia.aislacionPiso.AISLADO;
+    else if(rtObjetivoPiso[zona-1] < 0.6 && rtObjetivoPiso[zona-1] > 0.26) aislacionObjetivo = Morfologia.aislacionPiso.MEDIO;
+    return {
+        normal: piso.userData.perimetro * transmitanciaLineal[piso.userData.aislacion],
+        objetivo: piso.userData.perimetro * transmitanciaLineal[aislacionObjetivo],
+    }
 }
 
 function perdidasVentilacion(volumenInterno, volmenAire, gradosDias) {
@@ -363,38 +355,41 @@ function calcularRbParedes(paredes, latitud, longitud) {
 
 function calcularAporteSolar(periodo, ventanas, difusa, directa){
     let aporte_solar = 0;
+    let aporte_solar_objetivo = 0;
     let igb_suma = 0;
     let area_ventanas_suma = 0;
-    let f_suma = 0;
+    //let f_suma = 0;
+    //let f_suma_objetivo = 0;
     for (let ventana of ventanas){
         let f = calcularF(ventana);
-        f_suma += f;
+        //f_suma += f.normal;
+        //f_suma_objetivo += f.objetivo;
         let pared = ventana.parent;
         let Igb = 0;
         for(let i = 0; i < (periodo[1]-periodo[0]); i++){
             Igb += calcularIgb(difusa,directa,pared.userData.rb[i]);
         }
-        igb_suma += Igb;
+        //igb_suma += Igb;
         let area_ventana = Math.abs( (ventana.geometry.boundingBox.max.x - ventana.geometry.boundingBox.min.x) *
             (ventana.geometry.boundingBox.max.y - ventana.geometry.boundingBox.min.y) );
-        area_ventanas_suma += area_ventana;
-        aporte_solar += Igb * area_ventana * f;
+        //area_ventanas_suma += area_ventana;
+        aporte_solar += Igb * area_ventana * f.normal;
+        aporte_solar_objetivo += Igb * area_ventana * f.objetivo;
     }
-    return aporte_solar;
-
-    // return {
-    //     'Aporte Solar':aporte_solar,
-    //     'Radiacion Solar': igb_suma,
-    //     'Area de Ventanas': area_ventanas_suma,
-    //     'Factor de Asoleamiento': f_suma
-    // };
+    return {normal: aporte_solar, objetivo: aporte_solar_objetivo}
 }
 
 function calcularF(ventana){
     let fm = ventana.userData.info_marco.fs;
+    let fmObjetivo = ventana.userData.info_marco.fsObjetivo;
     let fs = ventana.userData.info_material.fs;
+    let fsObjetivo = ventana.userData.info_material.fsObjetivo;
     let um = ventana.userData.info_marco.u;
-    return ventana.userData.far * ((1-fm) * fs + (fm * 0.04 * um * 0.35));
+    let umObjetivo = ventana.userData.info_marco.uObjetivo;
+    return {
+        normal: ventana.userData.far * ((1-fm) * fs + (fm * 0.04 * um * 0.35)),
+        objetivo: ((1-fmObjetivo) * fsObjetivo + (fmObjetivo * 0.04 * umObjetivo * 0.35)),
+    }
 }
 
 function calcularIgb(difusa, directa, rb){
