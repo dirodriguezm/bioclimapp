@@ -451,7 +451,7 @@ class InformacionPisoTecho extends Component {
     }
 
     render() {
-        console.log(this.state);
+        
         const {classes, seleccionado} = this.props;
         let pisoSeleccionado = seleccionado;
         let techoSeleccionado;

@@ -47,12 +47,12 @@ class InfoObstruccion extends Component{
         //     altura: this.props.selectedObstruction.geometry.parameters.height,
         //     longitud: this.props.selectedObstruction.geometry.parameters.width,
         // }
-        // console.log(this.props);
+        // 
     }
 
     // componentDidUpdate(prevProps,prevState, snapshot){
-    //     console.log("this.props",this.props);
-    //     console.log("prevProps",prevProps);
+    //     
+    //     
     //     if(this.props !== prevProps){
     //         this.setState({
     //             altura: this.props.selectedObstruction.geometry.parameters.height,
@@ -81,7 +81,7 @@ class InfoObstruccion extends Component{
     }
 
     render(){
-        //console.log("this is rendering");
+        //
         const {classes} = this.props;
         return(
             <div className={classes.root}>

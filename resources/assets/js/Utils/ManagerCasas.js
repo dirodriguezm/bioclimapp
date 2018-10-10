@@ -611,7 +611,7 @@ class ManagerCasas {
     }
 
     aumentarNivelHabitacion(habitacion){
-        console.log(habitacion);
+        
         let pos = habitacion.position.clone();
         let prevNivel = habitacion.userData.nivel;
         habitacion.userData.nivel = prevNivel + 1;
@@ -656,7 +656,7 @@ class ManagerCasas {
                 }
             }
         }
-        console.log("habitacion",habitacion)
+
         this.agregarHabitacion(habitacion);
 
         //Se borra la habitacion de dibujo
@@ -738,12 +738,12 @@ class ManagerCasas {
         ventanas = pared.children;
 
         for(let ventana of ventanas){
-            console.log(ventana);
+            
             this.ventanas.splice(this.ventanas.indexOf(ventana),1);
             this.allObjects.splice(this.allObjects.indexOf(ventana),1);
         }
 
-        console.log(this.ventanas);
+        
 
         paredes2.remove(pared);
         this.paredes.splice( this.paredes.indexOf(pared), 1 );

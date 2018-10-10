@@ -117,7 +117,7 @@ export default class MapContainer extends Component {
     handleLocationFound(e) {
         let lng = parseFloat(e.location.x);
         let lat = parseFloat(e.location.y);
-        //console.log(lat + "," + lng);
+        //
         this.createMarker(lat, lng);
         axios.get("https://bioclimapp.host/api/comuna/" + lat + "/" + lng)
             .then(response => {

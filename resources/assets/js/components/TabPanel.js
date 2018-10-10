@@ -250,7 +250,7 @@ class TabPanel extends Component {
     onParedesChanged(paredes) {
         let paredes_calculadas = BalanceEnergetico.calcularRbParedes(paredes.slice(), this.state.latitud, this.state.longitud);
         this.setState({paredes: paredes_calculadas});
-        console.log("espera ?")
+
     }
 
     onVentanasChanged(ventanas){

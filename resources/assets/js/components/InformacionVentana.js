@@ -44,9 +44,6 @@ const styles = theme => ({
     selectEmpty: {
         marginTop: theme.spacing.unit * 2,
     },
-    titulo:{
-        margin: theme.spacing.unit,
-    },
 
 });
 
@@ -127,7 +124,7 @@ class InformacionVentana extends Component {
         this.setState({
             [event.target.name]: event.target.value,
         });
-        //console.log(event.target.name, event.target.value);
+        //
     }
 
     handleClickAgregar() {

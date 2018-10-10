@@ -174,7 +174,7 @@ function calcularAngulos(periodo, beta, latitud) {
     let now = new Date().getFullYear();
     let angulos=[];
     for(let date = new Date(now,periodo[0],15); date <= new Date(now,periodo[1],15); date.setMonth(date.getMonth()+1)){
-        //console.log("calculando angulos para", date);
+        //
         let phi = latitud;
         let delta = 23.45 * Math.sin(toRadians(360 * (284 + getDayOfYear(date)) / 365));
         let w2 = toDegrees(Math.acos(-Math.tan(toRadians(phi)) * Math.tan(toRadians(delta))));

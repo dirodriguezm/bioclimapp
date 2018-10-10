@@ -281,7 +281,7 @@ class InformacionPared extends Component {
 
         if(event.target.name === 'propiedad'){
             let conductividad;
-            console.log(this.info_material[capa.material]);
+            
 
             if(this.info_material[capa.material].hasOwnProperty('tipos')){
                 conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;

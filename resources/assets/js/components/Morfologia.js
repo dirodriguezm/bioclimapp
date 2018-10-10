@@ -58,7 +58,7 @@ class Morfologia extends Component {
             let aporte_interno = casa.userData.aporteInterno;
             let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            console.log("casa:", casa);
+            
             this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
         }
         if(this.props.width !== prevProps.width ){
@@ -74,7 +74,7 @@ class Morfologia extends Component {
             let aporte_interno = casa.userData.aporteInterno;
             let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            console.log("casa:", casa);
+            
             this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
             this.props.onCapaReady();
         }
@@ -145,14 +145,14 @@ class Morfologia extends Component {
         this.props.onVentanasChanged(this.ventanas);
 
 
-        console.log("ventanas",this.ventanas);
+        
 
         this.managerCasas.agregarHabitacionDibujada();
         let casa = this.managerCasas.getCasa();
         let aporte_interno = casa.userData.aporteInterno;
         let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
         let perdida_conduccion = casa.userData.perdidaPorConduccion;
-        console.log("casa:",casa);
+        
         this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
 
 
@@ -903,7 +903,7 @@ class Morfologia extends Component {
                 }
                 casa.userData.aporteInterno = aporteInterno;
                 casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-                //console.log(casa);
+                //
             }
             this.escena.add(casas);
 
@@ -934,7 +934,7 @@ class Morfologia extends Component {
             }
             casa.userData.aporteInterno = aporteInterno;
             casa.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-            //console.log(casa);
+            //
             this.escena.add(casa);
         }
         this.props.onParedesChanged(this.paredes);
@@ -987,7 +987,7 @@ class Morfologia extends Component {
                 let aporte_interno = casa.userData.aporteInterno;
                 let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
                 let perdida_conduccion = casa.userData.perdidaPorConduccion;
-                console.log("casa: ", casa);
+                
                 this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
                 this.props.onParedesChanged(this.paredes);
                 this.construyendo = false;
@@ -997,7 +997,7 @@ class Morfologia extends Component {
 
         if(this.dragging && this.props.rotando){
             this.dragging = false;
-            console.log("rotado", this.angleRotated);
+            
             let ventanas = [];
             for(let pared of this.paredes){
                 let resultAngle = pared.userData.gamma + this.angleRotated;
@@ -1019,7 +1019,7 @@ class Morfologia extends Component {
             }
             this.angleRotated = 0;
             this.props.onParedesChanged(this.paredes);
-            console.log("asdad")
+
             if(ventanas.length > 0) this.props.onVentanasChanged(ventanas);
         }
     }
@@ -1091,7 +1091,7 @@ class Morfologia extends Component {
             let intersect;
             //si se dibujan paredes
             if (this.props.dibujando === 0) {
-                console.log("YES");
+                
                 let intersects = this.raycaster.intersectObjects(this.objetos);
                 if (intersects.length > 0) {
                     intersect = intersects[0];
@@ -1140,7 +1140,7 @@ class Morfologia extends Component {
 
         //si se está rotando
         if(this.dragging){
-            // console.log("comparar", movementX, event.movementX);
+            // 
             // this.angleRotated += (angle*180/Math.PI);
             let movementX = event.screenX - this.prevX;
             this.prevX = event.screenX;
@@ -1204,7 +1204,7 @@ class Morfologia extends Component {
     }
 
     onDrag(event){
-        console.log("drag", event);
+        
     }
 
     handleSeleccionado(){

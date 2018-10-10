@@ -258,7 +258,7 @@ class DetalleBalance extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.aporte_solar !== prevProps.aporte_solar || this.props.aporte_interno !== prevProps.aporte_interno) {
-            console.log("Aporte solar", this.props.aporte_solar);
+            
             this.setState({
                 dataAportes: {
                     labels: ['Solares', 'Internos'],

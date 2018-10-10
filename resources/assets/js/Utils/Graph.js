@@ -65,7 +65,7 @@ class Graph {
                 conc += j + " ";
 
             // print the vertex and its adjacency list
-            console.log(i + " -> " + conc);
+
         }
     }
 

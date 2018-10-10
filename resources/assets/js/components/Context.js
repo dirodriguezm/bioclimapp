@@ -411,7 +411,7 @@ class Context extends Component {
     }
 
     onKeyDown(event) {
-        console.log(event);
+
     }
 
 
@@ -435,7 +435,7 @@ class Context extends Component {
                 raycasterFAR.set(ventana.userData.pos, angle);
                 let intersections = raycasterFAR.intersectObjects(this.obstrucciones);
                 let masAlto = {object: {aDistance: 0}};
-                //console.log(intersections.length);
+                //
                 //para cada obstruccion en el angulo actual se obtiene su aDistance y su bDistance, además se almacena el más alto
                 for (let i = 0; i < intersections.length; i++) {
                     if(intersections[i].distance > 50){intersections[i].object.fuera = true}
