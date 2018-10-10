@@ -3,17 +3,13 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Morfologia from "./Morfologia";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import Button from "@material-ui/core/Button";
 import axios from 'axios';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from "@material-ui/core/InputLabel";
@@ -23,10 +19,8 @@ import { createMuiTheme } from '@material-ui/core/styles';
 
 import Add from '@material-ui/icons/Add';
 import Clear from '@material-ui/icons/Clear';
-import AddToPhotos from '@material-ui/icons/AddToPhotos'
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
-import CardContent from "@material-ui/core/CardContent/CardContent";
 
 const ITEM_HEIGHT = 48;
 

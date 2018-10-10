@@ -3,17 +3,13 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import ExpansionPanelSummary from '@material-ui/core/ExpansionPanelSummary';
 import ExpansionPanelDetails from '@material-ui/core/ExpansionPanelDetails';
-import ExpansionPanelActions from '@material-ui/core/ExpansionPanelActions';
 import Typography from '@material-ui/core/Typography';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import Morfologia from "./Morfologia";
 import ExpansionPanel from "@material-ui/core/ExpansionPanel";
-import Button from "@material-ui/core/Button";
 import axios from 'axios';
 import Select from '@material-ui/core/Select';
 import Input from '@material-ui/core/Input';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
 import TextField from '@material-ui/core/TextField';
 import MenuItem from '@material-ui/core/MenuItem';
 import InputLabel from "@material-ui/core/InputLabel";
@@ -101,7 +97,7 @@ class InformacionPisoTecho extends Component {
             capasTecho: [],
             capaSeleccionadaPiso : null,
             capaSeleccionadaTecho : null,
-        }
+        };
         this.vaciosArrayPiso = [];
         this.vaciosArrayTecho = [];
         this.info_material = [];
@@ -124,13 +120,13 @@ class InformacionPisoTecho extends Component {
         if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.PISO) {
             if (this.props !== null) {
                 let seleccionados;
-                if(this.props.seleccionado.userData.techo){
+                if(this.props.seleccionado.userData.techo !== undefined){
                     seleccionados = [this.props.seleccionado, this.props.seleccionado.userData.techo];
                 }else{
                     seleccionados = [this.props.seleccionado];
                 }
                 for(let seleccionado of seleccionados){
-                    let capas = this.props.seleccionado.userData.capas;
+                    let capas = seleccionado.userData.capas;
                     for (let i = 0; i < capas.length; i++) {
                         capas[i].index = i;
                     }
@@ -150,11 +146,12 @@ class InformacionPisoTecho extends Component {
                     });
                 }
                 this.setState({
-                    width: this.props.seleccionado[0].userData.width,
-                    depth: this.props.seleccionado[0].userData.depth,
+                    width: this.props.seleccionado.userData.width,
+                    depth: this.props.seleccionado.userData.depth,
                 })
             }
         }
+
     }
     getJson(response) {
 
@@ -217,24 +214,21 @@ class InformacionPisoTecho extends Component {
         }
 
         if(event.target.name === 'tipo'){
-            capa.tipo = 0;
             capa.propiedad = 0;
 
         }
 
-        if(event.target.name === 'propiedad'){
-            let conductividad;
-
-            if(this.info_material[capa.material].hasOwnProperty('tipos')){
-                conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
-            }else{
-                conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
-
-            }
-            capa.conductividad = conductividad;
-        }
-
         capa[event.target.name] = event.target.value;
+
+        let conductividad;
+
+        if(this.info_material[capa.material].hasOwnProperty('tipos')){
+            conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
+        }else{
+            conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
+
+        }
+        capa.conductividad = conductividad;
 
         if(event.target.name === 'espesor'){
             capa.espesor = event.target.value/1000;
@@ -262,24 +256,21 @@ class InformacionPisoTecho extends Component {
         }
 
         if(event.target.name === 'tipo'){
-            capa.tipo = 0;
             capa.propiedad = 0;
 
         }
 
-        if(event.target.name === 'propiedad'){
-            let conductividad;
-
-            if(this.info_material[capa.material].hasOwnProperty('tipos')){
-                conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
-            }else{
-                conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
-
-            }
-            capa.conductividad = conductividad;
-        }
-
         capa[event.target.name] = event.target.value;
+
+        let conductividad;
+
+        if(this.info_material[capa.material].hasOwnProperty('tipos')){
+            conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
+        }else{
+            conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
+
+        }
+        capa.conductividad = conductividad;
 
         if(event.target.name === 'espesor'){
             capa.espesor = event.target.value/1000;
@@ -460,9 +451,15 @@ class InformacionPisoTecho extends Component {
     }
 
     render() {
+        console.log(this.state);
         const {classes, seleccionado} = this.props;
         let pisoSeleccionado = seleccionado;
-        let techoSeleccionado = seleccionado.userData.techo;
+        let techoSeleccionado;
+        if(pisoSeleccionado !== null && pisoSeleccionado.userData.tipo === Morfologia.tipos.PISO){
+            techoSeleccionado = seleccionado.userData.techo;
+        }else{
+            techoSeleccionado = null;
+        }
         const {capasPiso, capasTecho, depth, width, capaSeleccionadaPiso, capaSeleccionadaTecho} = this.state;
 
         let materialPiso ,tipoPiso ,espesorPiso ,propiedadPiso ;
@@ -475,7 +472,7 @@ class InformacionPisoTecho extends Component {
             propiedadPiso = capasPiso[capaSeleccionadaPiso].propiedad;
         }
 
-        if(capaSeleccionadaPiso !== null){
+        if(capaSeleccionadaTecho !== null){
             materialTecho = capasTecho[capaSeleccionadaTecho].material;
             tipoTecho = capasTecho[capaSeleccionadaTecho].tipo;
             espesorTecho = capasTecho[capaSeleccionadaTecho].espesor;
@@ -486,13 +483,13 @@ class InformacionPisoTecho extends Component {
         let hasTiposTecho;
 
         if (pisoSeleccionado !== null && this.info_material.length > 0 && pisoSeleccionado.userData.tipo === Morfologia.tipos.PISO && capaSeleccionadaPiso !== null) {
-            hasTiposPiso = this.info_material[material].hasOwnProperty('tipos');
+            hasTiposPiso = this.info_material[materialPiso].hasOwnProperty('tipos');
         } else {
             hasTiposPiso = null;
         }
 
-        if (techoSeleccionado !== null && this.info_material.length > 0 && techoSeleccionado.userData.tipo === Morfologia.tipos.TECHO && capaSeleccionadaTecho !== null) {
-            hasTiposTecho = this.info_material[material].hasOwnProperty('tipos');
+        if (techoSeleccionado !== null && this.info_material.length > 0 && capaSeleccionadaTecho !== null) {
+            hasTiposTecho = this.info_material[materialTecho].hasOwnProperty('tipos');
         } else {
             hasTiposTecho = null;
         }
@@ -505,12 +502,20 @@ class InformacionPisoTecho extends Component {
                             variant={"title"}
                             className={classes.titulo}
                         >
-                            {'Configuracion '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo] }
+                            {techoSeleccionado !== undefined ?
+                                <div>{'Configuracion '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo]
+                                +' y '+ Morfologia.tipos_texto[techoSeleccionado.userData.tipo]
+
+                                }</div>
+                                :
+                                <div>{'Configuracion '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo]}</div>
+                            }
+
                         </Typography>
 
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>Capas</Typography>
+                                <Typography className={classes.heading}>Capas piso</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
@@ -740,7 +745,7 @@ class InformacionPisoTecho extends Component {
                                                 </Grid>  : <div/>
                                             }
 
-                                            {!hasTiposTecho ?
+                                            {!hasTiposPiso ?
                                                 <Grid item xs={4}>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="conductividad-simple">Conductividad</InputLabel>
@@ -779,10 +784,10 @@ class InformacionPisoTecho extends Component {
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
-                        {techoSeleccionado !== null && techoSeleccionado.userData.tipo === Morfologia.tipos.TECHO ?
+                        {techoSeleccionado !== undefined  ?
                             <ExpansionPanel>
                                 <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                    <Typography className={classes.heading}>Capas</Typography>
+                                    <Typography className={classes.heading}>Capas techo</Typography>
                                 </ExpansionPanelSummary>
                                 <ExpansionPanelDetails>
                                     <Grid container spacing={8}>

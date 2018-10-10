@@ -49,7 +49,7 @@ class ManagerCasas {
         });
 
         this.materialPisoConstruccion = new THREE.MeshBasicMaterial({
-            color: '#eee3c5',
+            color: '#a1d1ee',
             opacity: 0.7,
             transparent: true,
             side: THREE.DoubleSide,
@@ -91,8 +91,13 @@ class ManagerCasas {
             side: THREE.DoubleSide,
         });
 
+        this.materialPisoConstruido = new THREE.MeshLambertMaterial({
+            color: '#a1d1ee',
+            side: THREE.DoubleSide,
+        });
+
         this.materialTechoConstruido = new THREE.MeshLambertMaterial({
-            color: '#6b3403',
+            color: '#B3B3B3',
             side: THREE.DoubleSide,
             opacity: 0.7,
             transparent: true,
@@ -558,6 +563,10 @@ class ManagerCasas {
 
         piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
 
+        piso.material = this.materialPisoConstruido.clone();
+        piso.castShadow = true;
+        piso.receiveShadow = true;
+
         let puenteTermico = piso.userData.puenteTermico;
 
         let techo = habitacion.getObjectByName("Techo");
@@ -964,15 +973,15 @@ class ManagerCasas {
         techo.userData.capas  =
             [
                 {
-                    material: 2,
+                    material: 10,
                     tipo: null,
                     propiedad: 0,
                     conductividad: this.info_material[2].propiedades[0].conductividad,
                     espesor: 0.1
                 },
                 {
-                    material: 11,
-                    tipo: 2,
+                    material: 15,
+                    tipo: 0,
                     propiedad: 0,
                     conductividad: this.info_material[11].tipos[2].propiedades[0].conductividad,
                     espesor: 0.2
