@@ -26,6 +26,9 @@ const styles = theme => ({
     root: {
         width: '100%',
     },
+    titulo:{
+        margin: theme.spacing.unit*2,
+    },
     formControl: {
         margin: theme.spacing.unit,
         minWidth: 200,
@@ -156,7 +159,7 @@ class InformacionVentana extends Component {
                             variant={"title"}
                             className={classes.titulo}
                         >
-                            Configuración Ventana
+                            {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
                         </Typography>
 
                         <ExpansionPanel>

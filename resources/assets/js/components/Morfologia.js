@@ -257,7 +257,7 @@ class Morfologia extends Component {
         this.ventanas = [];
         this.puertas = [];
         this.objetoSeleccionado = null;
-        this.objetoClick = null;
+        this.objetoSeleccionadoClick = null;
         this.paredDeVentana = null;
         this.grafoParedes = new Graph(0);
         this.pisos = [];
@@ -1037,42 +1037,51 @@ class Morfologia extends Component {
 
             if(intersects.length > 0){
                 let intersect = intersects[0].object;
-                if(this.objetoSeleccionado != intersect && this.objetoSeleccionado != null){
+                if(this.objetoSeleccionado !== intersect && this.objetoSeleccionado != null){
 
                     switch (this.objetoSeleccionado.userData.tipo) {
                         case  Morfologia.tipos.PARED:
-                            this.objetoSeleccionado.material = this.materialParedConstruida.clone();
+                            this.objetoSeleccionado.material = this.managerCasas.materialParedConstruida.clone();
                             break;
                         case  Morfologia.tipos.VENTANA:
-                            this.objetoSeleccionado.material = this.materialVentanaConstruida.clone();
+                            this.objetoSeleccionado.material = this.managerCasas.materialVentanaConstruccion.clone();
+                            break;
+                        case Morfologia.tipos.PUERTA:
+                            this.objetoSeleccionado.material = this.managerCasas.materialPuertaConstruida.clone();
+                            break;
+                        case Morfologia.tipos.PISO:
+                            this.objetoSeleccionado.material = this.managerCasas.materialPisoConstruido.clone();
+                            break;
                         default:
                             break;
                     }
                 }
                 this.objetoSeleccionado = intersect;
-                switch (this.objetoSeleccionado.userData.tipo) {
-                    case  Morfologia.tipos.PARED:
-                        this.objetoSeleccionado.material = this.materialSeleccionado.clone();
-                        break;
-                    case  Morfologia.tipos.VENTANA:
-                        this.objetoSeleccionado.material = this.materialSeleccionado.clone();
-                    default:
-                        break;
-                }
+                this.objetoSeleccionado.material = this.materialSeleccionado.clone();
 
             }else{
                 if(this.objetoSeleccionado != null){
                     switch (this.objetoSeleccionado.userData.tipo) {
                         case  Morfologia.tipos.PARED:
-                            this.objetoSeleccionado.material = this.materialParedConstruida.clone();
+                            this.objetoSeleccionado.material = this.managerCasas.materialParedConstruida.clone();
                             break;
                         case  Morfologia.tipos.VENTANA:
-                            this.objetoSeleccionado.material = this.materialVentanaConstruida.clone();
+                            this.objetoSeleccionado.material = this.managerCasas.materialVentanaConstruccion.clone();
+                            break;
+                        case Morfologia.tipos.PUERTA:
+                            this.objetoSeleccionado.material = this.managerCasas.materialPuertaConstruida.clone();
+                            break;
+                        case Morfologia.tipos.PISO:
+                            this.objetoSeleccionado.material = this.managerCasas.materialPisoConstruido.clone();
+                            break;
                         default:
                             break;
                     }
                     this.objetoSeleccionado = null;
                 }
+            }
+            if(this.objetoSeleccionadoClick !== null){
+                this.objetoSeleccionadoClick.material = this.materialSeleccionado.clone();
             }
         }
 
@@ -1170,6 +1179,27 @@ class Morfologia extends Component {
 
         if(this.props.seleccionando){
             this.handleSeleccionado();
+            if(this.objetoSeleccionadoClick !== null){
+                switch (this.objetoSeleccionadoClick.userData.tipo) {
+                    case  Morfologia.tipos.PARED:
+                        this.objetoSeleccionadoClick.material = this.managerCasas.materialParedConstruida.clone();
+                        break;
+                    case  Morfologia.tipos.VENTANA:
+                        this.objetoSeleccionadoClick.material = this.managerCasas.materialVentanaConstruccion.clone();
+                        break;
+                    case Morfologia.tipos.PUERTA:
+                        this.objetoSeleccionadoClick.material = this.managerCasas.materialPuertaConstruida.clone();
+                        break;
+                    case Morfologia.tipos.PISO:
+                        this.objetoSeleccionadoClick.material = this.managerCasas.materialPisoConstruido.clone();
+                        break;
+                    default:
+                        break;
+                }
+            }
+            this.objetoSeleccionadoClick = this.objetoSeleccionado;
+        }else{
+            this.objetoSeleccionadoClick = null;
         }
     }
 

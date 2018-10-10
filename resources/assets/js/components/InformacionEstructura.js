@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import InformacionPared from './InformacionPared'
 import InformacionVentana from './InformacionVentana'
+import InformacionPuerta from "./InformacionPuerta";
+import InformacionPisoTecho from "./InformacionPisoTecho";
 
 const ITEM_HEIGHT = 48;
 
@@ -59,6 +61,15 @@ class InformacionEstructura extends Component {
                     comuna={this.props.comuna}
                     onAporteSolarChanged={this.props.onAporteSolarChanged}
 
+                />
+
+                <InformacionPuerta
+                    seleccionado={seleccionado}
+
+                />
+
+                <InformacionPisoTecho
+                    seleccionado={seleccionado}
                 />
             </div>
         );

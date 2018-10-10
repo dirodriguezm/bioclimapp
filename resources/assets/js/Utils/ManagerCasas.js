@@ -50,7 +50,7 @@ class ManagerCasas {
         });
 
         this.materialPisoConstruccion = new THREE.MeshBasicMaterial({
-            color: '#eee3c5',
+            color: '#a1d1ee',
             opacity: 0.7,
             transparent: true,
             side: THREE.DoubleSide,
@@ -92,8 +92,13 @@ class ManagerCasas {
             side: THREE.DoubleSide,
         });
 
+        this.materialPisoConstruido = new THREE.MeshLambertMaterial({
+            color: '#a1d1ee',
+            side: THREE.DoubleSide,
+        });
+
         this.materialTechoConstruido = new THREE.MeshLambertMaterial({
-            color: '#6b3403',
+            color: '#B3B3B3',
             side: THREE.DoubleSide,
             opacity: 0.7,
             transparent: true,
@@ -521,7 +526,7 @@ class ManagerCasas {
         for(let pared of paredes.children){
             pared.material = this.materialParedConstruida.clone();
             pared.castShadow = true;
-            pared.receiveShadow = false;
+            pared.receiveShadow = true;
             pared.userData.superficie = pared.userData.width * pared.userData.height;
             pared.userData.capas = capas.slice();
 
@@ -540,36 +545,45 @@ class ManagerCasas {
         }
         let piso = habitacion.getObjectByName("Piso");
         this.pisos.push(piso);
+        this.allObjects.push(piso);
         piso.userData.superficie = piso.userData.width * piso.userData.depth;
         piso.userData.perimetro = piso.userData.width * 2 + piso.userData.depth * 2;
+
+        piso.userData.capas  =
+            [
+                {
+                    material: 2,
+                    tipo: null,
+                    propiedad: 0,
+                    conductividad: this.info_material[2].propiedades[0].conductividad,
+                    espesor: 0.1
+                },
+                {
+                    material: 11,
+                    tipo: 2,
+                    propiedad: 0,
+                    conductividad: this.info_material[11].tipos[2].propiedades[0].conductividad,
+                    espesor: 0.2
+                }
+            ];
+
         piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
+
+        piso.material = this.materialPisoConstruido.clone();
+        piso.castShadow = true;
+        piso.receiveShadow = true;
 
         let puenteTermico = piso.userData.puenteTermico;
 
         let techo = habitacion.getObjectByName("Techo");
         if(techo){
             techo.userData.superficie = techo.userData.width * techo.userData.depth;
-            techo.userData.capas  =
-                [
-                    {
-                        material: 2,
-                        tipo: null,
-                        propiedad: 0,
-                        conductividad: this.info_material[2].propiedades[0].conductividad,
-                        espesor: 0.1
-                    },
-                    {
-                        material: 11,
-                        tipo: 2,
-                        propiedad: 0,
-                        conductividad: this.info_material[11].tipos[2].propiedades[0].conductividad,
-                        espesor: 0.2
-                    }
-                ];
 
             BalanceEnergetico.transmitanciaSuperficie(techo,this.zona);
             transmitanciaSuperficies += techo.userData.transSup;
             transmitanciaSuperficiesObjetivo += techo.userData.transSup;
+
+            piso.userData.techo = techo;
         }
 
         let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
@@ -890,6 +904,8 @@ class ManagerCasas {
             let habitacion = pared.parent.parent;
             let orientacion = pared.userData.orientacion;
             puerta.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
+            puerta.castShadow = true;
+            puerta.receiveShadow = true;
             pared.add(puerta);
             pared.worldToLocal(puerta.position);
 
@@ -925,11 +941,11 @@ class ManagerCasas {
             puerta.userData.tipo = Morfologia.tipos.PUERTA;
 
             puerta.userData.info_material = {
-                material: 1,
-                tipo: null,
+                material: 15,
+                tipo: 4,
                 propiedad: 0,
                 conductividad: this.info_material[1].propiedades[0].conductividad,
-                espesor: 0.02,
+                espesor: 0.1,
             };
             //Por ahora el calculo se hace sin marco
 
@@ -962,6 +978,28 @@ class ManagerCasas {
         techo.userData.height = height;
         techo.name = "Techo";
         techo.material = this.materialTechoConstruido.clone();
+
+        techo.userData.capas  =
+            [
+                {
+                    material: 10,
+                    tipo: null,
+                    propiedad: 0,
+                    conductividad: this.info_material[2].propiedades[0].conductividad,
+                    espesor: 0.1
+                },
+                {
+                    material: 15,
+                    tipo: 0,
+                    propiedad: 0,
+                    conductividad: this.info_material[11].tipos[2].propiedades[0].conductividad,
+                    espesor: 0.2
+                }
+            ];
+
+        let piso = habitacion.getObjectByName("Piso");
+        piso.userData.techo = techo;
+
         habitacion.add(techo);
     }
 
