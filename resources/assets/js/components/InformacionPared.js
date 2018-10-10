@@ -32,7 +32,7 @@ const ITEM_HEIGHT = 48;
 
 const styles = theme => ({
     titulo:{
-        margin: theme.spacing.unit,
+        margin: theme.spacing.unit*2,
     },
 
     button: {
@@ -49,6 +49,25 @@ const styles = theme => ({
     textField: {
         width: 100,
     },
+    textRotation: {
+        marginLeft: '75%',
+        '-mozTransform': 'rotate(90deg)',
+        '-webkitTransform' : 'rotate(90deg)',
+        '-msTransform' : 'rotate(90deg)',
+        '-oTransform:' : 'rotate(90deg)',
+        'transform:' : 'rotate(90deg)',
+        '-msFilter' : 'progid:DXImageTransform.Microsoft.BasicImage(rotation=1)',
+        whiteSpace: 'nowrap',
+        left: '50%',
+        height: 0,
+        width: 0,
+        '-webkitUserSelect' : 'none',
+        '-khtmlUserSelect' : 'none',
+        '-mozUserSelect' : 'none',
+        '-msUserSelect' : 'none',
+        '-userSelect' : 'none',
+
+},
     form: {
         display: 'flex',
         flexWrap: 'wrap',
@@ -57,14 +76,14 @@ const styles = theme => ({
         marginTop: theme.spacing.unit * 2,
     },
     paper: {
-        height: 300,
+        height: 250,
         flexDirection: 'column',
         textAlign: 'center',
         overflow: 'hidden',
         elevation:24
     },
     paperAdd: {
-        height: 300,
+        height: 250,
         overflow: 'hidden',
         elevation:24
     },
@@ -213,7 +232,6 @@ class InformacionPared extends Component {
                 },
             });
             this.info_material[i].textColor = theme.palette.primary.contrastText;
-            this.info_material[i].colorSelected = "#fc0f4f";
 
 
             if (this.info_material[i].hasOwnProperty('tipos')) {
@@ -229,6 +247,15 @@ class InformacionPared extends Component {
                 }
             }
         }
+        var theme = createMuiTheme({
+            palette: {
+                primary: {
+                    main: "#fc0f4f",
+                },
+            },
+        });
+        this.colorSelected = [theme.palette.primary.main,theme.palette.primary.contrastText];
+        this.colorSelected = [theme.palette.primary.main,theme.palette.primary.contrastText];
     }
 
 
@@ -245,15 +272,27 @@ class InformacionPared extends Component {
         if(event.target.name === 'material'){
             if(this.info_material[event.target.value].hasOwnProperty('tipos')){
                 capa.tipo = 0;
+                capa.propiedad = 0;
+            }else{
+                capa.propiedad = 0;
             }
+        }
+
+        if(event.target.name === 'tipo'){
+            capa.tipo = 0;
+            capa.propiedad = 0;
+
         }
 
         if(event.target.name === 'propiedad'){
             let conductividad;
+            console.log(this.info_material[capa.material]);
+
             if(this.info_material[capa.material].hasOwnProperty('tipos')){
-                conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
+                conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
             }else{
-                conductividad = this.info_material[capa.material].tipo[capa.tipo].propiedades[capa.propiedad].conductividad;
+                conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
+
             }
             capa.conductividad = conductividad;
         }
@@ -407,12 +446,12 @@ class InformacionPared extends Component {
                                                 <Grid item xs>
                                                     {capaS === capa.index ?
                                                         <Paper className={classes.paper}
-                                                               style={{backgroundColor: this.info_material[capa.material].colorSelected}}
+                                                               style={{backgroundColor: this.colorSelected[0]}}
                                                                value={capa.index}
                                                                onClick={this.clickCapa}
                                                                elevation={0}
                                                         >
-                                                            <IconButton style={{color: this.info_material[capa.material].textColor}}
+                                                            <IconButton style={{color: this.colorSelected[1]}}
                                                                         className={classes.button}
                                                                         value={capa.index}
                                                                         onClick={this.handleClickBorrar}
@@ -422,14 +461,22 @@ class InformacionPared extends Component {
                                                             </IconButton>
                                                             {this.info_material[capa.material].hasOwnProperty('tipos') ?
                                                                 <div>
-                                                                    {(this.info_material[capa.material].material + this.info_material[capa.material].tipos[capa.tipo].nombre).split('').map(char =>
-                                                                        <Typography value={capa.index} style={{color: this.info_material[capa.material].textColor}}>{char}</Typography>)}
+                                                                    <Typography
+                                                                        className={classes.textRotation}
+                                                                        style={{color: this.colorSelected[1]}}
+                                                                        value={capa.index}
+                                                                        onClick={this.clickCapa}>
+                                                                        {this.info_material[capa.material].material + this.info_material[capa.material].tipos[capa.tipo].nombre}
+                                                                    </Typography>
                                                                 </div>
                                                                 :
-                                                                <div>
-                                                                    {this.info_material[capa.material].material.split('').map(char =>
-                                                                        <Typography value={capa.index} style={{color: this.info_material[capa.material].textColor}}>{char}</Typography>)}
-                                                                </div>
+                                                                <Typography
+                                                                    className={classes.textRotation}
+                                                                    style={{color: this.colorSelected[1]}}
+                                                                    value={capa.index}
+                                                                    onClick={this.clickCapa}>
+                                                                    {this.info_material[capa.material].material}
+                                                                </Typography>
                                                             }
                                                         </Paper> :
                                                         <Paper className={classes.paper}
@@ -448,13 +495,24 @@ class InformacionPared extends Component {
                                                             </IconButton>
                                                             {this.info_material[capa.material].hasOwnProperty('tipos') ?
                                                                 <div>
-                                                                    {(this.info_material[capa.material].material + this.info_material[capa.material].tipos[capa.tipo].nombre).split('').map(char =>
-                                                                        <Typography value={capa.index} style={{color: this.info_material[capa.material].textColor}}>{char}</Typography>)}
+                                                                    <Typography
+                                                                        className={classes.textRotation}
+                                                                        style={{color: this.info_material[capa.material].textColor}}
+                                                                        value={capa.index}
+                                                                        onClick={this.clickCapa}>
+                                                                        {this.info_material[capa.material].material + this.info_material[capa.material].tipos[capa.tipo].nombre}
+                                                                    </Typography>
+
                                                                 </div>
                                                                 :
                                                                 <div>
-                                                                    {this.info_material[capa.material].material.split('').map(char =>
-                                                                        <Typography value={capa.index} style={{color: this.info_material[capa.material].textColor}}>{char}</Typography>)}
+                                                                    <Typography
+                                                                        className={classes.textRotation}
+                                                                        style={{color: this.info_material[capa.material].textColor}}
+                                                                        value={capa.index}
+                                                                        onClick={this.clickCapa}>
+                                                                        {this.info_material[capa.material].material}
+                                                                    </Typography>
                                                                 </div>
                                                             }
                                                         </Paper>
@@ -492,42 +550,66 @@ class InformacionPared extends Component {
 
                                     {capaS !== null ?
                                         <Grid container spacing={8}>
-                                            <Grid item xs>
-                                                <FormControl className={classes.formControl}>
-                                                    <InputLabel htmlFor="material-simple">Material</InputLabel>
-                                                    <Select
-                                                        value={material}
-                                                        onChange={this.handleChangeCapa}
-                                                        input={<Input name="material" id="material-simple"/>}
-                                                    >
-                                                        {this.info_material.map(material => (
-                                                            <MenuItem value={material.index}>
-                                                                {material.material}
-                                                            </MenuItem>
-                                                        ))}
-                                                    </Select>
-                                                </FormControl>
-                                            </Grid>
                                             {hasTipos ?
-                                                <Grid item xs>
+                                                <Grid container spacing={0} style={{
+                                                    marginTop : 12,
+                                                    marginBottom : 4,
+                                                    marginLeft : 4,
+                                                    marginRight : 4,}}>
+                                                    <Grid item xs={6}>
+                                                        <FormControl className={classes.formControl}>
+                                                            <InputLabel htmlFor="material-simple">Material</InputLabel>
+                                                            <Select
+                                                                value={material}
+                                                                onChange={this.handleChangeCapa}
+                                                                input={<Input name="material" id="material-simple"/>}
+                                                            >
+                                                                {this.info_material.map(material => (
+                                                                    <MenuItem value={material.index}>
+                                                                        {material.material}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
+                                                    </Grid>
+                                                    <Grid item xs={6}>
+                                                        <FormControl className={classes.formControl}>
+                                                            <InputLabel htmlFor="tipo-simple">Tipo</InputLabel>
+                                                            <Select
+                                                                value={tipo}
+                                                                onChange={this.handleChangeCapa}
+                                                                input={<Input name="tipo" id="tipo-simple"/>}
+                                                            >
+                                                                {this.info_material[material].tipos.map(tipo => (
+                                                                    <MenuItem value={tipo.index}>
+                                                                        {tipo.nombre}
+                                                                    </MenuItem>
+                                                                ))}
+                                                            </Select>
+                                                        </FormControl>
+                                                    </Grid>
+                                                </Grid>
+                                                 : <Grid item xs={12} style={{
+                                                     marginTop : 8,
+                                                }}>
                                                     <FormControl className={classes.formControl}>
-                                                        <InputLabel htmlFor="tipo-simple">Tipo</InputLabel>
+                                                        <InputLabel htmlFor="material-simple">Material</InputLabel>
                                                         <Select
-                                                            value={tipo}
+                                                            value={material}
                                                             onChange={this.handleChangeCapa}
-                                                            input={<Input name="tipo" id="tipo-simple"/>}
+                                                            input={<Input name="material" id="material-simple"/>}
                                                         >
-                                                            {this.info_material[material].tipos.map(tipo => (
-                                                                <MenuItem value={tipo.index}>
-                                                                    {tipo.nombre}
+                                                            {this.info_material.map(material => (
+                                                                <MenuItem value={material.index}>
+                                                                    {material.material}
                                                                 </MenuItem>
                                                             ))}
                                                         </Select>
                                                     </FormControl>
-                                                </Grid> : <div/>
+                                                </Grid>
                                             }
                                             {hasTipos ?
-                                                <Grid item xs={12}>
+                                                <Grid item xs={4}>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="conductividad-simple">Densidad</InputLabel>
                                                         <Select
@@ -537,7 +619,7 @@ class InformacionPared extends Component {
                                                         >
                                                             {this.info_material[material].tipos[tipo].propiedades.map(propiedades => (
                                                                 <MenuItem value={propiedades.index}>
-                                                                    {propiedades.densidad != -1 ? propiedades.densidad
+                                                                    {propiedades.densidad !== -1 ? propiedades.densidad
                                                                     : "No tiene"}
                                                                 </MenuItem>
                                                             ))}
@@ -547,7 +629,7 @@ class InformacionPared extends Component {
                                             }
 
                                             {hasTipos ?
-                                                <Grid item xs={12}>
+                                                <Grid item xs={4}>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="conductividad-simple">Conductividad</InputLabel>
                                                         <Select
@@ -565,7 +647,7 @@ class InformacionPared extends Component {
                                                 </Grid> : <div/>
                                             }
                                             {!hasTipos?
-                                                <Grid item xs={12}>
+                                                <Grid item xs={4}>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="conductividad-simple">Densidad</InputLabel>
                                                         <Select
@@ -575,7 +657,7 @@ class InformacionPared extends Component {
                                                         >
                                                             {this.info_material[material].propiedades.map(propiedades => (
                                                                 <MenuItem value={propiedades.index}>
-                                                                    {propiedades.densidad != -1 ? propiedades.densidad
+                                                                    {propiedades.densidad !== -1 ? propiedades.densidad
                                                                         : "No tiene"}
                                                                 </MenuItem>
                                                             ))}
@@ -585,7 +667,7 @@ class InformacionPared extends Component {
                                             }
 
                                             {!hasTipos ?
-                                                <Grid item xs={12}>
+                                                <Grid item xs={4}>
                                                     <FormControl className={classes.formControl}>
                                                         <InputLabel htmlFor="conductividad-simple">Conductividad</InputLabel>
                                                         <Select
@@ -602,7 +684,7 @@ class InformacionPared extends Component {
                                                     </FormControl>
                                                 </Grid> : <div/>
                                             }
-                                            <Grid item xs={12}>
+                                            <Grid item xs={4}>
                                                 <FormControl className={classes.formControl}>
                                                     <TextField
                                                         label="Espesor (mm)"
@@ -613,7 +695,6 @@ class InformacionPared extends Component {
                                                         InputLabelProps={{
                                                             shrink: true,
                                                         }}
-                                                        margin="normal"
                                                     />
                                                 </FormControl>
                                             </Grid>
@@ -636,7 +717,7 @@ class InformacionPared extends Component {
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
 
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <FormControl className={classes.formControl}>
                                             <TextField
                                                 label="Altura (m)"
@@ -647,11 +728,10 @@ class InformacionPared extends Component {
                                                 InputLabelProps={{
                                                     shrink: true,
                                                 }}
-                                                margin="normal"
                                             />
                                         </FormControl>
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         <FormControl className={classes.formControl}>
                                             <TextField
                                                 label="Ancho (m)"
@@ -662,7 +742,6 @@ class InformacionPared extends Component {
                                                 InputLabelProps={{
                                                     shrink: true,
                                                 }}
-                                                margin="normal"
                                             />
                                         </FormControl>
                                     </Grid>

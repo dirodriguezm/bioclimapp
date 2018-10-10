@@ -379,7 +379,7 @@ class TabPanel extends Component {
                             <PieChart />
                         </IconButton>
                         <Tabs value={value} onChange={this.handleChange}  centered>
-                            <Tab label="Contexto"/>
+                            <Tab label="Emplazamiento"/>
                             <Tab label="Morfología"/>
                         </Tabs>
                     </Toolbar>

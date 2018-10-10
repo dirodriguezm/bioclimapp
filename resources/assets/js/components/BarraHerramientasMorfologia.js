@@ -9,8 +9,6 @@ import AddCircle from '@material-ui/icons/AddCircle'
 import SvgIcon from '@material-ui/core/SvgIcon';
 import Tooltip from '@material-ui/core/Tooltip';
 import ThreeDRotation from '@material-ui/icons/ThreeDRotation';
-import RotateLeft from '@material-ui/icons/RotateLeft';
-import RotateRight from '@material-ui/icons/RotateRight';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
 

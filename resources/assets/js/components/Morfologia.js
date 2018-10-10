@@ -1043,6 +1043,7 @@ class Morfologia extends Component {
                             break;
                         case  Morfologia.tipos.VENTANA:
                             this.objetoSeleccionado.material = this.materialVentanaConstruida.clone();
+
                         default:
                             break;
                     }
