@@ -361,10 +361,10 @@ class InformacionVentana extends Component {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         Ancho: {seleccionado.geometry.boundingBox.max.x.toFixed(3)}
                                     </Grid>
-                                    <Grid item xs={12}>
+                                    <Grid item xs={6}>
                                         Alto: {seleccionado.geometry.boundingBox.max.y.toFixed(3)}
                                     </Grid>
                                 </Grid>
@@ -376,41 +376,37 @@ class InformacionVentana extends Component {
                                 <Typography className={classes.heading}>FAR</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
-                                <Grid container spacing={8}>
-                                    <Grid item xs={12}>
-                                        <FormControl className={classes.formControl}>
-                                            <Typography>
-                                                FAR de la ventana: {seleccionado.userData.far}
-                                            </Typography>
-                                            {seleccionado.userData.obstrucciones != null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
-                                                <ExpansionPanel>
-                                                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                                        <Typography className={classes.heading}>Obstruccion: {index}</Typography>
-                                                    </ExpansionPanelSummary>
-                                                    <ExpansionPanelDetails>
-                                                        <Grid container spacing={8}>
-                                                            <Grid item xs={12}>
-                                                                <Typography>FAR obstruccion: {obstruccion.far}</Typography>
-                                                            </Grid>
-                                                            <Grid item xs={12}>
-                                                                <Typography>Altura respecto a la ventana: {obstruccion.aDistance}</Typography>
-                                                            </Grid>
-                                                            <Grid item xs={12}>
-                                                                <Typography>Distancia respecto a la ventana: {obstruccion.bDistance}</Typography>
-                                                            </Grid>
-                                                            <Grid item xs={12}>
-                                                                <Typography>Ángulo(s) que obstruye:</Typography>
-                                                                {obstruccion.betaAngle.map(angle => (
-                                                                    <Typography>{angle}</Typography>
-                                                                ))}
-                                                            </Grid>
-                                                        </Grid>
-                                                    </ExpansionPanelDetails>
-                                                </ExpansionPanel>
-                                            )) : <div></div>}
-                                        </FormControl>
-                                    </Grid>
-                                </Grid>
+                                <FormControl className={classes.formControl}>
+                                    <Typography>
+                                        FAR de la ventana: {seleccionado.userData.far}
+                                    </Typography>
+                                    {seleccionado.userData.obstrucciones != null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
+                                        <ExpansionPanel>
+                                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                                <Typography className={classes.heading}>Obstruccion: {index}</Typography>
+                                            </ExpansionPanelSummary>
+                                            <ExpansionPanelDetails>
+                                                <Grid container spacing={40}>
+                                                    <Grid item xs>
+                                                        <Typography>FAR obstruccion: {obstruccion.far.toFixed(3)}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs>
+                                                        <Typography>Altura respecto a la ventana: {obstruccion.aDistance.toFixed(3)}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs>
+                                                        <Typography>Distancia respecto a la ventana: {obstruccion.bDistance.toFixed(3)}</Typography>
+                                                    </Grid>
+                                                    <Grid item xs>
+                                                        <Typography>Ángulo(s) que obstruye:</Typography>
+                                                        {obstruccion.betaAngle.map(angle => (
+                                                            <Typography>{angle.toFixed(3)}</Typography>
+                                                        ))}
+                                                    </Grid>
+                                                </Grid>
+                                            </ExpansionPanelDetails>
+                                        </ExpansionPanel>
+                                    )) : <div></div>}
+                                </FormControl>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
