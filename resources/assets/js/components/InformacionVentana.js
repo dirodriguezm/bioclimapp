@@ -16,6 +16,7 @@ import InputLabel from "@material-ui/core/InputLabel";
 import FormControl from '@material-ui/core/FormControl'
 import Grid from "@material-ui/core/Grid";
 import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
+import TextField from "@material-ui/core/TextField/TextField";
 
 const ITEM_HEIGHT = 48;
 
@@ -30,9 +31,8 @@ const styles = theme => ({
         margin: theme.spacing.unit*2,
     },
     formControl: {
-        margin: theme.spacing.unit,
-        minWidth: 200,
-        maxWidth: 220,
+        width: '100%',
+        'box-sizing': 'border-box',
     },
     textField: {
         width: 100,
@@ -60,7 +60,9 @@ class InformacionVentana extends Component {
             marco: 0,
             tipo_marco: 0,
             U_marco: 0,
-            FM: 0
+            FM: 0,
+            height: 0,
+            width: 0,
 
         };
         this.info_material = [];
@@ -72,6 +74,8 @@ class InformacionVentana extends Component {
         this.difusa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,2,new Date().getMonth() + 1) : null;
         this.directa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,3,new Date().getMonth() + 1) : null;
         this.handleChange = this.handleChange.bind(this);
+        this.handleChangeDimension = this.handleChangeDimension.bind(this);
+        this.handleChangeAlturaPiso = this.handleChangeAlturaPiso.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
     }
 
@@ -79,6 +83,17 @@ class InformacionVentana extends Component {
         if(this.props.comuna !== prevProps.comuna){
             this.getFilteredRadiation(this.props.comuna.id,2,new Date().getMonth()+1);
             this.getFilteredRadiation(this.props.comuna.id,3,new Date().getMonth()+1);
+        }
+        if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.VENTANA) {
+            if (this.props !== null) {
+
+                this.setState({
+                    height: this.props.seleccionado.userData.height,
+                    width: this.props.seleccionado.userData.width,
+                });
+
+
+            }
         }
     }
 
@@ -143,11 +158,51 @@ class InformacionVentana extends Component {
         this.props.onAporteSolarChanged(aporte_solar);
     }
 
+    handleChangeDimension(event) {
+        let ventana = this.props.seleccionado;
+        let height = ventana.userData.height, width = ventana.userData.width;
+        if (event.target.name === 'altura') {
+            if(parseInt(event.target.value) >= height){
+                height += 0.1;
+            }else{
+                height -= 0.1;
+            }
+
+            //this.props.onDimensionChanged(puerta, width, height);
+        } else {
+            if(parseInt(event.target.value) >= width){
+                width += 0.1;
+            }else{
+                width -= 0.1;
+            }
+        }
+        this.props.onDimensionChanged(ventana, width, height);
+    }
+
+    handleChangeAlturaPiso(event){
+        let ventana = this.props.seleccionado;
+        let altura = ventana.position.y;
+        if(parseInt(event.target.value) >= altura){
+            altura += 0.1;
+        }else{
+            altura -= 0.1;
+        }
+        this.props.onAlturaVentanaChanged(ventana, altura);
+    }
+
 
 
     render() {
         const {classes, seleccionado} = this.props;
         const {material, tipo, U, FS, marco, tipo_marco, U_marco, FM} = this.state;
+
+        let height, width, alturaPiso;
+        if(seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.VENTANA){
+            height = seleccionado.userData.height;
+            width = seleccionado.userData.width;
+            alturaPiso = seleccionado.position.y;
+        }
+
         return (
             <div>
                 {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.VENTANA ?
@@ -361,11 +416,47 @@ class InformacionVentana extends Component {
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
-                                    <Grid item xs={12}>
-                                        Ancho: {seleccionado.geometry.boundingBox.max.x.toFixed(3)}
+
+                                    <Grid item xs={4}>
+                                        <FormControl className={classes.formControl}>
+                                            <TextField
+                                                label="Altura (m)"
+                                                name="altura"
+                                                value={height}
+                                                type="number"
+                                                onChange={this.handleChangeDimension}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                        </FormControl>
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        Alto: {seleccionado.geometry.boundingBox.max.y.toFixed(3)}
+                                    <Grid item xs={4}>
+                                        <FormControl className={classes.formControl}>
+                                            <TextField
+                                                label="Ancho (m)"
+                                                name="ancho"
+                                                value={width}
+                                                type="number"
+                                                onChange={this.handleChangeDimension}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={4}>
+                                        <FormControl className={classes.formControl}>
+                                            <TextField
+                                                label="Altura al Piso(m)"
+                                                value={alturaPiso}
+                                                type="number"
+                                                onChange={this.handleChangeAlturaPiso}
+                                                InputLabelProps={{
+                                                    shrink: true,
+                                                }}
+                                            />
+                                        </FormControl>
                                     </Grid>
                                 </Grid>
                             </ExpansionPanelDetails>
@@ -434,6 +525,8 @@ class InformacionVentana extends Component {
 InformacionVentana.propTypes = {
     classes: PropTypes.object.isRequired,
     seleccionado: PropTypes.object,
+    onAlturaVentanaChanged: PropTypes.func,
+    onDimensionChanged: PropTypes.func,
 };
 
 export default withStyles(styles)(InformacionVentana);

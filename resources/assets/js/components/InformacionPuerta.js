@@ -195,15 +195,13 @@ class InformacionPuerta extends Component {
 
     handleChangeDimension(event) {
         let puerta = this.props.seleccionado;
-        let height = this.state.height, width = this.state.width;
+        let height = puerta.userData.height, width = puerta.userData.width;
         if (event.target.name === 'altura') {
             if(parseInt(event.target.value) >= height){
                 height += 0.1;
             }else{
                 height -= 0.1;
             }
-
-            //this.props.onDimensionChanged(puerta, width, height);
         } else {
             if(parseInt(event.target.value) >= width){
                 width += 0.1;
@@ -211,15 +209,19 @@ class InformacionPuerta extends Component {
                 width -= 0.1;
             }
         }
-        this.setState({
-            height: height,
-            width: width,
-        });
+        this.props.onDimensionChanged(puerta, width, height);
     }
 
     render() {
         const {classes, seleccionado} = this.props;
-        const {height, width, material, tipo, espesor, propiedad} = this.state;
+        const {material, tipo, espesor, propiedad} = this.state;
+
+        let height, width;
+        if(seleccionado !== null){
+            height = seleccionado.userData.height;
+            width = seleccionado.userData.width;
+        }
+
 
         let hasTipos;
 
@@ -451,6 +453,7 @@ class InformacionPuerta extends Component {
 InformacionPuerta.propTypes = {
     classes: PropTypes.object.isRequired,
     seleccionado: PropTypes.object,
+    onDimensionChanged: PropTypes.func,
 }
 
 export default withStyles(styles)(InformacionPuerta);

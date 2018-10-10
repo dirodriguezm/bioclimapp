@@ -908,7 +908,7 @@ class ManagerCasas {
             puerta.receiveShadow = true;
             pared.add(puerta);
             pared.worldToLocal(puerta.position);
-
+            puerta.userData.superficie = puerta.userData.width * puerta.userData.height;
             puerta.geometry.computeBoundingBox();
 
             let bound = puerta.geometry.boundingBox;
@@ -959,7 +959,10 @@ class ManagerCasas {
                 habitacion.puenteTermico
             );
 
+            pared.userData.superficie -= puerta.userData.superficie;
+
             this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+
 
             this.puertas.push(puerta);
             this.allObjects.push(puerta);
@@ -1015,12 +1018,13 @@ class ManagerCasas {
             ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
             //ventana.material = this.materialVentanaConstruida.clone();
             //ventana.visible = false;
+            pared.worldToLocal(ventana.position);
+            pared.add(ventana);
+
             ventana.geometry.computeBoundingBox();
             ventana.userData.superficie = ventana.userData.width * ventana.userData.height;
 
 
-            pared.worldToLocal(ventana.position);
-            pared.add(ventana);
 
             let bound = ventana.geometry.boundingBox;
 
@@ -1034,7 +1038,7 @@ class ManagerCasas {
             //TODO: revisar superposicion de hoyos
 
             let hole = new THREE.Path(vertices);
-
+            ventana.userData.hole = hole;
             var shape = pared.geometry.userData.shape.clone();
             shape.holes.push(hole);
 
@@ -1071,6 +1075,8 @@ class ManagerCasas {
                 habitacion.puenteTermico
             );
 
+            pared.userData.superficie -= ventana.userData.superficie;
+
             this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
 
             this.ventanas.push(ventana);
@@ -1089,7 +1095,7 @@ class ManagerCasas {
         this.ventanaConstruccion.userData.pared = pared;
         this.ventanaConstruccion.setRotationFromEuler(pared.rotation);
         this.ventanaConstruccion.position.copy(point).round();
-        this.ventanaConstruccion.position.y = (pared.parent.parent.userData.nivel) * pared.parent.parent.userData.height - pared.parent.parent.userData.height / 2 - pared.parent.parent.userData.height / 4 + pared.parent.parent.userData.height / 8;
+        this.ventanaConstruccion.position.y = (pared.parent.parent.userData.nivel - 1) * pared.parent.parent.userData.height + 1;
 
         if(pared.userData.orientacion.z !== 0){
             this.ventanaConstruccion.position.x = this.ventanaConstruccion.position.x - 0.5;
@@ -1134,6 +1140,195 @@ class ManagerCasas {
             }
         }
 
+    }
+    modificarAlturaVentana(ventana, altura){
+        let oldAltura = ventana.position.y;
+        let height = ventana.userData.height;
+
+        let pared = ventana.parent;
+
+        if(altura !== oldAltura){
+            if((height + altura) < pared.userData.height && altura >= 0.1){
+
+                var shape = pared.geometry.userData.shape.clone();
+                let currentPointVentana = ventana.userData.hole.currentPoint;
+                for(let hole of shape.holes){
+                    if(hole.currentPoint.x === currentPointVentana.x && hole.currentPoint.y === currentPointVentana.y){
+                        var index = shape.holes.indexOf(hole);
+                        shape.holes.splice(index,1);
+                        break;
+                    }
+                }
+
+                ventana.position.y = altura;
+
+                let bound = ventana.geometry.boundingBox;
+
+                let vertices = [
+                    new THREE.Vector2(bound.min.x + ventana.position.x, bound.min.y + ventana.position.y),
+                    new THREE.Vector2(bound.min.x + ventana.position.x, bound.max.y + ventana.position.y),
+                    new THREE.Vector2(bound.max.x + ventana.position.x, bound.max.y + ventana.position.y),
+                    new THREE.Vector2(bound.max.x + ventana.position.x, bound.min.y + ventana.position.y),
+
+                ];
+
+                let hole = new THREE.Path(vertices);
+
+                ventana.userData.hole = hole;
+
+                shape.holes.push(hole);
+
+                pared.geometry.dispose();
+                pared.geometry.dynamic = true;
+                pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+                pared.geometry.userData.shape = shape;
+                pared.geometry.verticesNeedUpdate = true;
+            }
+        }
+    }
+
+    modificarVentana(ventana, width, height){
+        let oldWidth = ventana.userData.width;
+        let oldHeight = ventana.userData.height;
+
+        let pared = ventana.parent;
+
+        let habitacion = pared.parent.parent;
+
+        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+
+        console.log(ventana.position.y);
+
+        console.log(ventana.userData.hole);
+        console.log(pared.geometry.userData.shape);
+
+        if(oldHeight !== height || oldWidth !== width){
+            if((height + ventana.position.y) <= pared.userData.height && width <= 1){
+
+                var shape = pared.geometry.userData.shape.clone();
+                let currentPointVentana = ventana.userData.hole.currentPoint;
+                for(let hole of shape.holes){
+                    if(hole.currentPoint.x === currentPointVentana.x && hole.currentPoint.y === currentPointVentana.y){
+                        var index = shape.holes.indexOf(hole);
+                        shape.holes.splice(index,1);
+                        break;
+                    }
+                }
+
+                ventana.geometry = this.crearGeometriaVentana(width, height);
+                ventana.geometry.computeBoundingBox();
+                ventana.userData.width = width;
+                ventana.userData.height = height;
+                pared.userData.superficie += ventana.userData.superficie;
+                ventana.userData.superficie = width * height;
+                pared.userData.superficie -= ventana.userData.superficie;
+                let bound = ventana.geometry.boundingBox;
+
+                let vertices = [
+                    new THREE.Vector2(bound.min.x + ventana.position.x, bound.min.y + ventana.position.y),
+                    new THREE.Vector2(bound.min.x + ventana.position.x, bound.max.y + ventana.position.y),
+                    new THREE.Vector2(bound.max.x + ventana.position.x, bound.max.y + ventana.position.y),
+                    new THREE.Vector2(bound.max.x + ventana.position.x, bound.min.y + ventana.position.y),
+
+                ];
+
+                let hole = new THREE.Path(vertices);
+
+                ventana.userData.hole = hole;
+
+                shape.holes.push(hole);
+
+                pared.geometry.dispose();
+                pared.geometry.dynamic = true;
+                pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+                pared.geometry.userData.shape = shape;
+                pared.geometry.verticesNeedUpdate = true;
+
+                this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+
+                habitacion.transmitanciaSuperficies -= ventana.userData.transSup;
+                BalanceEnergetico.transmitanciaSuperficie(ventana,this.zona);
+                habitacion.transmitanciaSuperficies += ventana.userData.transSup;
+                habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+                    habitacion.transmitanciaSuperficies,
+                    this.gradoDias,
+                    habitacion.puenteTermico
+                );
+
+                this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+
+            }
+        }
+    }
+
+
+    modificarPuerta(puerta, width, height){
+        let oldWidth = puerta.userData.width;
+        let oldHeight = puerta.userData.height;
+
+        let pared = puerta.parent;
+
+        let habitacion = pared.parent.parent;
+
+        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+
+        if(oldHeight !== height || oldWidth !== width){
+            if(height <= pared.userData.height && width <= 1){
+
+                var shape = pared.geometry.userData.shape.clone();
+                let currentPointPuerta = puerta.userData.hole.currentPoint;
+                for(let hole of shape.holes){
+                    if(hole.currentPoint.x === currentPointPuerta.x && hole.currentPoint.y === currentPointPuerta.y){
+                        var index = shape.holes.indexOf(hole);
+                        shape.holes.splice(index,1);
+                        break;
+
+                    }
+                }
+                puerta.geometry = this.crearGeometriaVentana(width, height);
+                puerta.geometry.computeBoundingBox();
+                puerta.userData.width = width;
+                puerta.userData.height = height;
+                pared.userData.superficie += puerta.userData.superficie;
+                puerta.userData.superficie = width * height;
+                pared.userData.superficie -= puerta.userData.superficie;
+                let bound = puerta.geometry.boundingBox;
+
+                let vertices = [
+                    new THREE.Vector2(bound.min.x + puerta.position.x, bound.min.y + puerta.position.y),
+                    new THREE.Vector2(bound.min.x + puerta.position.x, bound.max.y + puerta.position.y),
+                    new THREE.Vector2(bound.max.x + puerta.position.x, bound.max.y + puerta.position.y),
+                    new THREE.Vector2(bound.max.x + puerta.position.x, bound.min.y + puerta.position.y),
+
+                ];
+
+                let hole = new THREE.Path(vertices);
+
+                puerta.userData.hole = hole;
+
+                shape.holes.push(hole);
+
+                pared.geometry.dispose();
+                pared.geometry.dynamic = true;
+                pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+                pared.geometry.userData.shape = shape;
+                pared.geometry.verticesNeedUpdate = true;
+
+                this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+
+                habitacion.transmitanciaSuperficies -= puerta.userData.transSup;
+                BalanceEnergetico.transmitanciaSuperficie(puerta,this.zona);
+                habitacion.transmitanciaSuperficies += puerta.userData.transSup;
+                habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+                    habitacion.transmitanciaSuperficies,
+                    this.gradoDias,
+                    habitacion.puenteTermico
+                );
+
+                this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+
+            }
+        }
     }
 
     modificarParedHabitacion(pared, width, height) {

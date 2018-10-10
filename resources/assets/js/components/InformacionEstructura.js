@@ -44,33 +44,46 @@ class InformacionEstructura extends Component {
     }
 
     render() {
-        const {classes, seleccionado, onDimensionChanged, onCapaChanged} = this.props;
+        const {classes, seleccionado, onDimensionChanged, onCapaChanged,onAlturaVentanaChanged} = this.props;
 
 
         return (
             <div>
-                <InformacionPared
-                    seleccionado={seleccionado}
-                    onDimensionChanged={onDimensionChanged}
-                    onCapaChanged={onCapaChanged}
+                {seleccionado !== null ?
+                <div>
+                    <InformacionPared
+                        seleccionado={seleccionado}
+                        onDimensionChanged={onDimensionChanged}
+                        onCapaChanged={onCapaChanged}
 
-                />
+                    />
 
-                <InformacionVentana
-                    seleccionado={seleccionado}
-                    comuna={this.props.comuna}
-                    onAporteSolarChanged={this.props.onAporteSolarChanged}
+                    <InformacionVentana
+                        seleccionado={seleccionado}
+                        onDimensionChanged={onDimensionChanged}
+                        onAlturaVentanaChanged={onAlturaVentanaChanged}
+                        comuna={this.props.comuna}
+                        onAporteSolarChanged={this.props.onAporteSolarChanged}
 
-                />
+                    />
 
-                <InformacionPuerta
-                    seleccionado={seleccionado}
+                    <InformacionPuerta
+                        seleccionado={seleccionado}
+                        onDimensionChanged={onDimensionChanged}
 
-                />
+                    />
 
-                <InformacionPisoTecho
-                    seleccionado={seleccionado}
-                />
+                    <InformacionPisoTecho
+                        seleccionado={seleccionado}
+                    />
+
+                </div> : <div></div>
+
+
+
+
+                }
+
             </div>
         );
 
@@ -80,6 +93,7 @@ class InformacionEstructura extends Component {
 InformacionEstructura.propTypes = {
     classes: PropTypes.object.isRequired,
     onDimensionChanged: PropTypes.func,
+    onAlturaVentanaChanged: PropTypes.func,
     onCapaChanged: PropTypes.func,
     seleccionado: PropTypes.object,
 };

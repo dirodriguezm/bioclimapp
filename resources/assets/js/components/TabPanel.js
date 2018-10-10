@@ -152,7 +152,8 @@ class TabPanel extends Component {
             sunPosition: null,
             seleccionadoMorf: null,
             openMorf: false,
-            dimensionesPared: null,
+            dimensiones: null,
+            alturaPiso: null,
             openDashboard: false,
             drawer_localidad: true,
             sunPathClicked: false,
@@ -188,6 +189,8 @@ class TabPanel extends Component {
         this.onCapaReady = this.onCapaReady.bind(this);
         this.onRotationClicked = this.onRotationClicked.bind(this);
         this.onCasaPredefinidaChanged = this.onCasaPredefinidaChanged.bind(this);
+        this.onAlturaVentanaChanged = this.onAlturaVentanaChanged.bind(this);
+
     }
 
     handleDrawerOpen() {
@@ -288,6 +291,7 @@ class TabPanel extends Component {
     onSeleccionadoMorfChanged(seleccionado) {
         this.setState({
             seleccionadoMorf: seleccionado,
+            seleccionandoMorf: false,
         });
         this.handleDrawerOpen();
     }
@@ -312,15 +316,25 @@ class TabPanel extends Component {
         this.handleDrawerClose();
     }
 
-    onDimensionChanged(pared, width, height){
+    onDimensionChanged(elemento, width, height){
         this.setState({
-            dimensionesPared: {
-                pared: pared,
+            dimensiones: {
+                elemento: elemento,
                 width: width,
-                height: height
+                height: height,
             }
         });
     }
+    onAlturaVentanaChanged(ventana, altura){
+        this.setState({
+            alturaPiso: {
+                ventana: ventana,
+                altura: altura,
+            }
+        })
+    }
+
+
 
     onCapaChanged(){
         this.setState({
@@ -359,7 +373,7 @@ class TabPanel extends Component {
 
     render() {
         const {classes, theme, sunPosition} = this.props;
-        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensionesPared, paredCapaChange} = this.state;
+        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensiones, alturaPiso, paredCapaChange} = this.state;
         return (
 
             <div className={classes.appFrame} ref={(tab) => {
@@ -482,7 +496,8 @@ class TabPanel extends Component {
                                         seleccionando={seleccionandoMorf}
                                         borrando={borrandoMorf}
                                         onVentanasChanged={this.onVentanasChanged}
-                                        dimensionesPared={dimensionesPared}
+                                        dimensiones={dimensiones}
+                                        alturaPiso={alturaPiso}
                                         paredes={this.props.paredes}
                                         comuna={this.state.comuna}
                                         onCasaChanged={this.onCasaChanged}
@@ -530,6 +545,7 @@ class TabPanel extends Component {
                                 ventanas={this.state.ventanas}
                                 onAporteSolarChanged={this.onAporteSolarChanged}
                                 onDimensionChanged={this.onDimensionChanged}
+                                onAlturaVentanaChanged={this.onAlturaVentanaChanged}
                                 onCapaChanged={this.onCapaChanged}
                             />
                         </Drawer>

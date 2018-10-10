@@ -307,20 +307,21 @@ class InformacionPared extends Component {
 
     handleChangeDimension(event) {
         let pared = this.props.seleccionado;
-        let height, width;
+        let height= pared.userData.height, width = pared.userData.width;
         if (event.target.name === 'altura') {
-            height = parseInt(event.target.value);
-            width = this.props.seleccionado.userData.width;
-            this.props.onDimensionChanged(pared, width, height);
+            if(parseInt(event.target.value) >= height){
+                height += 0.1;
+            }else{
+                height -= 0.1;
+            }
         } else {
-            height = this.props.seleccionado.userData.height;
-            width = parseInt(event.target.value);
-            this.props.onDimensionChanged(pared, width, height);
+            if(parseInt(event.target.value) >= width){
+                width += 1;
+            }else{
+                width -= 1;
+            }
         }
-        this.setState({
-            height: height,
-            width: width,
-        });
+        this.props.onDimensionChanged(pared, width, height);
     }
 
     handleClickBorrar(event) {
@@ -392,7 +393,7 @@ class InformacionPared extends Component {
 
         this.setState({
             capas: capas,
-        })
+        });
 
         this.props.onCapaChanged();
 
@@ -400,7 +401,13 @@ class InformacionPared extends Component {
 
     render() {
         const {classes, seleccionado} = this.props;
-        const {capas, height, width, capaS} = this.state;
+        const {capas, capaS} = this.state;
+
+        let height, width;
+        if(seleccionado !== null){
+            height = seleccionado.userData.height;
+            width = seleccionado.userData.width;
+        }
 
         let material ,tipo ,espesor ,propiedad ;
 

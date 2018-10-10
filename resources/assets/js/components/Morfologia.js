@@ -52,14 +52,30 @@ class Morfologia extends Component {
             this.onComunaChanged();
         }
 
-        if(this.props.dimensionesPared !== prevProps.dimensionesPared && this.props.dimensionesPared != null){
-            this.managerCasas.modificarParedHabitacion(this.props.dimensionesPared.pared, this.props.dimensionesPared.width, this.props.dimensionesPared.height );
+        if(this.props.alturaPiso !== prevProps.alturaPiso && this.props.alturaPiso !== null){
+            this.managerCasas.modificarAlturaVentana(this.props.alturaPiso.ventana, this.props.alturaPiso.altura);
+            this.props.onVentanasChanged(this.ventanas);
+        }
+
+        if(this.props.dimensiones !== prevProps.dimensiones && this.props.dimensiones != null){
+            if(this.props.dimensiones.elemento.userData.tipo === Morfologia.tipos.PARED){
+                this.managerCasas.modificarParedHabitacion(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
+
+            }
+            if(this.props.dimensiones.elemento.userData.tipo === Morfologia.tipos.PUERTA){
+                this.managerCasas.modificarPuerta(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
+            }
+            if(this.props.dimensiones.elemento.userData.tipo === Morfologia.tipos.VENTANA){
+                this.managerCasas.modificarVentana(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
+                this.props.onVentanasChanged(this.ventanas);
+            }
             let casa = this.managerCasas.getCasa();
             let aporte_interno = casa.userData.aporteInterno;
             let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
             let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            
+
             this.props.onCasaChanged(aporte_interno, perdida_ventilacion, perdida_conduccion, casa.userData.volumen, casa.userData.area);
+
         }
         if(this.props.width !== prevProps.width ){
             this.renderer.setSize(this.props.width, this.props.height);
@@ -317,13 +333,15 @@ class Morfologia extends Component {
         renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer = renderer;
 
-        this.escena.add(new THREE.AmbientLight(0x666666));
+        this.escena.add(new THREE.AmbientLight(0xB1B1B1));
         this.escena.add(this.casas);
 
         //Luz
-        this.light = new THREE.DirectionalLight(0xffffff, 1, 100);
-        this.light.position.set(10, 10, 1); 			//default; light shining from top
+        this.light = new THREE.DirectionalLight(0xffff00, 1, 100);
+        //this.light.position.set(0, 0, 0); 			//default; light shining from top
+
         this.light.castShadow = true;            // default false
+
         //this.escena.add(this.light);
 
         this.light.shadow.mapSize.width = 512;  // default
@@ -370,7 +388,9 @@ class Morfologia extends Component {
         planoGeometria.computeFaceNormals();
         planoGeometria.computeVertexNormals();
 
-        this.positionParedes = [];
+
+
+            this.positionParedes = [];
         for (let i = 0; i < 50; i++) {
             this.positionParedes[i] = [];
             for (let j = 0; j < 50; j++) {
@@ -1024,6 +1044,25 @@ class Morfologia extends Component {
         }
     }
 
+    changeColorSeleccion(elemento){
+        switch (elemento.userData.tipo) {
+            case  Morfologia.tipos.PARED:
+                elemento.material = this.managerCasas.materialParedConstruida.clone();
+                break;
+            case  Morfologia.tipos.VENTANA:
+                elemento.material = this.managerCasas.materialVentanaConstruccion.clone();
+                break;
+            case Morfologia.tipos.PUERTA:
+                elemento.material = this.managerCasas.materialPuertaConstruida.clone();
+                break;
+            case Morfologia.tipos.PISO:
+                elemento.material = this.managerCasas.materialPisoConstruido.clone();
+                break;
+            default:
+                break;
+        }
+    }
+
     onMouseMove(event) {
         event.preventDefault();
         let rect = this.renderer.domElement.getBoundingClientRect();
@@ -1034,55 +1073,25 @@ class Morfologia extends Component {
         //Si se está seleccionado
         if(this.props.seleccionando){
             let intersects = this.raycaster.intersectObjects(this.allObjects);
+            if(this.objetoSeleccionadoClick !== null){
+                this.changeColorSeleccion(this.objetoSeleccionadoClick);
 
+            }
             if(intersects.length > 0){
                 let intersect = intersects[0].object;
                 if(this.objetoSeleccionado !== intersect && this.objetoSeleccionado != null){
-
-                    switch (this.objetoSeleccionado.userData.tipo) {
-                        case  Morfologia.tipos.PARED:
-                            this.objetoSeleccionado.material = this.managerCasas.materialParedConstruida.clone();
-                            break;
-                        case  Morfologia.tipos.VENTANA:
-                            this.objetoSeleccionado.material = this.managerCasas.materialVentanaConstruccion.clone();
-                            break;
-                        case Morfologia.tipos.PUERTA:
-                            this.objetoSeleccionado.material = this.managerCasas.materialPuertaConstruida.clone();
-                            break;
-                        case Morfologia.tipos.PISO:
-                            this.objetoSeleccionado.material = this.managerCasas.materialPisoConstruido.clone();
-                            break;
-                        default:
-                            break;
-                    }
+                    this.changeColorSeleccion(this.objetoSeleccionado);
                 }
                 this.objetoSeleccionado = intersect;
                 this.objetoSeleccionado.material = this.materialSeleccionado.clone();
 
             }else{
                 if(this.objetoSeleccionado != null){
-                    switch (this.objetoSeleccionado.userData.tipo) {
-                        case  Morfologia.tipos.PARED:
-                            this.objetoSeleccionado.material = this.managerCasas.materialParedConstruida.clone();
-                            break;
-                        case  Morfologia.tipos.VENTANA:
-                            this.objetoSeleccionado.material = this.managerCasas.materialVentanaConstruccion.clone();
-                            break;
-                        case Morfologia.tipos.PUERTA:
-                            this.objetoSeleccionado.material = this.managerCasas.materialPuertaConstruida.clone();
-                            break;
-                        case Morfologia.tipos.PISO:
-                            this.objetoSeleccionado.material = this.managerCasas.materialPisoConstruido.clone();
-                            break;
-                        default:
-                            break;
-                    }
+                    this.changeColorSeleccion(this.objetoSeleccionado);
                     this.objetoSeleccionado = null;
                 }
             }
-            if(this.objetoSeleccionadoClick !== null){
-                this.objetoSeleccionadoClick.material = this.materialSeleccionado.clone();
-            }
+
         }
 
         //Si se está dibujando
@@ -1148,6 +1157,7 @@ class Morfologia extends Component {
             this.angleRotated += (angle*180/Math.PI);
             this.cardinalPointsCircle.rotateZ(angle);
             this.sunPath.rotateY(angle);
+            this.light.target.position.set(0,0,0);
             //this.light.position.set(this.sol.position.x, this.sol.position.y, this.sol.position.z);
 
         }
@@ -1180,26 +1190,9 @@ class Morfologia extends Component {
         if(this.props.seleccionando){
             this.handleSeleccionado();
             if(this.objetoSeleccionadoClick !== null){
-                switch (this.objetoSeleccionadoClick.userData.tipo) {
-                    case  Morfologia.tipos.PARED:
-                        this.objetoSeleccionadoClick.material = this.managerCasas.materialParedConstruida.clone();
-                        break;
-                    case  Morfologia.tipos.VENTANA:
-                        this.objetoSeleccionadoClick.material = this.managerCasas.materialVentanaConstruccion.clone();
-                        break;
-                    case Morfologia.tipos.PUERTA:
-                        this.objetoSeleccionadoClick.material = this.managerCasas.materialPuertaConstruida.clone();
-                        break;
-                    case Morfologia.tipos.PISO:
-                        this.objetoSeleccionadoClick.material = this.managerCasas.materialPisoConstruido.clone();
-                        break;
-                    default:
-                        break;
-                }
+                this.changeColorSeleccion(this.objetoSeleccionadoClick);
             }
             this.objetoSeleccionadoClick = this.objetoSeleccionado;
-        }else{
-            this.objetoSeleccionadoClick = null;
         }
     }
 
@@ -1257,7 +1250,7 @@ Morfologia.propTypes = {
     borrando: PropTypes.bool,
     seleccionando: PropTypes.bool,
     onSeleccionadoChanged: PropTypes.func,
-    dimensionesPared: PropTypes.object,
+    dimensiones: PropTypes.object,
     onCapaReady: PropTypes.func,
     onCasaPredefinidaChanged: PropTypes.func,
 

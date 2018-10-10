@@ -257,6 +257,12 @@ class BarraHerramientasMorfologia extends Component {
 
     };
 
+    componentDidUpdate(prevProps){
+        if(this.props.seleccionando !== prevProps.seleccionando){
+            this.setState({seleccionando: this.props.seleccionando})
+        }
+    }
+
     handleClickAgregar(event) {
         this.setState({anchorEl: event.currentTarget});
     };
