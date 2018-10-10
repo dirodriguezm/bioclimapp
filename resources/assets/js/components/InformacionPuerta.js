@@ -241,7 +241,7 @@ class InformacionPuerta extends Component {
 
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>Capas</Typography>
+                                <Typography className={classes.heading}>Materiales</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
                                 <Grid container spacing={8}>
