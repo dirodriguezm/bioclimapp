@@ -23,7 +23,7 @@ class Morfologia extends Component {
         this.onChangeCamera = this.onChangeCamera.bind(this);
 
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
-        this.temperaturaConfort = 14;
+        this.temperaturaConfort = props.temperatura;
         this.angleRotated = 0;
 
         this.state  = {
@@ -86,6 +86,53 @@ class Morfologia extends Component {
 
         if(this.props.casaPredefinida !== prevProps.casaPredefinida && this.props.casaPredefinida !== -1){
             this.handleCasaPredefinida(this.props.casaPredefinida);
+        }
+        if(this.props.personas !== prevProps.personas) {
+            this.ocupantes = this.props.personas;
+            this.managerCasas.setPersonas(this.props.personas);
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+        }
+        if(this.props.temperatura !== prevProps.temperatura) {
+            this.temperaturaConfort = this.props.temperatura;
+            let res = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
+            let gradoDias = res[0];
+            let periodo = res[1];
+            this.managerCasas.setGradosDias(gradoDias, periodo);
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+        }
+        if(this.props.iluminacion !== prevProps.iluminacion) {
+            this.horasIluminacion = this.props.iluminacion;
+            this.managerCasas.setIluminacion(this.props.iluminacion);
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+        }
+        if(this.props.aire !== prevProps.aire) {
+            this.aireRenovado = this.props.aire;
+            this.managerCasas.setAire(this.props.aire);
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
         }
     }
 
@@ -273,9 +320,9 @@ class Morfologia extends Component {
         escena.background = new THREE.Color(0xf0f0f0);
         this.escena = escena;
 
-        this.ocupantes = 4;
-        this.horasIluminacion = 5;
-        this.aireRenovado = 5;
+        this.ocupantes = this.props.personas;
+        this.horasIluminacion = this.props.iluminacion;
+        this.aireRenovado = this.props.aire;
 
         this.heightWall = 2.5;
 

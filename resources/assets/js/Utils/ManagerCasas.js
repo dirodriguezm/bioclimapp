@@ -194,10 +194,66 @@ class ManagerCasas {
         this.zona = zona;
     }
 
+    setPersonas(personas){
+        this.ocupantes = personas;
+        let aporteInternoTotal = 0;
+        for(let nivel of this.casa.children){
+            for(let habitacion of nivel.children){
+                let superficie = habitacion.userData.depth * habitacion.userData.width;
+                let aporteInterno = BalanceEnergetico.aporteInterno(personas,superficie,this.horasIluminacion,this.periodo);
+                habitacion.userData.aporteInterno = aporteInterno;
+                aporteInternoTotal += aporteInterno;
+            }
+        }
+        this.casa.userData.aporteInterno = aporteInternoTotal;
+    }
+    setIluminacion(iluminacion){
+        this.horasIluminacion = iluminacion;
+        let aporteInternoTotal = 0;
+        for(let nivel of this.casa.children){
+            for(let habitacion of nivel.children){
+                let superficie = habitacion.userData.depth * habitacion.userData.width;
+                let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes,superficie,iluminacion,this.periodo);
+                habitacion.userData.aporteInterno = aporteInterno;
+                aporteInternoTotal += aporteInterno;
+            }
+        }
+        this.casa.userData.aporteInterno = aporteInternoTotal;
+    }
+    setAire(aire){
+        this.aireRenovado = aire;
+        let perdidaPorVentilacionTotal = 0;
+        for(let nivel of this.casa.children){
+            for(let habitacion of nivel.children){
+                let volumen = habitacion.userData.volumen;
+                let perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(volumen,aire,this.gradoDias);
+                habitacion.userData.perdidaPorVentilacion = perdidaVentilacion;
+                perdidaPorVentilacionTotal += perdidaVentilacion;
+            }
+        }
+        this.casa.userData.perdidaPorVentilacion = perdidaPorVentilacionTotal;
+    }
+
     setGradosDias(gradoDias, periodo) {
         this.gradoDias = gradoDias;
         this.periodo = periodo;
         this.casa.userData.periodo = periodo;
+        let perdidaPorVentilacionTotal = 0;
+        let perdidaPorConduccionTotal = 0;
+        for(let nivel of this.casa.children){
+            for(let habitacion of nivel.children){
+                let volumen = habitacion.userData.volumen;
+                let transSup = habitacion.userData.transmitanciaSuperficies;
+                let perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(volumen,this.aireRenovado,gradoDias);
+                let perdidaConduccion = BalanceEnergetico.perdidasConduccion(transSup,gradoDias,habitacion.userData.puenteTermico)
+                habitacion.userData.perdidaPorVentilacion = perdidaVentilacion;
+                habitacion.userData.perdidaPorConduccion = perdidaConduccion;
+                perdidaPorVentilacionTotal += perdidaVentilacion;
+                perdidaPorConduccionTotal += perdidaConduccion;
+            }
+        }
+        this.casa.userData.perdidaPorVentilacion = perdidaPorVentilacionTotal;
+        this.casa.userData.perdidaPorConduccion = perdidaPorConduccionTotal;
     }
 
     setStartHabitacion(start, raycaster) {

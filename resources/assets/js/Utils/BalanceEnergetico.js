@@ -21,13 +21,10 @@ function aporteInterno(ocupantes, superficie, horasIluminacion, periodo) {
     const ilumuinacion = 1.5 * horasIluminacion * superficie;
     const aporte_usuarios = uso * ocupantes;
     const aportes = ilumuinacion + aporte_usuarios;
-
     let valor = 0;
-
     for(let i = periodo[0]; i < periodo[1]; i++){
         valor +=(aportes)*diasMeses[i];
     }
-
     return valor;
 }
 
