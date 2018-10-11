@@ -285,21 +285,22 @@ class InformacionPisoTecho extends Component {
     }
 
     handleChangeDimension(event) {
-        let pared = this.props.seleccionado;
-        let depth, width;
+        let piso = this.props.seleccionado;
+        let depth = piso.userData.depth, width = piso.userData.width;
         if (event.target.name === 'profundidad') {
-            depth = parseInt(event.target.value);
-            width = this.props.seleccionado.userData.width;
-            this.props.onDimensionChanged(pared, width, depth);
+            if(parseInt(event.target.value) >= depth){
+                depth += 1;
+            }else{
+                depth -= 1;
+            }
         } else {
-            depth = this.props.seleccionado.userData.depth;
-            width = parseInt(event.target.value);
-            this.props.onDimensionChanged(pared, width, depth);
+            if(parseInt(event.target.value) >= width){
+                width += 1;
+            }else{
+                width -= 1;
+            }
         }
-        this.setState({
-            depth: depth,
-            width: width,
-        });
+        this.props.onDimensionChanged(piso, width, depth);
     }
 
     handleClickBorrarPiso(event) {
@@ -455,12 +456,15 @@ class InformacionPisoTecho extends Component {
         const {classes, seleccionado} = this.props;
         let pisoSeleccionado = seleccionado;
         let techoSeleccionado;
+        let depth, width;
         if(pisoSeleccionado !== null && pisoSeleccionado.userData.tipo === Morfologia.tipos.PISO){
             techoSeleccionado = seleccionado.userData.techo;
+            depth = pisoSeleccionado.userData.depth;
+            width = pisoSeleccionado.userData.width;
         }else{
             techoSeleccionado = null;
         }
-        const {capasPiso, capasTecho, depth, width, capaSeleccionadaPiso, capaSeleccionadaTecho} = this.state;
+        const {capasPiso, capasTecho, capaSeleccionadaPiso, capaSeleccionadaTecho} = this.state;
 
         let materialPiso ,tipoPiso ,espesorPiso ,propiedadPiso ;
         let materialTecho ,tipoTecho ,espesorTecho ,propiedadTecho ;
@@ -1110,7 +1114,7 @@ class InformacionPisoTecho extends Component {
 InformacionPisoTecho.propTypes = {
     classes: PropTypes.object.isRequired,
     seleccionado: PropTypes.object,
-    /*onDimensionChanged: PropTypes.func,
+    onDimensionChanged: PropTypes.func,/*
     onCapaChanged: PropTypes.func,*/
 };
 

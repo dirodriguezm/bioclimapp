@@ -60,7 +60,7 @@ class Morfologia extends Component {
         if(this.props.dimensiones !== prevProps.dimensiones && this.props.dimensiones != null){
             if(this.props.dimensiones.elemento.userData.tipo === Morfologia.tipos.PARED){
                 this.managerCasas.modificarParedHabitacion(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
-
+                //this.props.onVentanasChanged(this.ventanas);
             }
             if(this.props.dimensiones.elemento.userData.tipo === Morfologia.tipos.PUERTA){
                 this.managerCasas.modificarPuerta(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
@@ -68,6 +68,12 @@ class Morfologia extends Component {
             if(this.props.dimensiones.elemento.userData.tipo === Morfologia.tipos.VENTANA){
                 this.managerCasas.modificarVentana(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
                 this.props.onVentanasChanged(this.ventanas);
+            }
+            if(this.props.dimensiones.elemento.userData.tipo === Morfologia.tipos.PISO){
+                console.log("MORFOLOGIA");
+                console.log(this.props.dimensiones.width, this.props.dimensiones.depth);
+                this.managerCasas.modificarHabitacionDesdePiso(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
+                //this.props.onVentanasChanged(this.ventanas);
             }
             let casa = this.managerCasas.getCasa();
             let aporte_interno = casa.userData.aporteInterno;

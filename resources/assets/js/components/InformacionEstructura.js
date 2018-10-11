@@ -74,6 +74,7 @@ class InformacionEstructura extends Component {
                     />
 
                     <InformacionPisoTecho
+                        onDimensionChanged={onDimensionChanged}
                         seleccionado={seleccionado}
                     />
 

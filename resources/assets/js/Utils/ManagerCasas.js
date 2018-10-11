@@ -1213,11 +1213,6 @@ class ManagerCasas {
 
         let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
 
-        console.log(ventana.position.y);
-
-        console.log(ventana.userData.hole);
-        console.log(pared.geometry.userData.shape);
-
         if(oldHeight !== height || oldWidth !== width){
             if((height + ventana.position.y) <= pared.userData.height && width <= 1){
 
@@ -1427,12 +1422,6 @@ class ManagerCasas {
 
         }
         if (oldWidth !== width) {
-
-
-            let paredes = habitacion.getObjectByName("Paredes");
-
-            let index = paredes.children.indexOf(pared);
-
             let end;
             let start = new THREE.Vector3(
                 habitacion.userData.start.x,
@@ -1440,38 +1429,26 @@ class ManagerCasas {
                 habitacion.userData.start.z
             );
 
-            if (index % 2 === 0) {
+            if (pared.userData.orientacion.z !== 0) {
                 let x1 = start.x + width;
                 let x2 = start.x - width;
 
                 let dif = Math.abs(habitacion.userData.end.x - x1);
+                let x = dif === 1 ? x1 : x2;
 
-                let x;
-
-                if (dif === 1) {
-                    x = x1;
-                } else {
-                    x = x2;
-
-                }
                 end = new THREE.Vector3(
                     x,
                     habitacion.userData.end.y,
                     habitacion.userData.end.z
                 );
+
             } else {
                 let z1 = start.z + width;
                 let z2 = start.z - width;
 
                 let dif = Math.abs(habitacion.userData.end.z - z1);
+                let z = dif === 1 ? z1 : z2;
 
-                let z;
-
-                if (dif === 1) {
-                    z = z1;
-                } else {
-                    z = z2;
-                }
                 end = new THREE.Vector3(
                     habitacion.userData.end.x,
                     habitacion.userData.end.y,
@@ -1484,6 +1461,26 @@ class ManagerCasas {
         }
     }
 
+    modificarHabitacionDesdePiso(piso, width, depth){
+        let habitacion = piso.parent;
+
+        console.log(width, depth);
+
+        let start = new THREE.Vector3(
+            habitacion.userData.start.x,
+            habitacion.userData.start.y,
+            habitacion.userData.start.z
+        );
+
+        let end = new THREE.Vector3(
+                start.x + width,
+                start.y,
+                start.z + depth,
+            );
+
+        this.crecerHabitacionDibujada(habitacion, end, start);
+    }
+
     crecerHabitacionDibujada(habitacion, end, start) {
         var dir = end.clone().sub(start);
         var len = dir.length();
@@ -1494,20 +1491,6 @@ class ManagerCasas {
         habitacion.position.y = 0;
         habitacion.userData.end = end.clone();
         habitacion.userData.start = start.clone();
-        if (start.x < end.x) {
-            habitacion.userData.x1 = start.x;
-            habitacion.userData.x2 = end.x;
-        } else {
-            habitacion.userData.x2 = start.x;
-            habitacion.userData.x1 = end.x;
-        }
-        if (start.z < end.z) {
-            habitacion.userData.z1 = start.z;
-            habitacion.userData.z2 = end.z;
-        } else {
-            habitacion.userData.z2 = start.z;
-            habitacion.userData.z1 = end.z;
-        }
 
         //modificar geometrias paredes, piso y techo
         let paredes = habitacion.getObjectByName("Paredes");
@@ -1516,9 +1499,27 @@ class ManagerCasas {
         let widths = [width, depth, width, depth];
         let height = habitacion.userData.height;
 
-        let oldVolume = habitacion.userData.volumen;
-        this.casa.userData.volumen -= oldVolume;
+        this.casa.userData.volumen -= habitacion.userData.volumen;
         habitacion.userData.volumen = width * height * depth;
+
+        let oldWidth = habitacion.userData.width;
+        let oldDepth = habitacion.userData.depth;
+
+        if(oldWidth !== width){
+            if(width < oldWidth){
+                if(width % 2 === 0) habitacion.parent.position.x += 1;
+            }else{
+                if(width % 2 !== 0) habitacion.parent.position.x -= 1;
+            }
+        }
+        if(oldDepth !== depth){
+            if(depth < oldDepth){
+                if(depth % 2 === 0) habitacion.parent.position.z += 1;
+            }else{
+                if(depth % 2 !== 0) habitacion.parent.position.z -= 1;
+            }
+        }
+
         habitacion.userData.height = height;
         habitacion.userData.width = width;
         habitacion.userData.depth = depth;
@@ -1540,60 +1541,83 @@ class ManagerCasas {
             }else if(pared.userData.orientacion.x === -1){
                 pared.position.x = width / 2;
             }
-            pared.userData.width = widths[i];
-            pared.userData.height = height;
-            pared.userData.superficie = widths[i] * height;
+            if(pared.userData.width !== widths[i]){
+                pared.userData.width = widths[i];
+                pared.userData.height = height;
+                pared.userData.superficie = widths[i] * height;
 
-            var holes = [];
-            pared.geometry = this.crearGeometriaPared(widths[i], height);
-            var shape = pared.geometry.userData.shape.clone();
+                var holes = [];
+                pared.geometry = this.crearGeometriaPared(widths[i], height);
+                var shape = pared.geometry.userData.shape.clone();
+                let killElements = [];
+                for(let elemento of pared.children){
+                    if (widths[i] < oldWidth) {
+                        if (widths[i] % 2 === 0) {
+                            if(pared.userData.orientacion.z !== 0){
+                                elemento.position.x -= pared.userData.orientacion.z*0.5;
+                            }else{
+                                elemento.position.x += pared.userData.orientacion.x*0.5;
+                            }
+                        } else {
+                            if(pared.userData.orientacion.z !== 0){
+                                elemento.position.x += pared.userData.orientacion.z*0.5;
+                            }else{
+                                elemento.position.x -= pared.userData.orientacion.x*0.5;
+                            }
+                        }
+                    } else {
+                        if (widths[i] % 2 === 0) {
+                            if(pared.userData.orientacion.z !== 0){
+                                elemento.position.x -= pared.userData.orientacion.z*0.5;
+                            }else{
+                                elemento.position.x += pared.userData.orientacion.x*0.5;
+                            }
+                        } else {
+                            if(pared.userData.orientacion.z !== 0){
+                                elemento.position.x += pared.userData.orientacion.z*0.5;
+                            }else{
+                                elemento.position.x -= pared.userData.orientacion.x*0.5;
+                            }
+                        }
+                    }
 
-            pared.geometry.computeBoundingBox();
-            let bound = pared.geometry.boundingBox;
-            let boundElemento;
-            for(let elemento of pared.children){
-                if(pared.userData.width%2 === 0){
-                    elemento.position.x-= 0.5;
+                    if(elemento.position.x < -pared.userData.width/2 || elemento.position.x > pared.userData.width/2){
+                        killElements.push(elemento);
+                        transmitanciaSuperficies -= elemento.userData.transSup;
+                    }else{
+                        elemento.geometry.computeBoundingBox();
+                        let bound = elemento.geometry.boundingBox;
+
+                        let vertices = [
+                            new THREE.Vector2(bound.min.x + elemento.position.x, bound.min.y + elemento.position.y),
+                            new THREE.Vector2(bound.min.x + elemento.position.x, bound.max.y + elemento.position.y),
+                            new THREE.Vector2(bound.max.x + elemento.position.x, bound.max.y + elemento.position.y),
+                            new THREE.Vector2(bound.max.x + elemento.position.x, bound.min.y + elemento.position.y),
+                        ];
+
+                        elemento.userData.hole = new THREE.Path(vertices);
+
+                        holes.push(elemento.userData.hole);
+                        pared.userData.superficie -= elemento.userData.superficie;
+                    }
+
                 }
-                elemento.geometry.computeBoundingBox();
-                boundElemento = elemento.geometry.boundingBox;
-                console.log(elemento.position.x, -pared.userData.width/2);
-
-                if(elemento.position.x <= -pared.userData.width/2 || elemento.position.x >= pared.userData.width/2){
-                    pared.remove(elemento);
-                    elemento.parent = null;
-                    transmitanciaSuperficies -= elemento.userData.transSup;
-                }else{
-                    let bound = elemento.geometry.boundingBox;
-
-                    let vertices = [
-                        new THREE.Vector2(bound.min.x + elemento.position.x, bound.min.y + elemento.position.y),
-                        new THREE.Vector2(bound.min.x + elemento.position.x, bound.max.y + elemento.position.y),
-                        new THREE.Vector2(bound.max.x + elemento.position.x, bound.max.y + elemento.position.y),
-                        new THREE.Vector2(bound.max.x + elemento.position.x, bound.min.y + elemento.position.y),
-
-                    ];
-
-                    let hole = new THREE.Path(vertices);
-
-                    elemento.userData.hole = hole;
-
-                    holes.push(elemento.userData.hole);
-                    pared.userData.superficie -= elemento.userData.superficie;
+                for(let element of killElements){
+                    pared.remove(element);
                 }
+                shape.holes = holes;
 
+                pared.geometry.dispose();
+                pared.geometry.dynamic = true;
+                pared.geometry = new THREE.ShapeBufferGeometry( shape );
+                pared.geometry.userData.shape = shape;
+                pared.geometry.verticesNeedUpdate = true;
+
+                transmitanciaSuperficies -= pared.userData.transSup;
+                BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
+                transmitanciaSuperficies += pared.userData.transSup;
             }
-            shape.holes = holes;
 
-            pared.geometry.dispose();
-            pared.geometry.dynamic = true;
-            pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
-            pared.geometry.userData.shape = shape;
-            pared.geometry.verticesNeedUpdate = true;
-
-            transmitanciaSuperficies -= pared.userData.transSup;
-            BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
-            transmitanciaSuperficies += pared.userData.transSup;
 
 
         }
