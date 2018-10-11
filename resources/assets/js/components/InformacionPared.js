@@ -130,8 +130,6 @@ class InformacionPared extends Component {
                 this.setState({
                     capas: capas,
                     capaS: null,
-                    height: this.props.seleccionado.userData.height,
-                    width: this.props.seleccionado.userData.width,
                 });
                 if(this.props.seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR) {
                     this.info_rb = <div/>;

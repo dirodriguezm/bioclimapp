@@ -624,6 +624,7 @@ class ManagerCasas {
         this.casa.add(nivel);
 
         nivel.position.y = (habitacion.userData.nivel - 1) * habitacion.userData.height;
+        nivel.userData.nivel = prevNivel + 1;
         nivel.add(habitacion);
 
 
@@ -822,6 +823,21 @@ class ManagerCasas {
         let habitacion = this.crearHabitacion(this.widthPredefinida, this.heightWall, this.depthPredefinida, 1);
 
         habitacion.position.x = -0.5;
+        habitacion.userData.start =  new THREE.Vector3(
+            habitacion.position.x - this.widthPredefinida/2,
+            habitacion.position.y,
+            habitacion.position.z - this.depthPredefinida/2
+        );
+
+        habitacion.userData.end =  new THREE.Vector3(
+            habitacion.position.x + this.widthPredefinida/2,
+            habitacion.position.y,
+            habitacion.position.z + this.depthPredefinida/2
+        );
+
+        console.log(habitacion);
+
+
 
         this.agregarTecho(habitacion);
 
@@ -1339,7 +1355,7 @@ class ManagerCasas {
 
         let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
 
-        if (oldHeight !== height) {
+        if (oldHeight !== height && height >= 1.9) {
             habitacion.userData.height = height;
             let oldVolume = habitacion.userData.volumen;
             this.casa.userData.volumen -= oldVolume;
@@ -1351,9 +1367,22 @@ class ManagerCasas {
             for (let i = 0; i < paredes.children.length; i++) {
                 let pared = paredes.children[i];
                 let paredWidth = pared.userData.width;
+
+                let superficieElementos = (pared.userData.width*pared.userData.height)-pared.userData.superficie;
+                var holes = pared.geometry.userData.shape.holes.slice(0);
+
                 pared.geometry = this.crearGeometriaPared(paredWidth, height);
+                var shape = pared.geometry.userData.shape.clone();
+                shape.holes = holes;
+
+                pared.geometry.dispose();
+                pared.geometry.dynamic = true;
+                pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+                pared.geometry.userData.shape = shape;
+                pared.geometry.verticesNeedUpdate = true;
+
                 pared.userData.height = height;
-                pared.userData.superficie = paredWidth * height;
+                pared.userData.superficie = paredWidth * height - superficieElementos;
 
                 transmitanciaSuperficies -= pared.userData.transSup;
                 BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
@@ -1362,7 +1391,12 @@ class ManagerCasas {
 
             let techo = habitacion.getObjectByName("Techo");
             if(techo){
-                techo.geometry = this.crearGeometriaTecho(width, habitacion.userData.depth, height);
+                if(pared.userData.orientacion.z !== 0){
+                    techo.geometry = this.crearGeometriaTecho(width, habitacion.userData.depth, height);
+                }else{
+                    techo.geometry = this.crearGeometriaTecho(habitacion.userData.width, width, height);
+                }
+
             }
 
 
@@ -1380,6 +1414,17 @@ class ManagerCasas {
             this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
             this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
             this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
+
+            habitacion.userData.height = height;
+
+            let indiceNivel = habitacion.userData.nivel;
+
+            for(let nivel of this.casa.children){
+                if(nivel.userData.nivel > indiceNivel){
+                    nivel.position.y += (height - oldHeight);
+                }
+            }
+
         }
         if (oldWidth !== width) {
 
@@ -1484,30 +1529,73 @@ class ManagerCasas {
         for (let i = 0; i < paredes.children.length; i++) {
             let pared = paredes.children[i];
 
-            pared.geometry = this.crearGeometriaPared(widths[i], height);
+            if(pared.userData.orientacion.z === 1) {
+                pared.position.z = -depth / 2;
+            }
+            else if(pared.userData.orientacion.z === -1) {
+                pared.position.z = depth / 2;
+            }
+            if(pared.userData.orientacion.x === 1){
+                pared.position.x = -width / 2;
+            }else if(pared.userData.orientacion.x === -1){
+                pared.position.x = width / 2;
+            }
             pared.userData.width = widths[i];
             pared.userData.height = height;
             pared.userData.superficie = widths[i] * height;
 
+            var holes = [];
+            pared.geometry = this.crearGeometriaPared(widths[i], height);
+            var shape = pared.geometry.userData.shape.clone();
+
+            pared.geometry.computeBoundingBox();
+            let bound = pared.geometry.boundingBox;
+            let boundElemento;
+            for(let elemento of pared.children){
+                if(pared.userData.width%2 === 0){
+                    elemento.position.x-= 0.5;
+                }
+                elemento.geometry.computeBoundingBox();
+                boundElemento = elemento.geometry.boundingBox;
+                console.log(elemento.position.x, -pared.userData.width/2);
+
+                if(elemento.position.x <= -pared.userData.width/2 || elemento.position.x >= pared.userData.width/2){
+                    pared.remove(elemento);
+                    elemento.parent = null;
+                    transmitanciaSuperficies -= elemento.userData.transSup;
+                }else{
+                    let bound = elemento.geometry.boundingBox;
+
+                    let vertices = [
+                        new THREE.Vector2(bound.min.x + elemento.position.x, bound.min.y + elemento.position.y),
+                        new THREE.Vector2(bound.min.x + elemento.position.x, bound.max.y + elemento.position.y),
+                        new THREE.Vector2(bound.max.x + elemento.position.x, bound.max.y + elemento.position.y),
+                        new THREE.Vector2(bound.max.x + elemento.position.x, bound.min.y + elemento.position.y),
+
+                    ];
+
+                    let hole = new THREE.Path(vertices);
+
+                    elemento.userData.hole = hole;
+
+                    holes.push(elemento.userData.hole);
+                    pared.userData.superficie -= elemento.userData.superficie;
+                }
+
+            }
+            shape.holes = holes;
+
+            pared.geometry.dispose();
+            pared.geometry.dynamic = true;
+            pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+            pared.geometry.userData.shape = shape;
+            pared.geometry.verticesNeedUpdate = true;
+
             transmitanciaSuperficies -= pared.userData.transSup;
-            BalanceEnergetico.transmitanciaSuperficie(pared.this.zona);
+            BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
             transmitanciaSuperficies += pared.userData.transSup;
 
-            switch (i) {
-                case 0:
-                    pared.position.z = -depth / 2;
 
-                    break;
-                case 1:
-                    pared.position.x = -width / 2;
-                    break;
-                case 2:
-                    pared.position.z = +depth / 2;
-                    break;
-                case 3:
-                    pared.position.x = +width / 2;
-                    break;
-            }
         }
 
         let piso = habitacion.getObjectByName("Piso");
@@ -1567,6 +1655,7 @@ class ManagerCasas {
 
         this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
         this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
+
     }
 
     crecerHabitacion(nextPosition) {
@@ -1658,6 +1747,7 @@ class ManagerCasas {
         var casa = new THREE.Group();
         casa.name = "casa";
         var nivel = new THREE.Group();
+        nivel.userData.nivel = 1;
 
         casa.add(nivel);
 
@@ -1778,21 +1868,6 @@ class ManagerCasas {
 
         let geometria = new THREE.ShapeBufferGeometry(ParedShape);
         geometria.userData.shape = ParedShape;
-       /* geometria.faces.push(new THREE.Face3(0, 2, 1));
-        geometria.faces.push(new THREE.Face3(1, 2, 3));*/
-
-        /*let x1 = width / -2, x2 = width / 2, y1 = 0, y2 = height;
-
-        geometria.vertices.push(new THREE.Vector3(x1, y1, 0));
-        geometria.vertices.push(new THREE.Vector3(x1, y2, 0));
-        geometria.vertices.push(new THREE.Vector3(x2, y1, 0));
-        geometria.vertices.push(new THREE.Vector3(x2, y2, 0));
-
-        geometria.faces.push(new THREE.Face3(0, 2, 1));
-        geometria.faces.push(new THREE.Face3(1, 2, 3));*/
-
-       /* geometria.computeFaceNormals();
-        geometria.computeVertexNormals();*/
 
         return geometria;
     }
@@ -1844,31 +1919,7 @@ class ManagerCasas {
 
         let geometria = new THREE.ShapeBufferGeometry(VentanaShape);
         geometria.userData.shape = VentanaShape;
-        /*let geometria = new THREE.Geometry();
 
-        let x1 = 0, x2 = width, y1 = 0, y2 = height;
-        let z_offset = 0.01;
-
-        geometria.vertices.push(new THREE.Vector3(x1, y1, z_offset));
-        geometria.vertices.push(new THREE.Vector3(x1, y2, z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y1, z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y2, z_offset));
-
-        geometria.vertices.push(new THREE.Vector3(x1, y1, -z_offset));
-        geometria.vertices.push(new THREE.Vector3(x1, y2, -z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y1, -z_offset));
-        geometria.vertices.push(new THREE.Vector3(x2, y2, -z_offset));
-
-        let face = new THREE.Face3(0, 2, 1);
-        let face2 = new THREE.Face3(1, 2, 3);
-        let face3 = new THREE.Face3(4, 6, 5);
-        let face4 = new THREE.Face3(5, 6, 7);
-
-        geometria.faces.push(face);
-        geometria.faces.push(face2);
-        geometria.faces.push(face3);
-        geometria.faces.push(face4);
-*/
         return geometria;
     }
 
