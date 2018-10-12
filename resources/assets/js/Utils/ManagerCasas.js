@@ -289,15 +289,39 @@ class ManagerCasas {
 
     }
 
-    capasChanged(elemento) {
-        let habitacion = elemento.parent.parent;
+    capasChanged(estructura) {
+        this.actualizarTransmitanciaSuperficie(estructura);
+        if(estructura.userData.tipo === Morfologia.tipos.PISO){
+            this.actualizarTransmitanciaSuperficie(estructura.userData.techo);
+        }
+    }
+
+    actualizarTransmitanciaSuperficie(estructura){
+        let habitacion;
+        if(estructura.userData.tipo === Morfologia.tipos.PISO || estructura.userData.tipo === Morfologia.tipos.TECHO){
+            habitacion = estructura.parent;
+        }else if(estructura.userData.tipo === Morfologia.tipos.VENTANA || estructura.userData.tipo === Morfologia.tipos.PUERTA){
+            habitacion = estructura.parent.parent.parent;
+        }else{
+            habitacion = estructura.parent.parent;
+        }
 
         let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
 
-        transmitanciaSuperficies -= elemento.userData.transSup;
-        BalanceEnergetico.transmitanciaSuperficie(elemento,this.zona);
-        transmitanciaSuperficies += elemento.userData.transSup;
+        console.log(transmitanciaSuperficies);
+
+        transmitanciaSuperficies -= estructura.userData.transSup;
+        BalanceEnergetico.transmitanciaSuperficie(estructura,this.zona);
+        transmitanciaSuperficies += estructura.userData.transSup;
+        if(estructura.userData.tipo === Morfologia.tipos.PISO){
+            estructura.userData.puenteTermico = BalanceEnergetico.puenteTermico(estructura);
+            habitacion.userData.puenteTermico = estructura.userData.puenteTermico;
+        }
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
+
+        console.log(transmitanciaSuperficies);
+        console.log(estructura.userData.transSup);
+
         this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
         this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
 
@@ -624,12 +648,21 @@ class ManagerCasas {
                 }
             ];
 
-        let puenteTermico = BalanceEnergetico.puenteTermico(piso,this.zona);
-        piso.userData.puenteTermico = puenteTermico.normal;
-        piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
         piso.material = this.materialPisoConstruido.clone();
         piso.castShadow = true;
         piso.receiveShadow = true;
+
+        piso.userData.superficie = piso.userData.width * piso.userData.depth;
+
+        BalanceEnergetico.transmitanciaSuperficie(piso,this.zona);
+        transmitanciaSuperficies += piso.userData.transSup;
+        transmitanciaSuperficiesObjetivo += piso.userData.transSup;
+
+
+        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
+        let puenteTermico = piso.userData.puenteTermico;
+        piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+
 
         let techo = habitacion.getObjectByName("Techo");
         if(techo){
@@ -676,7 +709,19 @@ class ManagerCasas {
         let pos = habitacion.position.clone();
         let prevNivel = habitacion.userData.nivel;
         habitacion.userData.nivel = prevNivel + 1;
-        //habitacion.position.y = (nivel - 1) *habitacion.userData.height;
+        let piso = habitacion.getObjectByName("Piso");
+        piso.userData.separacion =  Morfologia.separacion.INTERIOR;
+
+        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
+
+        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+        habitacion.userData.puenteTermico = piso.userData.puenteTermico;
+
+        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
+        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+
+       //habitacion.position.y = (nivel - 1) *habitacion.userData.height;
 
         let nivel = habitacion.parent;
         nivel.remove(habitacion);
@@ -896,10 +941,6 @@ class ManagerCasas {
             habitacion.position.z + this.depthPredefinida/2
         );
 
-        console.log(habitacion);
-
-
-
         this.agregarTecho(habitacion);
 
         this.agregarHabitacion(habitacion);
@@ -1107,8 +1148,6 @@ class ManagerCasas {
 
             ventana.geometry.computeBoundingBox();
             ventana.userData.superficie = ventana.userData.width * ventana.userData.height;
-
-
 
             let bound = ventana.geometry.boundingBox;
 
@@ -1442,8 +1481,39 @@ class ManagerCasas {
                 let pared = paredes.children[i];
                 let paredWidth = pared.userData.width;
 
+
+
                 let superficieElementos = (pared.userData.width*pared.userData.height)-pared.userData.superficie;
+                let killElements = [];
+                for(let elemento of pared.children){
+                    if(elemento.userData.tipo === Morfologia.tipos.VENTANA){
+                        if(elemento.userData.height + elemento.position.y >= height){
+                            killElements.push(elemento);
+                        }
+                    }else{
+                        if(elemento.userData.height  >= height){
+                            killElements.push(elemento);
+                        }
+                    }
+                }
                 var holes = pared.geometry.userData.shape.holes.slice(0);
+                for(let element of killElements){
+                    let index;
+                    if(element.userData.tipo === Morfologia.tipos.VENTANA){
+                        index = this.ventanas.indexOf(element);
+                        this.ventanas.splice(index,1);
+
+                    }else{
+                        index = this.puertas.indexOf(element);
+                        this.puertas.splice(index,1);
+                    }
+                    index = holes.indexOf(element.userData.hole);
+                    holes.splice(index,1);
+                    index = this.allObjects.indexOf(element);
+                    this.allObjects.splice(index,1);
+                    pared.remove(element);
+                    superficieElementos -= element.userData.superficie;
+                }
 
                 pared.geometry = this.crearGeometriaPared(paredWidth, height);
                 var shape = pared.geometry.userData.shape.clone();
@@ -1553,9 +1623,6 @@ class ManagerCasas {
 
     modificarHabitacionDesdePiso(piso, width, depth){
         let habitacion = piso.parent;
-
-        console.log(width, depth);
-
         let start = new THREE.Vector3(
             habitacion.userData.start.x,
             habitacion.userData.start.y,
@@ -1694,6 +1761,16 @@ class ManagerCasas {
 
                 }
                 for(let element of killElements){
+                    let index;
+                    if(element.userData.tipo === Morfologia.tipos.VENTANA){
+                        index = this.ventanas.indexOf(element);
+                        this.ventanas.splice(index,1);
+                    }else{
+                        index = this.puertas.indexOf(element);
+                        this.puertas.splice(index,1);
+                    }
+                    index = this.allObjects.indexOf(element);
+                    this.allObjects.splice(index,1);
                     pared.remove(element);
                 }
                 shape.holes = holes;
@@ -1723,6 +1800,12 @@ class ManagerCasas {
         piso.userData.superficie = piso.userData.width * piso.userData.depth;
         this.casa.userData.area += piso.userData.superficie;
         piso.userData.perimetro = piso.userData.width * 2 + piso.userData.depth * 2;
+        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
+
+        transmitanciaSuperficies -= piso.userData.transSup;
+        BalanceEnergetico.transmitanciaSuperficie(piso, this.zona);
+        transmitanciaSuperficies += piso.userData.transSup;
+
 
         let puenteTermico = BalanceEnergetico.puenteTermico(piso);
         piso.userData.puenteTermico = puenteTermico.normal;
@@ -1961,6 +2044,11 @@ class ManagerCasas {
         piso.userData.tipo = Morfologia.tipos.PISO;
         piso.userData.aislacion = Morfologia.aislacionPiso.CORRIENTE;
 
+        if(nivel === 1){
+            piso.userData.separacion =  Morfologia.separacion.EXTERIOR;
+        }else{
+            piso.userData.separacion =  Morfologia.separacion.INTERIOR;
+        }
 
         /*var techo = this.crearMeshTecho(width, depth, height);
         techo.userData.tipo = Morfologia.tipos.TECHO;

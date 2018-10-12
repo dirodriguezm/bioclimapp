@@ -84,13 +84,7 @@ class InformacionPuerta extends Component {
         super(props);
 
         this.state = {
-            material: 0,
-            tipo: 0,
-            espesor: 0,
-            propiedad: 0,
-            conductividad: 0,
-            height: 0,
-            width: 0,
+            capa: {},
 
         };
         this.info_material = [];
@@ -102,16 +96,12 @@ class InformacionPuerta extends Component {
 
     componentDidUpdate(prevProps) {
         if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.PUERTA) {
+
             if (this.props !== null) {
+                let capa = this.props.seleccionado.userData.info_material;
 
                 this.setState({
-                    height: this.props.seleccionado.userData.height,
-                    width: this.props.seleccionado.userData.width,
-                    material: this.props.seleccionado.userData.info_material.material,
-                    tipo: this.props.seleccionado.userData.info_material.tipo,
-                    propiedad: this.props.seleccionado.userData.info_material.propiedad,
-                    conductividad: this.props.seleccionado.userData.info_material.conductividad,
-                    espesor: this.props.seleccionado.userData.info_material.espesor,
+                    capa: capa,
                 });
 
 
@@ -142,55 +132,46 @@ class InformacionPuerta extends Component {
     }
 
     handleChangeMaterial(event){
+        let capa = this.state.capa;
+
+        capa[event.target.name] = event.target.value;
 
         if(event.target.name === 'material'){
             if(this.info_material[event.target.value].hasOwnProperty('tipos')){
-                this.setState({
-                    tipo: 0,
-                    propiedad: 0,
-                });
+                capa.tipo = 0;
+                capa.propiedad = 0;
             }else{
-                this.setState({
-                    propiedad: 0,
-                });
+                capa.propiedad = 0;
             }
         }
 
         if(event.target.name === 'tipo'){
-            this.setState({
-                tipo: 0,
-                propiedad: 0,
-            });
+            capa.tipo = 0;
+            capa.propiedad = 0;
         }
 
-        if(event.target.name === 'propiedad'){
-            let conductividad;
 
-            if(this.info_material[this.state.material].hasOwnProperty('tipos')){
-                conductividad = this.info_material[this.state.material].tipos[this.state.tipo].propiedades[this.state.propiedad].conductividad;
-            }else{
-                conductividad = this.info_material[this.state.material].propiedades[this.state.propiedad].conductividad;
+        let conductividad;
 
-            }
-            this.setState({
-                conductividad: conductividad,
-            });
+        if(this.info_material[capa.material].hasOwnProperty('tipos')){
+           conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
+        }else{
+            conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
+
         }
-
+        capa.conductividad = conductividad;
 
 
         if(event.target.name === 'espesor'){
-            this.setState({
-                espesor : event.target.value/1000,
-            });
-        }else{
-            this.setState({
-                [event.target.name] : event.target.value,
-            });
+            capa.espesor =  event.target.value/1000;
         }
 
+        this.setState({
+            capa: capa,
+        });
+
         //TODO: crear onMaterialChanged
-        //this.props.onCapaChanged();
+        this.props.onCapaChanged();
     }
 
     handleChangeDimension(event) {
@@ -214,25 +195,32 @@ class InformacionPuerta extends Component {
 
     render() {
         const {classes, seleccionado} = this.props;
-        const {material, tipo, espesor, propiedad} = this.state;
+        const {capa} = this.state;
 
         let height, width;
         if(seleccionado !== null){
             height = seleccionado.userData.height;
             width = seleccionado.userData.width;
         }
+        let material, tipo, espesor, propiedad;
 
+        if(Object.keys(capa).length > 0){
+            material = capa.material;
+            tipo = capa.tipo;
+            espesor = capa.espesor;
+            propiedad = capa.propiedad;
+        }
 
         let hasTipos;
 
-        if (seleccionado !== null && this.info_material.length > 0 && seleccionado.userData.tipo === Morfologia.tipos.PUERTA ) {
+        if (seleccionado !== null && this.info_material.length > 0 && seleccionado.userData.tipo === Morfologia.tipos.PUERTA && Object.keys(capa).length > 0) {
             hasTipos = this.info_material[material].hasOwnProperty('tipos');
         } else {
             hasTipos = null;
         }
         return (
             <div>
-                {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.PUERTA ?
+                {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.PUERTA && Object.keys(capa).length > 0 ?
                     <div className={classes.root}>
                         <Typography
                             variant={"title"}
@@ -255,7 +243,7 @@ class InformacionPuerta extends Component {
                                                 marginRight : 4,}}>
                                                 <Grid item xs={6}>
                                                     <FormControl className={classes.formControl}>
-                                                        <InputLabel htmlFor="material-simple">Material</InputLabel>
+                                                        <InputLabel htmlFor="material-simple">Material puerta</InputLabel>
                                                         <Select
                                                             value={material}
                                                             onChange={this.handleChangeMaterial}

@@ -49,41 +49,35 @@ class InformacionEstructura extends Component {
 
         return (
             <div>
-                {seleccionado !== null ?
-                <div>
-                    <InformacionPared
-                        seleccionado={seleccionado}
-                        onDimensionChanged={onDimensionChanged}
-                        onCapaChanged={onCapaChanged}
+                <InformacionPared
+                    seleccionado={seleccionado}
+                    onDimensionChanged={onDimensionChanged}
+                    onCapaChanged={onCapaChanged}
 
-                    />
+                />
 
-                    <InformacionVentana
-                        seleccionado={seleccionado}
-                        onDimensionChanged={onDimensionChanged}
-                        onAlturaVentanaChanged={onAlturaVentanaChanged}
-                        comuna={this.props.comuna}
-                        onAporteSolarChanged={this.props.onAporteSolarChanged}
+                <InformacionVentana
+                    seleccionado={seleccionado}
+                    onDimensionChanged={onDimensionChanged}
+                    onAlturaVentanaChanged={onAlturaVentanaChanged}
+                    comuna={this.props.comuna}
+                    onAporteSolarChanged={this.props.onAporteSolarChanged}
+                    onCapaChanged={onCapaChanged}
 
-                    />
+                />
 
-                    <InformacionPuerta
-                        seleccionado={seleccionado}
-                        onDimensionChanged={onDimensionChanged}
+                <InformacionPuerta
+                    seleccionado={seleccionado}
+                    onDimensionChanged={onDimensionChanged}
+                    onCapaChanged={onCapaChanged}
 
-                    />
+                />
 
-                    <InformacionPisoTecho
-                        onDimensionChanged={onDimensionChanged}
-                        seleccionado={seleccionado}
-                    />
-
-                </div> : <div></div>
-
-
-
-
-                }
+                <InformacionPisoTecho
+                    onDimensionChanged={onDimensionChanged}
+                    seleccionado={seleccionado}
+                    onCapaChanged={onCapaChanged}
+                />
 
             </div>
         );
