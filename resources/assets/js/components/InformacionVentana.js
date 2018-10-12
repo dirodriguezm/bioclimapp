@@ -88,8 +88,8 @@ class InformacionVentana extends Component {
             this.getFilteredRadiation(this.props.comuna.id,2,new Date().getMonth()+1);
             this.getFilteredRadiation(this.props.comuna.id,3,new Date().getMonth()+1);
         }
-        if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.VENTANA) {
-            if (this.props !== null) {
+        if (this.props.seleccionado !== prevProps.seleccionado) {
+            if (this.props.seleccionado !== null  && this.props.seleccionado.userData.tipo === Morfologia.tipos.VENTANA) {
 
                 let info_material_ventana = this.props.seleccionado.userData.info_material;
                 let info_material_marco = this.props.seleccionado.userData.info_marco;

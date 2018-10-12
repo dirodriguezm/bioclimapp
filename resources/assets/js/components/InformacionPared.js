@@ -115,8 +115,8 @@ class InformacionPared extends Component {
 
     componentDidUpdate(prevProps) {
         //console.log("selec pared",this.props.seleccionado);
-        if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.PARED) {
-            if (this.props !== null) {
+        if (this.props.seleccionado !== prevProps.seleccionado) {
+            if(this.props.seleccionado !== null  && this.props.seleccionado.userData.tipo === Morfologia.tipos.PARED ){
                 let capas = this.props.seleccionado.userData.capas;
                 for (let i = 0; i < capas.length; i++) {
                     capas[i].index = i;

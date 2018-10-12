@@ -95,9 +95,9 @@ class InformacionPuerta extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.PUERTA) {
+        if (this.props.seleccionado !== prevProps.seleccionado ) {
 
-            if (this.props !== null) {
+            if (this.props.seleccionado !== null && this.props.seleccionado.userData.tipo === Morfologia.tipos.PUERTA) {
                 let capa = this.props.seleccionado.userData.info_material;
 
                 this.setState({
@@ -204,7 +204,7 @@ class InformacionPuerta extends Component {
         }
         let material, tipo, espesor, propiedad;
 
-        if(Object.keys(capa).length > 0){
+        if(Object.keys(capa).length > 0 && seleccionado !== null){
             material = capa.material;
             tipo = capa.tipo;
             espesor = capa.espesor;

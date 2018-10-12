@@ -149,6 +149,12 @@ const styles = theme => ({
         color: theme.palette.text.secondary,
         background: '#fdfdfd',
     },
+    visible: {
+        display: 'visible',
+    },
+    hidden: {
+        display: 'none',
+    },
 });
 
 
@@ -238,7 +244,7 @@ class TabPanel extends Component {
             console.log("ok");
             this.setState({openVarDash: !this.state.openVarDash, openMorf: false, mapDrawer:false});
         }
-        else this.setState({openVarDash: !this.state.openVarDash, openMorf: false, mapDrawer:false, drawer_localidad:!this.state.drawer_localidad});
+        else this.setState({openVarDash: !this.state.openVarDash, openMorf: false, mapDrawer:false, drawer_localidad:!this.state.drawer_localidad, seleccionadoMorf: null});
 
     }
 
@@ -524,26 +530,27 @@ class TabPanel extends Component {
                                 paper: classes.drawerRightPaper,
                             }}
                         >
-                            {this.state.mapDrawer ?
-                                <div>
-                                    <MapContainer
-                                        lat={-36.82013519999999}
-                                        lng={-73.0443904}
-                                        zoom={12}
-                                        markers={[]}
-                                        onComunaChanged={this.onComunaChanged}
-                                    />
-                                    <GeoInfoPanel
-                                        comuna={this.state.comuna}
-                                        onRadiationsChanged={this.onRadiationsChanged}
-                                    />
-                                </div>
-                                :
+                            <div  style={this.state.mapDrawer ? {display:'none'}:{}}>
                                 <InfoVariablesInternas
                                     handleChange={this.handleChangeVariable}
                                     handleClose={this.handleCloseVarDash}
                                 />
-                            }
+                            </div>
+                            <div style={!this.state.mapDrawer ? {display:'none'}:{display:'contents'}}>
+                                <MapContainer
+                                    lat={-36.82013519999999}
+                                    lng={-73.0443904}
+                                    zoom={12}
+                                    markers={[]}
+                                    onComunaChanged={this.onComunaChanged}
+                                />
+                                <GeoInfoPanel
+                                    comuna={this.state.comuna}
+                                    onRadiationsChanged={this.onRadiationsChanged}
+                                />
+                            </div>
+
+
                         </Drawer>
                     </div>
 
@@ -613,16 +620,17 @@ class TabPanel extends Component {
                                 paper: classes.drawerPaper,
                             }}
                         >
+                            <InformacionEstructura
+                                seleccionado={seleccionadoMorf}
+                                comuna={this.state.comuna}
+                                ventanas={this.state.ventanas}
+                                onAporteSolarChanged={this.onAporteSolarChanged}
+                                onDimensionChanged={this.onDimensionChanged}
+                                onAlturaVentanaChanged={this.onAlturaVentanaChanged}
+                                onCapaChanged={this.onCapaChanged}
+                            />
                             { openMorf && !this.state.openVarDash?
-                                <InformacionEstructura
-                                    seleccionado={seleccionadoMorf}
-                                    comuna={this.state.comuna}
-                                    ventanas={this.state.ventanas}
-                                    onAporteSolarChanged={this.onAporteSolarChanged}
-                                    onDimensionChanged={this.onDimensionChanged}
-                                    onAlturaVentanaChanged={this.onAlturaVentanaChanged}
-                                    onCapaChanged={this.onCapaChanged}
-                                />
+                                <div></div>
                                 :
                                 <InfoVariablesInternas
                                     handleChange={this.handleChangeVariable}

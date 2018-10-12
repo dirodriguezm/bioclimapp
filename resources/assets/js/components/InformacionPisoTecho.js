@@ -117,8 +117,8 @@ class InformacionPisoTecho extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.PISO) {
-            if (this.props !== null) {
+        if (this.props.seleccionado !== prevProps.seleccionado) {
+            if (this.props.seleccionado !== null && this.props.seleccionado.userData.tipo === Morfologia.tipos.PISO) {
                 let seleccionados;
                 if(this.props.seleccionado.userData.techo !== undefined){
                     seleccionados = [this.props.seleccionado, this.props.seleccionado.userData.techo];
@@ -473,14 +473,14 @@ class InformacionPisoTecho extends Component {
         let materialPiso ,tipoPiso ,espesorPiso ,propiedadPiso ;
         let materialTecho ,tipoTecho ,espesorTecho ,propiedadTecho ;
 
-        if(capaSeleccionadaPiso !== null){
+        if(capaSeleccionadaPiso !== null && pisoSeleccionado !== null){
             materialPiso = capasPiso[capaSeleccionadaPiso].material;
             tipoPiso = capasPiso[capaSeleccionadaPiso].tipo;
             espesorPiso = capasPiso[capaSeleccionadaPiso].espesor;
             propiedadPiso = capasPiso[capaSeleccionadaPiso].propiedad;
         }
 
-        if(capaSeleccionadaTecho !== null){
+        if(capaSeleccionadaTecho !== null && pisoSeleccionado !== null){
             materialTecho = capasTecho[capaSeleccionadaTecho].material;
             tipoTecho = capasTecho[capaSeleccionadaTecho].tipo;
             espesorTecho = capasTecho[capaSeleccionadaTecho].espesor;
