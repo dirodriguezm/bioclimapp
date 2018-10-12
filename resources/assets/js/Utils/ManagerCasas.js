@@ -126,9 +126,12 @@ class ManagerCasas {
         //Ventana que dibuja nuevas ventanas
         this.ventanaConstruccion = this.crearMeshVentana(0.9, 0.6);
         this.ventanaConstruccion.visible = false;
+        this.ventanaConstruccion.error = false;
         //Puerta que dibuja nuevas puertas
         this.puertaConstruccion = this.crearMeshPuerta(0.6, 1.8);
         this.puertaConstruccion.visible = false;
+        this.puertaConstruccion.error = false;
+
 
         escena.add(this.habitacionConstruccion);
         escena.add(this.ventanaConstruccion);
@@ -1115,6 +1118,9 @@ class ManagerCasas {
     }
 
     agregarPuerta() {
+        if (this.puertaConstruccion.userData.error) {
+            return;
+        }
         let pared = this.puertaConstruccion.userData.pared;
         if (pared !== null) {
             let puerta = this.puertaConstruccion.clone();
@@ -1231,6 +1237,11 @@ class ManagerCasas {
     }
 
     agregarVentana() {
+
+        if (this.ventanaConstruccion.userData.error) {
+            return;
+        }
+
         let pared = this.ventanaConstruccion.userData.pared;
         if (pared !== null) {
 
@@ -1346,23 +1357,21 @@ class ManagerCasas {
             }
         }
 
-        /*let pos = this.ventanaConstruccion.position.clone().round();
+        let pos = this.ventanaConstruccion.position.clone();
         pared.worldToLocal(pos);
-        pos.round();
 
-        let error = false;
+        this.ventanaConstruccion.userData.error = false;
         for(let elementos of pared.children){
-            if(elementos.position.x === pos.x){
+            if(elementos.position.x ===( Math.round( pos.x * 10) / 10)){
 
                 this.ventanaConstruccion.material = this.materialError.clone();
                 this.ventanaConstruccion.userData.error = true;
-                error = true;
                 break;
             }
         }
-        if(!error){
+        if(!this.ventanaConstruccion.userData.error){
             this.ventanaConstruccion.material = this.materialVentanaConstruccion.clone();
-        }*/
+        }
     }
 
     moverPuertaConstruccion(pared, point) {
@@ -1391,23 +1400,21 @@ class ManagerCasas {
             }
         }
 
-        /*let posclone = this.puertaConstruccion.position.clone().round();
+        let posclone = this.puertaConstruccion.position.clone();
         pared.worldToLocal(posclone);
-        posclone.round();
 
-        let error = false;
+        this.puertaConstruccion.userData.error = false;
         for(let elementos of pared.children){
-            if(elementos.position.x === posclone.x){
+            if(elementos.position.x ===( Math.round( posclone.x * 10) / 10)){
 
                 this.puertaConstruccion.material = this.materialError.clone();
                 this.puertaConstruccion.userData.error = true;
-                error = true;
                 break;
             }
         }
-        if(!error){
-            this.puertaConstruccion.material = this.materialVentanaConstruccion.clone();
-        }*/
+        if(!this.puertaConstruccion.userData.error){
+            this.puertaConstruccion.material = this.materialPuertaConstruccion.clone();
+        }
 
     }
     modificarAlturaVentana(ventana, altura){
@@ -2139,6 +2146,7 @@ class ManagerCasas {
         pared1.userData.choques = {};
         pared1.userData.tipo = Morfologia.tipos.PARED;
         pared1.userData.separacion = Morfologia.separacion.EXTERIOR;
+        //pared1.add(new THREE.AxesHelper(5));
 
         var pared2 = this.crearMeshPared(depth, height);
         pared2.rotation.y = Math.PI / 2;
@@ -2150,6 +2158,7 @@ class ManagerCasas {
         pared2.userData.choques = {};
         pared2.userData.tipo = Morfologia.tipos.PARED;
         pared2.userData.separacion = Morfologia.separacion.EXTERIOR;
+        //pared2.add(new THREE.AxesHelper(5));
 
         var pared3 = this.crearMeshPared(width, height);
         pared3.rotation.y = Math.PI;
@@ -2161,6 +2170,7 @@ class ManagerCasas {
         pared3.userData.choques = {};
         pared3.userData.tipo = Morfologia.tipos.PARED;
         pared3.userData.separacion = Morfologia.separacion.EXTERIOR;
+        //pared3.add(new THREE.AxesHelper(5));
 
         var pared4 = this.crearMeshPared(depth, height);
         pared4.rotation.y = -Math.PI / 2;
@@ -2172,6 +2182,7 @@ class ManagerCasas {
         pared4.userData.choques = {};
         pared4.userData.tipo = Morfologia.tipos.PARED;
         pared4.userData.separacion = Morfologia.separacion.EXTERIOR;
+        //pared4.add(new THREE.AxesHelper(5));
 
         var piso = this.crearMeshPiso(width, depth);
         piso.name = "Piso";
