@@ -12,6 +12,7 @@ const resistenciasTermicasSuperficie = [
     [0.14 , 0.10] ,
     [0.22 , 0.34] ];
 const transmitanciaLineal = [1.4 , 1.2 , 1.0];
+const rangos_transmitancia = [[0.15,0.25],[0.26,0.6]];
 const uObjetivoMuro = [4,3,1.9,1.7,1.6,1.1,0.6];
 const uObjetivoTecho = [0.84,0.6,0.47,0.38,0.33,0.28,0.25];
 const uObjetivoPiso = [3.6,0.87,0.7,0.6,0.5,0.39,0.32];
@@ -77,6 +78,25 @@ function transmitanciaSuperficie(elemento,zona) {
             elemento.userData.transSup = u * elemento.userData.superficie;
             elemento.userData.transSupObjetivo = uObjetivoTecho[zona-1] * elemento.userData.superficie;
             break;
+        case Morfologia.tipos.PISO:
+            for(let capa of elemento.userData.capas){
+                transmitancia += capa.espesor / capa.conductividad;
+            }
+            transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
+            u = 1 / transmitancia;
+            elemento.userData.transmitancia = u;
+            elemento.userData.transmitanciaObjetivo = uObjetivoPiso[zona-1];
+            elemento.userData.transSup = u * elemento.userData.superficie;
+            elemento.userData.transSupObjetivo = uObjetivoPiso[zona-1] * elemento.userData.superficie;
+
+            if(elemento.userData.transSup >=0.15 && elemento.userData.transSup <=0.25){
+                elemento.userData.aislacion = Morfologia.aislacionPiso.CORRIENTE;
+            }else if(elemento.userData.transSup >=0.26 && elemento.userData.transSup <=0.60){
+                elemento.userData.aislacion = Morfologia.aislacionPiso.MEDIO;
+            }else{
+                elemento.userData.aislacion = Morfologia.aislacionPiso.AISLADO;
+            }
+            break;
         case Morfologia.tipos.VENTANA:
             /*let casa = elemento.parent.parent.parent.parent.parent;
             let superficieParedes  = 0;
@@ -99,6 +119,7 @@ function transmitanciaSuperficie(elemento,zona) {
 
         case Morfologia.tipos.PUERTA:
             transmitancia += elemento.userData.info_material.espesor / elemento.userData.info_material.conductividad;
+            console.log(elemento.userData.info_material.espesor / elemento.userData.info_material.conductividad);
             transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.parent.userData.separacion];
 
             u = 1 / transmitancia;

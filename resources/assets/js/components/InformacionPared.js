@@ -114,6 +114,7 @@ class InformacionPared extends Component {
     }
 
     componentDidUpdate(prevProps) {
+        //console.log("selec pared",this.props.seleccionado);
         if (this.props.seleccionado !== prevProps.seleccionado && this.props.seleccionado.userData.tipo === Morfologia.tipos.PARED) {
             if (this.props !== null) {
                 let capas = this.props.seleccionado.userData.capas;
@@ -197,6 +198,7 @@ class InformacionPared extends Component {
         }
     }
 
+
     hexToRGB(hex, alpha) {
         var r = parseInt(hex.slice(1, 3), 16),
             g = parseInt(hex.slice(3, 5), 16),
@@ -262,6 +264,8 @@ class InformacionPared extends Component {
         let capas = this.state.capas;
         let capa = capas[this.state.capaS];
 
+        capa[event.target.name] = event.target.value;
+
         if(event.target.name === 'material'){
             if(this.info_material[event.target.value].hasOwnProperty('tipos')){
                 capa.tipo = 0;
@@ -277,20 +281,19 @@ class InformacionPared extends Component {
 
         }
 
-        if(event.target.name === 'propiedad'){
-            let conductividad;
+        let conductividad;
             
 
-            if(this.info_material[capa.material].hasOwnProperty('tipos')){
-                conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
-            }else{
-                conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
+        if(this.info_material[capa.material].hasOwnProperty('tipos')){
+            conductividad = this.info_material[capa.material].tipos[capa.tipo].propiedades[capa.propiedad].conductividad;
+        }else{
+            conductividad = this.info_material[capa.material].propiedades[capa.propiedad].conductividad;
 
-            }
-            capa.conductividad = conductividad;
         }
+        capa.conductividad = conductividad;
 
-        capa[event.target.name] = event.target.value;
+
+
 
         if(event.target.name === 'espesor'){
             capa.espesor = event.target.value/1000;
@@ -558,7 +561,7 @@ class InformacionPared extends Component {
                                                     marginRight : 4,}}>
                                                     <Grid item xs={6}>
                                                         <FormControl className={classes.formControl}>
-                                                            <InputLabel htmlFor="material-simple">Material</InputLabel>
+                                                            <InputLabel htmlFor="material-simple">Material capa seleccionada</InputLabel>
                                                             <Select
                                                                 value={material}
                                                                 onChange={this.handleChangeCapa}
@@ -593,7 +596,7 @@ class InformacionPared extends Component {
                                                      marginTop : 8,
                                                 }}>
                                                     <FormControl className={classes.formControl}>
-                                                        <InputLabel htmlFor="material-simple">Material</InputLabel>
+                                                        <InputLabel htmlFor="material-simple">Material capa seleccionada</InputLabel>
                                                         <Select
                                                             value={material}
                                                             onChange={this.handleChangeCapa}

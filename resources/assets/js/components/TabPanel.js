@@ -336,7 +336,7 @@ class TabPanel extends Component {
 
 
 
-    onCapaChanged(){
+    onCapaChanged(elemento){
         this.setState({
             paredCapaChange: true,
         })

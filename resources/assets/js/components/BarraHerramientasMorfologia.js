@@ -454,7 +454,7 @@ class BarraHerramientasMorfologia extends Component {
                     }}
                     elevation={9}
                 >
-                    <Tooltip title="Pared"
+                    <Tooltip title="Paredes"
                              disableFocusListener={!dibujandoStatesButtons[0]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
@@ -502,14 +502,14 @@ class BarraHerramientasMorfologia extends Component {
                         </MenuItem>
                     </Tooltip>
 
-                    <Tooltip title="Piso"
+                    <Tooltip title="Techo"
                              disableFocusListener={!dibujandoStatesButtons[3]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
                                   disabled={dibujandoStatesButtons[3]}>
                             <IconButton
                                 className={classes.button}
-                                aria-label="AgregarPiso"
+                                aria-label="AgregarTecho"
                                 value={3}
                                 disabled={dibujandoStatesButtons[3]}
                                 onClick={this.handleDibujo}>

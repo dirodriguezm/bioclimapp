@@ -237,9 +237,13 @@ class InformacionPisoTecho extends Component {
         //TODO: metodos para cambiar la capa
         //this.props.onCapaChanged();
 
+        this.props.onCapaChanged();
+
         this.setState({
             capasPiso: capas,
-        })
+        });
+
+
     }
 
     handleChangeCapaTecho(event){
@@ -324,7 +328,7 @@ class InformacionPisoTecho extends Component {
             })
         }
 
-        //this.props.onCapaChanged();
+        this.props.onCapaChanged();
 
         this.setState({
             capasPiso: capas,
@@ -352,7 +356,7 @@ class InformacionPisoTecho extends Component {
             })
         }
 
-        //this.props.onCapaChanged();
+        this.props.onCapaChanged();
 
         this.setState({
             capasTecho: capas,
@@ -412,9 +416,9 @@ class InformacionPisoTecho extends Component {
 
         this.setState({
             capasPiso: capas,
-        })
+        });
 
-        //this.props.onCapaChanged();
+        this.props.onCapaChanged();
 
     }
 
@@ -447,7 +451,7 @@ class InformacionPisoTecho extends Component {
             capasTecho: capas,
         })
 
-        //this.props.onCapaChanged();
+        this.props.onCapaChanged();
 
     }
 
