@@ -430,18 +430,19 @@ class Context extends Component {
                     obs.betaAngle = null;
                 }
             }
+            let pos = new THREE.Vector3();
+            ventana.getWorldPosition(pos);
             for (let x = 0; x < 90; x++) {
                 angle = angle.normalize();
-                raycasterFAR.set(ventana.userData.pos, angle);
+                raycasterFAR.set(pos, angle);
                 let intersections = raycasterFAR.intersectObjects(this.obstrucciones);
                 let masAlto = {object: {aDistance: 0}};
                 //
                 //para cada obstruccion en el angulo actual se obtiene su aDistance y su bDistance, además se almacena el más alto
                 for (let i = 0; i < intersections.length; i++) {
                     if(intersections[i].distance > 50){intersections[i].object.fuera = true}
-                    intersections[i].object.aDistance = intersections[i].object.geometry.parameters.height - ventana.userData.pos.y;
-                    let auxPoint = new THREE.Vector3(intersections[i].object.position.x, ventana.userData.pos.y, ventana.userData.pos.z);
-                    intersections[i].object.bDistance = auxPoint.distanceTo(intersections[i].object.position);
+                    intersections[i].object.aDistance = intersections[i].object.geometry.parameters.height - pos.y;
+                    intersections[i].object.bDistance = ventana.userData.orientacion.dot(intersections[i].object.position);
                     intersections[i].object.far = Math.pow(0.2996,(intersections[i].object.aDistance / intersections[i].object.bDistance));
                     if (intersections[i].object.aDistance > masAlto.object.aDistance) {
                         masAlto = intersections[i];
@@ -497,6 +498,9 @@ class Context extends Component {
 
                 obs.material.color.setHex(0xff0000);
                 obs.currentHex = 0xff0000;
+                if(ventana.userData.obstrucciones.length === 1 && obs.betaAngle.length > 1){
+                    obs.betaAngle = [obs.betaAngle[0]];
+                }
                 for(let beta of obs.betaAngle){
                     f1 -= beta / 90;
                     f2 += obs.far * beta/90;
