@@ -213,11 +213,12 @@ class TabPanel extends Component {
 
     }
 
-    handleDrawerOpen() {
-        this.setState({openMorf: true});
+    handleDrawerOpen(){
+        this.setState({openMorf: true, openVarDash:false});
     };
 
     handleDrawerClose() {
+        let width = this.state.width;
         this.setState({openMorf: false});
     };
 
@@ -233,15 +234,12 @@ class TabPanel extends Component {
         this.setState({openDashboard: !this.state.openDashboard});
     }
     handleVarDashOpen(){
-        if(this.state.openVarDash){
-            let width = this.state.width;
-            this.setState({width: width + drawerWidth });
+        if(!this.state.drawer_localidad && this.state.mapDrawer){
+            console.log("ok");
+            this.setState({openVarDash: !this.state.openVarDash, openMorf: false, mapDrawer:false});
         }
-        else {
-            let width = this.state.width;
-            this.setState({width: width - drawerWidth });
-        }
-        this.setState({openVarDash: !this.state.openVarDash});
+        else this.setState({openVarDash: !this.state.openVarDash, openMorf: false, mapDrawer:false, drawer_localidad:!this.state.drawer_localidad});
+
     }
 
     componentDidMount() {
@@ -399,7 +397,7 @@ class TabPanel extends Component {
 
     onSeleccionarLocalidad(){
         this.setState((state) => {
-            return {drawer_localidad: !state.drawer_localidad}
+            return {drawer_localidad: !state.drawer_localidad, mapDrawer: true}
         });
     }
     onSunPathClicked(){
@@ -420,8 +418,7 @@ class TabPanel extends Component {
     };
 
     handleCloseVarDash(){
-        let width = this.state.width;
-        this.setState({width: width + drawerWidth,openVarDash: !this.state.openVarDash });
+        this.setState({openVarDash: false, drawer_localidad: true});
     }
 
 
@@ -434,9 +431,8 @@ class TabPanel extends Component {
                 this.tab = tab
             }} style={{margin:0, padding:0}}>
                 <AppBar  className={classNames(classes.appBar, {
-                    [classes.appBarShift]: this.state.openDashboard || this.state.openVarDash,
+                    [classes.appBarShift]: this.state.openDashboard ,
                     [classes.appBarShiftLeft]: this.state.openDashboard,
-                    [classes.appBarShiftRight]: this.state.openVarDash,
                 })}>
                     <Toolbar>
                         <IconButton
@@ -485,16 +481,16 @@ class TabPanel extends Component {
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={this.state.value}
                     onChangeIndex={this.handleChangeIndex}
-                    className={classNames(classes.content, classes.contentLeft, classes.contentRight, {
-                        [classes.contentShift]: this.state.openDashboard || this.state.openVarDash,
+                    className={classNames(classes.content, classes.contentLeft, {
+                        [classes.contentShift]: this.state.openDashboard,
                         [classes.contentShiftLeft]: this.state.openDashboard,
-                        [classes.contentShiftRight]: this.state.openVarDash,
                     })}
                 >
                     <div className={classes.frameTabs}>
                         <div className={classNames(classes.contentInside, classes.contentRight, {
-                            [classes.contentShift]: this.state.drawer_localidad,
-                            [classes.contentShiftRight]: this.state.drawer_localidad,
+                            [classes.contentShift]: this.state.drawer_localidad ,
+                            [classes.contentShiftRight]: this.state.drawer_localidad ,
+
                         })}>
                             <TabContainer dir={theme.direction}>
                                 {this.state.width ?
@@ -528,26 +524,33 @@ class TabPanel extends Component {
                                 paper: classes.drawerRightPaper,
                             }}
                         >
-                            <MapContainer
-                                lat={-36.82013519999999}
-                                lng={-73.0443904}
-                                zoom={12}
-                                markers={[]}
-                                onComunaChanged={this.onComunaChanged}
-                            />
-                            <GeoInfoPanel
-                                comuna={this.state.comuna}
-                                // width={this.props.width}
-                                // height={this.state.height}
-                                onRadiationsChanged={this.onRadiationsChanged}
+                            {this.state.mapDrawer ?
+                                <div>
+                                    <MapContainer
+                                        lat={-36.82013519999999}
+                                        lng={-73.0443904}
+                                        zoom={12}
+                                        markers={[]}
+                                        onComunaChanged={this.onComunaChanged}
+                                    />
+                                    <GeoInfoPanel
+                                        comuna={this.state.comuna}
+                                        onRadiationsChanged={this.onRadiationsChanged}
+                                    />
+                                </div>
+                                :
+                                <InfoVariablesInternas
+                                    handleChange={this.handleChangeVariable}
+                                    handleClose={this.handleCloseVarDash}
                                 />
+                            }
                         </Drawer>
                     </div>
 
                     <div className={classes.frameTabs}>
                         <div className={classNames(classes.contentInside, classes.contentRight, {
-                            [classes.contentShift]: !openMorf,
-                            [classes.contentShiftRight]: !openMorf,
+                            [classes.contentShift]: !openMorf && !this.state.openVarDash,
+                            [classes.contentShiftRight]: !openMorf && !this.state.openVarDash,
                         })}>
                             <TabContainer dir={theme.direction}>
                                 {this.state.width ?
@@ -604,37 +607,32 @@ class TabPanel extends Component {
                         <Drawer
                             variant='persistent'
                             anchor='right'
-                            open={openMorf}
-                            hidden={!openMorf}
+                            open={openMorf || this.state.openVarDash}
+                            hidden={!openMorf && !this.state.openVarDash}
                             classes={{
                                 paper: classes.drawerPaper,
                             }}
                         >
-                            <InformacionEstructura
-                                seleccionado={seleccionadoMorf}
-                                comuna={this.state.comuna}
-                                ventanas={this.state.ventanas}
-                                onAporteSolarChanged={this.onAporteSolarChanged}
-                                onDimensionChanged={this.onDimensionChanged}
-                                onAlturaVentanaChanged={this.onAlturaVentanaChanged}
-                                onCapaChanged={this.onCapaChanged}
-                            />
+                            { openMorf && !this.state.openVarDash?
+                                <InformacionEstructura
+                                    seleccionado={seleccionadoMorf}
+                                    comuna={this.state.comuna}
+                                    ventanas={this.state.ventanas}
+                                    onAporteSolarChanged={this.onAporteSolarChanged}
+                                    onDimensionChanged={this.onDimensionChanged}
+                                    onAlturaVentanaChanged={this.onAlturaVentanaChanged}
+                                    onCapaChanged={this.onCapaChanged}
+                                />
+                                :
+                                <InfoVariablesInternas
+                                    handleChange={this.handleChangeVariable}
+                                    handleClose={this.handleCloseVarDash}
+                                />
+                            }
                         </Drawer>
                     </div>
                 </SwipeableViews>
-                <Drawer
-                    variant="persistent"
-                    anchor={'right'}
-                    open={this.state.openVarDash}
-                    classes={{
-                        paper: classes.drawerRightPaper,
-                    }}
-                >
-                    <InfoVariablesInternas
-                        handleChange={this.handleChangeVariable}
-                        handleClose={this.handleCloseVarDash}
-                    />
-                </Drawer>
+
             </div>
         );
     }
