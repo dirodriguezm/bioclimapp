@@ -314,8 +314,10 @@ class ManagerCasas {
         BalanceEnergetico.transmitanciaSuperficie(estructura,this.zona);
         transmitanciaSuperficies += estructura.userData.transSup;
         if(estructura.userData.tipo === Morfologia.tipos.PISO){
-            estructura.userData.puenteTermico = BalanceEnergetico.puenteTermico(estructura);
-            habitacion.userData.puenteTermico = estructura.userData.puenteTermico;
+            let puenteTermico = BalanceEnergetico.puenteTermico(estructura);
+
+            estructura.userData.puenteTermico = puenteTermico.normal;
+            estructura.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
         }
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
 
@@ -656,11 +658,11 @@ class ManagerCasas {
 
         BalanceEnergetico.transmitanciaSuperficie(piso,this.zona);
         transmitanciaSuperficies += piso.userData.transSup;
-        transmitanciaSuperficiesObjetivo += piso.userData.transSup;
+        transmitanciaSuperficiesObjetivo += piso.userData.transSupObjetivo;
 
+        let puenteTermico = BalanceEnergetico.puenteTermico(piso);
 
-        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
-        let puenteTermico = piso.userData.puenteTermico;
+        piso.userData.puenteTermico = puenteTermico.normal;
         piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
 
 
@@ -712,10 +714,17 @@ class ManagerCasas {
         let piso = habitacion.getObjectByName("Piso");
         piso.userData.separacion =  Morfologia.separacion.INTERIOR;
 
-        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
+       let puenteTermico = BalanceEnergetico.puenteTermico(piso);
+
+        piso.userData.puenteTermico = puenteTermico.normal;
+        piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
 
         let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
         habitacion.userData.puenteTermico = piso.userData.puenteTermico;
+        habitacion.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+
+
+
 
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
         this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
