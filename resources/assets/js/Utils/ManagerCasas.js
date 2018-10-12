@@ -918,20 +918,110 @@ class ManagerCasas {
 
     }
 
-    quitarObjetoPuerta(objeto){
-        let hole = objeto.userData.hole;
-        let pared = objeto.parent;
+    borrarEstructura(objeto){
+        switch (objeto.userData.tipo) {
+            case Morfologia.tipos.PUERTA:
+                this.quitarObjetoPuerta(objeto);
+                break;
+            case Morfologia.tipos.VENTANA:
+                this.quitarObjetoVentana(objeto);
+                break;
+        }
+    }
+
+    quitarObjetoVentana(ventana){
+        let pared = ventana.parent;
+        let habitacion = pared.parent.parent;
 
         var shape = pared.geometry.userData.shape.clone();
-        shape.holes.splice(shape.holes.indexOf(hole));
-
-        pared.remove(objeto);
+        let currentPointVentana = ventana.userData.hole.currentPoint;
+        for(let hole of shape.holes){
+            if(hole.currentPoint.x === currentPointVentana.x && hole.currentPoint.y === currentPointVentana.y){
+                var index = shape.holes.indexOf(hole);
+                shape.holes.splice(index,1);
+                break;
+            }
+        }
 
         pared.geometry.dispose();
         pared.geometry.dynamic = true;
         pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
         pared.geometry.userData.shape = shape;
         pared.geometry.verticesNeedUpdate = true;
+
+        pared.remove(ventana);
+
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
+
+        habitacion.userData.transmitanciaSuperficies -= ventana.userData.transSup;
+        habitacion.userData.transmitanciaSuperficiesObjetivo -= ventana.userData.transSupObjetivo;
+        habitacion.userData.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+            habitacion.userData.transmitanciaSuperficies,
+            this.gradoDias,
+            habitacion.userData.puenteTermico
+        );
+        habitacion.userData.perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
+            habitacion.userData.transmitanciaSuperficiesObjetivo,
+            this.gradoDias,
+            habitacion.userData.puenteTermicoObjetivo
+        );
+
+        pared.userData.superficie += ventana.userData.superficie;
+
+        this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
+
+        this.ventanas.splice(this.ventanas.indexOf(ventana),1);
+        this.allObjects.splice(this.allObjects.indexOf(ventana),1);
+    }
+
+    quitarObjetoPuerta(puerta){
+        let pared = puerta.parent;
+        let habitacion = pared.parent.parent;
+
+        var shape = pared.geometry.userData.shape.clone();
+        let currentPointPuerta = puerta.userData.hole.currentPoint;
+        for(let hole of shape.holes){
+            if(hole.currentPoint.x === currentPointPuerta.x && hole.currentPoint.y === currentPointPuerta.y){
+                var index = shape.holes.indexOf(hole);
+                shape.holes.splice(index,1);
+                break;
+            }
+        }
+
+        pared.geometry.dispose();
+        pared.geometry.dynamic = true;
+        pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
+        pared.geometry.userData.shape = shape;
+        pared.geometry.verticesNeedUpdate = true;
+
+
+
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
+
+        habitacion.userData.transmitanciaSuperficies -= puerta.userData.transSup;
+        habitacion.userData.transmitanciaSuperficiesObjetivo -= puerta.userData.transSupObjetivo;
+        habitacion.userData.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+            habitacion.userData.transmitanciaSuperficies,
+            this.gradoDias,
+            habitacion.userData.puenteTermico
+        );
+        habitacion.userData.perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
+            habitacion.userData.transmitanciaSuperficiesObjetivo,
+            this.gradoDias,
+            habitacion.userData.puenteTermicoObjetivo
+        );
+
+        pared.userData.superficie += puerta.userData.superficie;
+
+        this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
+
+        this.puertas.splice(this.puertas.indexOf(puerta),1);
+        this.allObjects.splice(this.allObjects.indexOf(puerta),1);
+        pared.remove(puerta);
     }
 
     crearCasaSimple(){
@@ -1143,6 +1233,7 @@ class ManagerCasas {
     agregarVentana() {
         let pared = this.ventanaConstruccion.userData.pared;
         if (pared !== null) {
+
             let ventana = this.ventanaConstruccion.clone();
             let habitacion = pared.parent.parent;
             let orientacion = pared.userData.orientacion;
@@ -1254,6 +1345,24 @@ class ManagerCasas {
                 this.ventanaConstruccion.position.z = this.ventanaConstruccion.position.z - 1;
             }
         }
+
+        /*let pos = this.ventanaConstruccion.position.clone().round();
+        pared.worldToLocal(pos);
+        pos.round();
+
+        let error = false;
+        for(let elementos of pared.children){
+            if(elementos.position.x === pos.x){
+
+                this.ventanaConstruccion.material = this.materialError.clone();
+                this.ventanaConstruccion.userData.error = true;
+                error = true;
+                break;
+            }
+        }
+        if(!error){
+            this.ventanaConstruccion.material = this.materialVentanaConstruccion.clone();
+        }*/
     }
 
     moverPuertaConstruccion(pared, point) {
@@ -1281,6 +1390,24 @@ class ManagerCasas {
                 this.puertaConstruccion.position.z = this.puertaConstruccion.position.z - 1;
             }
         }
+
+        /*let posclone = this.puertaConstruccion.position.clone().round();
+        pared.worldToLocal(posclone);
+        posclone.round();
+
+        let error = false;
+        for(let elementos of pared.children){
+            if(elementos.position.x === posclone.x){
+
+                this.puertaConstruccion.material = this.materialError.clone();
+                this.puertaConstruccion.userData.error = true;
+                error = true;
+                break;
+            }
+        }
+        if(!error){
+            this.puertaConstruccion.material = this.materialVentanaConstruccion.clone();
+        }*/
 
     }
     modificarAlturaVentana(ventana, altura){

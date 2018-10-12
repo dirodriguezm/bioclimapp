@@ -1153,6 +1153,23 @@ class Morfologia extends Component {
             }
 
         }
+        if(this.props.borrando){
+            let intersects = this.raycaster.intersectObjects(this.allObjects);
+            if(intersects.length > 0){
+                let intersect = intersects[0].object;
+                if(this.objetoSeleccionado !== intersect && this.objetoSeleccionado != null){
+                    this.changeColorSeleccion(this.objetoSeleccionado);
+                }
+                this.objetoSeleccionado = intersect;
+                this.objetoSeleccionado.material = this.materialSeleccionado.clone();
+
+            }else{
+                if(this.objetoSeleccionado != null){
+                    this.changeColorSeleccion(this.objetoSeleccionado);
+                    this.objetoSeleccionado = null;
+                }
+            }
+        }
 
         //Si se está dibujando
         if (this.props.dibujando !== -1 && this.props.dibujando < 4) {
@@ -1241,18 +1258,35 @@ class Morfologia extends Component {
         if (this.props.dibujando === 1 && this.props.dibujando !== -1) {
             this.managerCasas.agregarVentana();
             this.props.onVentanasChanged(this.ventanas);
+
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
         }
 
         if (this.props.dibujando === 2 && this.props.dibujando !== -1) {
             this.managerCasas.agregarPuerta();
+
+            let casa = this.managerCasas.getCasa();
+            let aporte_interno = casa.userData.aporteInterno;
+            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
+            let perdida_conduccion = casa.userData.perdidaPorConduccion;
+            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+        }
+
+        if(this.props.borrando){
+            this.handleBorrado();
         }
 
         if(this.props.seleccionando){
             this.handleSeleccionado();
-            if(this.objetoSeleccionadoClick !== null){
-                this.changeColorSeleccion(this.objetoSeleccionadoClick);
-            }
-            this.objetoSeleccionadoClick = this.objetoSeleccionado;
+
         }
     }
 
@@ -1263,7 +1297,34 @@ class Morfologia extends Component {
     handleSeleccionado(){
         if (this.objetoSeleccionado != null){
             this.props.onSeleccionadoChanged(this.objetoSeleccionado);
+
         }
+        if(this.objetoSeleccionadoClick !== null){
+            this.changeColorSeleccion(this.objetoSeleccionadoClick);
+        }
+        this.objetoSeleccionadoClick = this.objetoSeleccionado;
+    }
+
+    handleBorrado(){
+        if(this.objetoSeleccionado != null){
+            this.managerCasas.borrarEstructura(this.objetoSeleccionado);
+            if(this.objetoSeleccionado.userData.tipo === Morfologia.tipos.VENTANA){
+                this.props.onVentanasChanged(this.ventanas);
+            }
+            this.objetoSeleccionado = null;
+            if(this.objetoSeleccionadoClick !== null){
+                this.changeColorSeleccion(this.objetoSeleccionadoClick);
+            }
+            this.objetoSeleccionadoClick = null;
+        }
+        let casa = this.managerCasas.getCasa();
+        let aporte_interno = casa.userData.aporteInterno;
+        let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
+        let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
+        let perdida_conduccion = casa.userData.perdidaPorConduccion;
+        let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
+        this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+
     }
 
     agregarVentana() {

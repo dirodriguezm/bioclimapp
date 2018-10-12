@@ -508,7 +508,14 @@ class Context extends Component {
             }
             ventana.userData.far = f1 + f2;
         }
-        if (ventanas.length > 0) this.props.onFarChanged(ventanas);
+        if (ventanas.length > 0){
+            this.notVacio = true;
+            this.props.onFarChanged(ventanas);
+        }
+        if(ventanas.length === 0 && this.notVacio){
+            this.notVacio = false;
+            this.props.onFarChanged(ventanas);
+        }
     }
 
 
