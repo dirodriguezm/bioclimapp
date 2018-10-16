@@ -4,7 +4,7 @@ import axios from "axios";
 import Morfologia from "../components/Morfologia";
 
 class ManagerCasas {
-    constructor(escena, paredes, ventanas, puertas, allObjects, ocupantes, horasIluminacion, aireRenovado, heightWall, zona) {
+    constructor(escena, paredes, ventanas, puertas, allObjects, ocupantes, horasIluminacion, aireRenovado, heightWall) {
         this.escena = escena;
         this.paredes = paredes;
         this.paredesX = [];
@@ -29,7 +29,6 @@ class ManagerCasas {
         this.info_ventana = [];
         this.info_material = [];
         this.info_marcos = [];
-        this.zona = zona;
 
         axios.get("https://bioclimapp.host/api/info_materiales")
             .then(response => this.getJsonMateriales(response))
@@ -195,6 +194,7 @@ class ManagerCasas {
 
     setZona(zona){
         this.zona = zona;
+        console.log("seteando zona",this.zona,zona);
     }
 
     setPersonas(personas){
@@ -692,6 +692,7 @@ class ManagerCasas {
         habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
         habitacion.userData.perdidaPorVentilacionObjetivo = perdidaPorVentilacionObjetivo;
         habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
+        console.log("perdida objetivo",perdidaPorConduccionObjetivo,transmitanciaSuperficiesObjetivo,this.gradoDias,puenteTermico.objetivo);
 
         let nivel = this.casa.children[habitacion.userData.nivel - 1];
         nivel.add(habitacion);

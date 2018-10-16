@@ -99,10 +99,6 @@ class BarraHerramientasContexto extends Component {
                 marginRight:'auto',
             }}>
             <div className={classes.root} align="center">
-                <div style={{
-                    display: 'inline-block',
-                    width: cuartoWidth,
-                }}/>
 
                 <Tooltip title="Seleccionar obstrucción">
                     <IconButton className={classes.button} aria-label="Seleccionar"
@@ -128,11 +124,6 @@ class BarraHerramientasContexto extends Component {
                         <Delete/>
                     </IconButton>
                 </Tooltip>
-
-                <div style={{
-                    display: 'inline-block',
-                    width: cuartoWidth,
-                }}/>
 
                 <Tooltip title="Seleccionar localidad" style={{
                 }}>

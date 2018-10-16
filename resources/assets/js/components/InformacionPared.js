@@ -142,7 +142,7 @@ class InformacionPared extends Component {
                     capas: capas,
                     capaS: null,
                 });
-                if(this.props.seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR) {
+                if(this.props.seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR && this.props.seleccionado.userData.hasOwnProperty('omegas')) {
                     this.info_rb = <div/>;
                     if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde == null) {
                         this.info_rb = <Grid container spacing={8} justify="center">

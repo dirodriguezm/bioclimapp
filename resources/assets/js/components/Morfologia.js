@@ -47,7 +47,6 @@ class Morfologia extends Component {
         if(this.paredes !== this.props.paredes && this.props.paredes != null){
             this.paredes = this.props.paredes.slice();
         }
-
         if(this.props.comuna !== prevProps.comuna){
             this.onComunaChanged();
         }
@@ -359,8 +358,10 @@ class Morfologia extends Component {
             this.horasIluminacion,
             this.aireRenovado,
             this.heightWall,
-            this.props.zona,
         );
+        if(this.props.comuna != null){
+            this.managerCasas.setZona(this.props.comuna.zona);
+        }
 
         //Camaras
 

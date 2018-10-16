@@ -106,7 +106,10 @@ export default class MapContainer extends Component {
                         comuna: response.data[0],
                         sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng),
                         sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
-                    },this.props.onComunaChanged(this.state));
+                    },function(){
+                        this.props.onComunaChanged(this.state);
+                        console.log("onCOmunaChanged",this.state);
+                    });
                 }
             );
 
@@ -125,7 +128,10 @@ export default class MapContainer extends Component {
                         comuna: response.data[0],
                         sunPosition: this.getSunPosition(lat, lng),
                         sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
-                    },this.props.onComunaChanged(this.state));
+                    },function () {
+                        this.createMarker(this.state.lat, this.state.lng);
+                        this.props.onComunaChanged(this.state);
+                    });
                 }
             );
     }
@@ -144,8 +150,8 @@ export default class MapContainer extends Component {
                     zoom={this.state.zoom}
                     style={style}
                     onDblclick={this.mapClicked}
-                    onLocationfound={this.handleLocationFound}
-                    onShowlocation={this.handleLocationFound}
+                    //onLocationfound={this.handleLocationFound}
+                    //onShowlocation={this.handleLocationFound}
                     ref="map"
                     doubleClickZoom={false}
                 >

@@ -64,6 +64,7 @@ function transmitanciaSuperficie(elemento,zona) {
             elemento.userData.transmitanciaObjetivo = uObjetivoMuro[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;
             elemento.userData.transSupObjetivo = uObjetivoMuro[zona-1] * elemento.userData.superficie;
+            console.log("elemento transsupobjetivo", elemento.userData.transSupObjetivo, uObjetivoMuro[zona-1], zona ,elemento.userData.superficie);
             break;
         case Morfologia.tipos.TECHO:
             for(let capa of elemento.userData.capas){

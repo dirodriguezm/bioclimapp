@@ -275,6 +275,10 @@ class TabPanel extends Component {
             sunPosition: mapState.sunPosition,
             sunPath: mapState.sunPath,
         });
+        if(this.state.paredes != null){
+            let paredes_calculadas = BalanceEnergetico.calcularRbParedes(this.state.paredes.slice(), this.state.latitud, this.state.longitud);
+            this.setState({paredes: paredes_calculadas});
+        }
     }
 
     onParedesChanged(paredes) {
@@ -444,14 +448,6 @@ class TabPanel extends Component {
                             <Tab label="Morfología"/>
                             <Tab label="Variables Internas"/>
                         </Tabs>
-                        <IconButton
-                            color="inherit"
-                            aria-label="Dashboard"
-                            onClick={this.handleVarDashOpen}
-                            className={classNames(classes.menuButton)}
-                        >
-                            <People />
-                        </IconButton>
                         <div style={{
                             marginLeft: 'auto',}}>
                             <Typography variant="button" color="inherit"  >

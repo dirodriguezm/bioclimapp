@@ -29,7 +29,7 @@ export default class SearchBar extends MapControl{
 
   createLeafletElement() {
     return GeoSearchControl({
-      provider: new OpenStreetMapProvider(),
+      provider: new OpenStreetMapProvider({ params: { countrycodes: 'CL' }, }),
       style:'bar',
       autoComplete: true,
       autoClose:true,
