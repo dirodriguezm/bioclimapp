@@ -11,6 +11,10 @@ import Tooltip from '@material-ui/core/Tooltip';
 import ThreeDRotation from '@material-ui/icons/ThreeDRotation';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import Videocam from '@material-ui/icons/Videocam';
+import Home from '@material-ui/icons/Home'
+import RotateRight from '@material-ui/icons/RotateRight'
+import RemoveRedEye from '@material-ui/icons/RemoveRedEye'
 
 const styles = theme => ({
     button: {
@@ -237,12 +241,18 @@ class BarraHerramientasMorfologia extends Component {
             rotando: props.borrando,
             anchorEl: null,
             anchor: null,
+            anchorCamara: null,
+            anchorSol: null,
         };
 
 
         this.handleCasaPredefinida = this.handleCasaPredefinida.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
         this.handleClose = this.handleClose.bind(this);
+        this.handleClickCamara = this.handleClickCamara.bind(this);
+        this.handleCloseCamara = this.handleCloseCamara.bind(this);
+        this.handleClickSol = this.handleClickSol.bind(this);
+        this.handleCloseSol = this.handleCloseSol.bind(this);
         this.handlePerspective = this.handlePerspective.bind(this);
         this.handleClickCasa = this.handleClickCasa.bind(this);
         this.handleCloseCasa = this.handleCloseCasa.bind(this);
@@ -262,6 +272,23 @@ class BarraHerramientasMorfologia extends Component {
             this.setState({seleccionando: this.props.seleccionando})
         }
     }
+
+    handleClickCamara(event){
+      this.setState({anchorCamara: event.currentTarget})
+    };
+
+    handleCloseCamara(event){
+      this.setState({anchorCamara: null})
+    };
+
+    handleClickSol(event){
+        this.setState({anchorSol: event.currentTarget})
+    };
+
+    handleCloseSol(event){
+        this.setState({anchorSol: null})
+    };
+
 
     handleClickAgregar(event) {
         this.setState({anchorEl: event.currentTarget});
@@ -331,6 +358,7 @@ class BarraHerramientasMorfologia extends Component {
             borrando: true,
             seleccionando: false,
             dibujandoStatesButtons: dibujandoStatesButtons,
+            rotando: false,
         });
         this.onActionChanged(-1, true, false);
     }
@@ -343,6 +371,7 @@ class BarraHerramientasMorfologia extends Component {
             borrando: false,
             seleccionando: true,
             dibujandoStatesButtons: dibujandoStatesButtons,
+            rotando: false,
         });
         this.onActionChanged(-1, false, true);
     }
@@ -371,65 +400,71 @@ class BarraHerramientasMorfologia extends Component {
 
 
     render() {
-        const {classes} = this.props;
-        const {dibujandoStatesButtons, borrando, seleccionando, click2D, anchorEl, anchor} = this.state;
+        const {classes,width} = this.props;
+        const {dibujandoStatesButtons, borrando, seleccionando, click2D, anchorEl, anchor, anchorCamara, anchorSol} = this.state;
         return (
-            <div className={classes.root} align="center">
+            <div style={{display: 'table',
+                marginLeft: 'auto',
+                marginRight: 'auto'}}>
+            <div className={classes.root} align="center" >
 
-                <Tooltip title="Camara 2D"
-                         disableFocusListener={!click2D}
-                >
-                    <div>
-                        <IconButton
-                            className={classes.button}
-                            aria-label="2D"
-                            disabled={click2D}
-                            onClick={this.handlePerspective}>
-                            <IconTwoD/>
-                        </IconButton>
-                    </div>
-                </Tooltip>
-
-                <Tooltip title="Camara 3D"
-                         disableFocusListener={click2D}>
-                    <div>
-                        <IconButton
-                            className={classes.button}
-                            aria-label="3D"
-                            disabled={!click2D}
-                            onClick={this.handlePerspective}>
-                            <IconThreeD/>
-                        </IconButton>
-                    </div>
-                </Tooltip>
-
-                <Tooltip title="Seleccionar"
-                         disableFocusListener={!seleccionando}>
+                <Tooltip title="Cambiar tipo camara">
                     <div>
                         <IconButton
                             className={classes.button}
                             aria-label="Seleccionar"
-                            disabled={seleccionando}
-                            onClick={this.handleSeleccionando}>
-                            <CursorIcon/>
+                            aria-owns={anchorCamara ? 'simple-menu-camara' : null}
+                            aria-haspopup="true"
+                            onClick={this.handleClickCamara}
+                        >
+                            <Videocam/>
                         </IconButton>
                     </div>
                 </Tooltip>
 
-                <Tooltip title="Eliminar"
-                         disableFocusListener={!borrando}>
-                    <div>
-                        <IconButton
-                            className={classes.button}
-                            aria-label="AgregarPuerta"
-                            disabled={borrando}
-                            onClick={this.handleBorrando}>
-                            <Delete/>
-                        </IconButton>
-                    </div>
-                </Tooltip>
+                <Menu
+                    id="simple-menu-camara"
+                    anchorEl={anchorCamara}
+                    open={Boolean(anchorCamara)}
+                    onClose={this.handleCloseCamara}
+                    transformOrigin={{
+                        vertical: 'bottom',
+                        horizontal: 'left',
+                    }}
+                    elevation={9}
+                >
+                    <Tooltip title="Tipo 2D"
+                             disableFocusListener={!click2D}
+                    >
+                        <MenuItem onClick={this.handleCloseCamara}
+                                  disabled={click2D}>
+                            <IconButton
+                                className={classes.button}
+                                aria-label="2D"
+                                disabled={click2D}
+                                onClick={this.handlePerspective}>
+                                <IconTwoD/>
+                            </IconButton>
+                        </MenuItem>
+                    </Tooltip>
+                    <Tooltip title="Tipo 3D"
+                             disableFocusListener={click2D}
+                    >
+                        <MenuItem onClick={this.handleCloseCamara}
+                                  disabled={!click2D}>
+                            <IconButton
+                                className={classes.button}
+                                aria-label="3D"
+                                disabled={!click2D}
+                                onClick={this.handlePerspective}>
+                                <IconThreeD/>
+                            </IconButton>
+                        </MenuItem>
+                    </Tooltip>
 
-                <Tooltip title="Agregar">
+                </Menu>
+
+                <Tooltip title="Agregar elementos">
                     <div>
                         <IconButton
                             className={classes.button}
@@ -454,7 +489,7 @@ class BarraHerramientasMorfologia extends Component {
                     }}
                     elevation={9}
                 >
-                    <Tooltip title="Paredes"
+                    <Tooltip title="!gregar bloques de paredes"
                              disableFocusListener={!dibujandoStatesButtons[0]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
@@ -470,7 +505,7 @@ class BarraHerramientasMorfologia extends Component {
                         </MenuItem>
                     </Tooltip>
 
-                    <Tooltip title="Ventana"
+                    <Tooltip title="Agregar ventanas"
                              disableFocusListener={!dibujandoStatesButtons[1]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
@@ -486,7 +521,7 @@ class BarraHerramientasMorfologia extends Component {
                         </MenuItem>
                     </Tooltip>
 
-                    <Tooltip title="Puerta"
+                    <Tooltip title="Agregar puertas"
                              disableFocusListener={!dibujandoStatesButtons[2]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
@@ -501,8 +536,8 @@ class BarraHerramientasMorfologia extends Component {
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
-
-                    <Tooltip title="Techo"
+                    {/*{borrar si no se peude}*/}
+                    <Tooltip title="Agregar techo"
                              disableFocusListener={!dibujandoStatesButtons[3]}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
@@ -518,110 +553,169 @@ class BarraHerramientasMorfologia extends Component {
                         </MenuItem>
                     </Tooltip>
 
+                    <Tooltip title="Cambiar a casa predefinida"
+                             placement="left">
+                        <MenuItem >
+                            <IconButton
+                                className={classes.button}
+                                aria-label="Predefinida"
+                                aria-owns={anchor ? 'simple-menu2' : null}
+                                aria-haspopup="true"
+                                onClick={this.handleClickCasa}>
+                                <Home/>
+                            </IconButton>
+                        </MenuItem>
+                    </Tooltip>
+
+                    <Menu
+                        id="simple-menu2"
+                        anchorEl={anchor}
+                        open={Boolean(anchor)}
+                        onClose={this.handleCloseCasa}
+                        transformOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        elevation={9}
+                    >
+                        <Tooltip title="Casa simple"
+                                 placement="left">
+                            <MenuItem onClick={this.handleCloseCasa}>
+                                <IconButton
+                                    className={classes.button}
+                                    aria-label="Simple"
+                                    value={0}
+                                    onClick={this.handleCasaPredefinida}>
+                                    <SimpleIcon/>
+                                </IconButton>
+                            </MenuItem>
+                        </Tooltip>
+
+                        <Tooltip title="Casa pareada"
+                                 placement="left">
+                            <MenuItem onClick={this.handleCloseCasa}>
+                                <IconButton
+                                    className={classes.button}
+                                    aria-label="Double"
+                                    value={1}
+                                    onClick={this.handleCasaPredefinida}>
+                                    <DoubleIcon/>
+                                </IconButton>
+                            </MenuItem>
+                        </Tooltip>
+
+                        <Tooltip title="Casa simple dos pisos"
+                                 placement="left">
+                            <MenuItem onClick={this.handleCloseCasa}>
+                                <IconButton
+                                    className={classes.button}
+                                    aria-label="Simple dos pisos"
+                                    value={2}
+                                    onClick={this.handleCasaPredefinida}>
+                                    <SimpleTwoFloorIcon/>
+                                </IconButton>
+                            </MenuItem>
+                        </Tooltip>
+
+                        <Tooltip title="Casa pareada dos pisos"
+                                 placement="left">
+                            <MenuItem onClick={this.handleCloseCasa}>
+                                <IconButton
+                                    className={classes.button}
+                                    aria-label="Simple"
+                                    value={3}
+                                    onClick={this.handleCasaPredefinida}>
+                                    <DoubleTwoFloorIcon/>
+                                </IconButton>
+                            </MenuItem>
+                        </Tooltip>
+                    </Menu>
+
                 </Menu>
 
-                <Tooltip title="Agregar Casa Predefinida">
+                <Tooltip title="Seleccionar elementos"
+                         disableFocusListener={!seleccionando}>
                     <div>
                         <IconButton
                             className={classes.button}
-                            aria-label="Predefinida"
-                            aria-owns={anchor ? 'simple-menu2' : null}
+                            aria-label="Seleccionar"
+                            disabled={seleccionando}
+                            onClick={this.handleSeleccionando}>
+                            <CursorIcon/>
+                        </IconButton>
+                    </div>
+                </Tooltip>
+
+                <Tooltip title="Eliminar elementos"
+                         disableFocusListener={!borrando}>
+                    <div>
+                        <IconButton
+                            className={classes.button}
+                            aria-label="AgregarPuerta"
+                            disabled={borrando}
+                            onClick={this.handleBorrando}>
+                            <Delete/>
+                        </IconButton>
+                    </div>
+                </Tooltip>
+
+                <Tooltip title="Configuración sol">
+                    <div>
+                        <IconButton
+                            className={classes.button}
+                            aria-label="ConfigSol"
+                            aria-owns={anchor ? 'simple-menu-sol' : null}
                             aria-haspopup="true"
-                            onClick={this.handleClickCasa}>
-                            <HomeIcon/>
+                            onClick={this.handleClickSol}
+                        >
+                            <SunPathIcon/>
                         </IconButton>
                     </div>
                 </Tooltip>
 
                 <Menu
-                    id="simple-menu2"
-                    anchorEl={anchor}
-                    open={Boolean(anchor)}
-                    onClose={this.handleCloseCasa}
+                    id="simple-menu-sol"
+                    anchorEl={anchorSol}
+                    open={Boolean(anchorSol)}
+                    onClose={this.handleCloseSol}
                     transformOrigin={{
                         vertical: 'bottom',
                         horizontal: 'left',
                     }}
                     elevation={9}
                 >
-                    <Tooltip title="Simple"
-                             placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}>
+
+                    <Tooltip title="Ver/Ocultar sol">
+                        <MenuItem onClick={this.handleCloseSol}>
                             <IconButton
                                 className={classes.button}
-                                aria-label="Simple"
-                                value={0}
-                                onClick={this.handleCasaPredefinida}>
-                                <SimpleIcon/>
+                                aria-label="Sunpath"
+                                aria-haspopup="true"
+                                onClick={this.handleSunPathClick}>
+                                <RemoveRedEye/>
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
 
-                    <Tooltip title="Doble"
-                             placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}>
+                    <Tooltip title="Rotar coordenadas"
+                             disableFocusListener={!this.state.rotando}
+                    >
+                        <MenuItem onClick={this.handleCloseSol}
+                                  disabled={this.state.rotando}>
                             <IconButton
                                 className={classes.button}
-                                aria-label="Double"
-                                value={1}
-                                onClick={this.handleCasaPredefinida}>
-                                <DoubleIcon/>
+                                aria-label="Rotar"
+                                aria-haspopup="true"
+                                onClick={this.handleRotation}
+                                disabled={this.state.rotando}>
+                                <RotateRight/>
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
 
-                    <Tooltip title="Simple dos pisos"
-                             placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}>
-                            <IconButton
-                                className={classes.button}
-                                aria-label="Simple dos pisos"
-                                value={2}
-                                onClick={this.handleCasaPredefinida}>
-                                <SimpleTwoFloorIcon/>
-                            </IconButton>
-                        </MenuItem>
-                    </Tooltip>
-
-                    <Tooltip title="Doble dos pisos"
-                             placement="left">
-                        <MenuItem onClick={this.handleCloseCasa}>
-                            <IconButton
-                                className={classes.button}
-                                aria-label="Simple"
-                                value={3}
-                                onClick={this.handleCasaPredefinida}>
-                                <DoubleTwoFloorIcon/>
-                            </IconButton>
-                        </MenuItem>
-                    </Tooltip>
                 </Menu>
 
-                <Tooltip title="Ver/Ocultar Sunpath">
-                    <div>
-                        <IconButton
-                            className={classes.button}
-                            aria-label="Sunpath"
-                            onClick={this.handleSunPathClick}>
-                            <SunPathIcon/>
-                        </IconButton>
-                    </div>
-                </Tooltip>
-
-                <Tooltip title="Rotar"
-                         disableFocusListener={!this.state.rotando}
-                >
-                    <div>
-                        <IconButton
-                            className={classes.button}
-                            aria-label="Rotar"
-                            aria-haspopup="true"
-                            onClick={this.handleRotation}>
-                            <ThreeDRotation/>
-                        </IconButton>
-                    </div>
-                </Tooltip>
-
+            </div>
             </div>
 
 

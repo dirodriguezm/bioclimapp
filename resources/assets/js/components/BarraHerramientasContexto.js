@@ -89,17 +89,28 @@ class BarraHerramientasContexto extends Component {
     }
 
     render() {
-        const {classes} = this.props;
-        return (
-            <div className={classes.root} align="center">
+        const {classes,width} = this.props;
 
-                <Tooltip title="Seleccionar">
+        const cuartoWidth = width/4+'px';
+        return (
+            <div style={{
+                display: 'table',
+                marginLeft: 'auto',
+                marginRight:'auto',
+            }}>
+            <div className={classes.root} align="center">
+                <div style={{
+                    display: 'inline-block',
+                    width: cuartoWidth,
+                }}/>
+
+                <Tooltip title="Seleccionar obstrucción">
                     <IconButton className={classes.button} aria-label="Seleccionar"
                                 onClick={this.handleSeleccionar}>
                         <CursorIcon/>
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Agregar">
+                <Tooltip title="Agregar obstrucción">
                     <IconButton
                         className={classes.button}
                         aria-label="Agregar"
@@ -108,7 +119,7 @@ class BarraHerramientasContexto extends Component {
                         <AddCircle/>
                     </IconButton>
                 </Tooltip>
-                <Tooltip title="Borrar">
+                <Tooltip title="Borrar obstrucción">
                     <IconButton
                         className={classes.button}
                         aria-label="Borrar"
@@ -118,14 +129,18 @@ class BarraHerramientasContexto extends Component {
                     </IconButton>
                 </Tooltip>
 
-                <div style={{width:'25%'}}/>
+                <div style={{
+                    display: 'inline-block',
+                    width: cuartoWidth,
+                }}/>
 
-                <Tooltip title="Seleccionar localidad">
+                <Tooltip title="Seleccionar localidad" style={{
+                }}>
                     <IconButton className={classes.button} aria-label="Undo" onClick={this.handleSeleccionarLocalidad}>
                         <MapIcon/>
                     </IconButton>
                 </Tooltip>
-            </div>
+            </div></div>
 
         );
     }

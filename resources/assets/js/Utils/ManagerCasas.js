@@ -368,19 +368,19 @@ class ManagerCasas {
             origin.x = i;
             this.ray.set(origin, dirX);
             var intersects = this.ray.intersectObjects(this.paredesX);
-            let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
-            this.arrows.push(arrow);
-            this.escena.add(arrow);
+            //let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
+            //this.arrows.push(arrow);
+            //this.escena.add(arrow);
             if (intersects.length > 0) {
                 for(let pared of intersects){
                     let distance = pared.distance;
                     distance = Math.round(distance);
                     if(distance > 0  &&  distance < lenZ){
-                        this.escena.remove(arrow);
+                        /*this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
-                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
+                        //arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
                         this.arrows.push(arrow);
-                        this.escena.add(arrow);
+                        this.escena.add(arrow);*/
                         return true;
                     }else{
                         let paredes = habitacion.getObjectByName("Paredes");
@@ -402,11 +402,11 @@ class ManagerCasas {
                                 }
                             }
                         }
-                        this.escena.remove(arrow);
+                        /*this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
                         arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
                         this.arrows.push(arrow);
-                        this.escena.add(arrow);
+                        this.escena.add(arrow);*/
                     }
                 }
 
@@ -419,19 +419,19 @@ class ManagerCasas {
             origin.z = i;
             this.ray.set(origin, dirZ);
             var intersects = this.ray.intersectObjects(this.paredesZ);
-            let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
+            /*let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
             this.arrows.push(arrow);
-            this.escena.add(arrow);
+            this.escena.add(arrow);*/
             if (intersects.length > 0) {
                 for(let pared of intersects){
                     let distance = pared.distance;
                     distance = Math.round(distance);
                     if(distance > 0  &&  distance < lenX){
-                        this.escena.remove(arrow);
+                        /*this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
                         arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
                         this.arrows.push(arrow);
-                        this.escena.add(arrow);
+                        this.escena.add(arrow);*/
                         return true;
                     }else{
                         let paredes = habitacion.getObjectByName("Paredes");
@@ -454,11 +454,11 @@ class ManagerCasas {
                                 }
                             }
                         }
-                        this.escena.remove(arrow);
+                        /*this.escena.remove(arrow);
                         this.arrows.splice(this.arrows.indexOf(arrow));
                         arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
                         this.arrows.push(arrow);
-                        this.escena.add(arrow);
+                        this.escena.add(arrow);*/
                     }
                 }
 
