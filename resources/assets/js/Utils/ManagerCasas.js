@@ -311,7 +311,6 @@ class ManagerCasas {
 
         let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
 
-        console.log(transmitanciaSuperficies);
 
         transmitanciaSuperficies -= estructura.userData.transSup;
         BalanceEnergetico.transmitanciaSuperficie(estructura,this.zona);
@@ -324,8 +323,6 @@ class ManagerCasas {
         }
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
 
-        console.log(transmitanciaSuperficies);
-        console.log(estructura.userData.transSup);
 
         this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
         this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;

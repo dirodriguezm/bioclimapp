@@ -215,9 +215,6 @@ function SunPathIcon() {
     );
 }
 
-function RotateIcon(){
-
-}
 
 class BarraHerramientasMorfologia extends Component {
 

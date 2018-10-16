@@ -265,6 +265,7 @@ class DetalleBalance extends Component {
     }
 
     componentDidUpdate(prevProps) {
+        console.log("PROPS", this.props);
         if (this.props.aporte_solar !== prevProps.aporte_solar) {
             this.setState({
                 dataAportes: {
@@ -353,10 +354,7 @@ class DetalleBalance extends Component {
         const {classes} = this.props;
         let balance = Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
             this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )
-        console.log("balance",balance);
-        console.log("balance objetivo", this.state.balanceObjetivo);
         let ahorro = balance * 100 / this.state.balanceObjetivo;
-        console.log("ahorro",ahorro);
 
         return (
             <Grid container spacing={16} className={classes.root} style={{

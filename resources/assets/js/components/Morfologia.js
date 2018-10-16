@@ -35,10 +35,10 @@ class Morfologia extends Component {
     };
 
     componentDidUpdate(prevProps) {
-        if (this.props.sunPosition !== prevProps.sunPosition) {
+        if (this.props.sunPosition !== prevProps.sunPosition || this.sunPath == null) {
             this.onSunpositionChanged();
         }
-        if(this.props.sunPath !== prevProps.sunPath){
+        if(this.props.sunPath !== prevProps.sunPath || this.sunPath == null){
             this.getSunPath();
         }
         if (this.props.click2D !== prevProps.click2D) {
@@ -193,9 +193,9 @@ class Morfologia extends Component {
         let f = sunAlt.x / d;
         sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
 
-        this.light.position.set(sunPos.x, sunAlt.y - 1, sunPos.z);
+        this.light.position.set(sunPos.x, (sunAlt.y-1), sunPos.z);
 
-        this.sol.position.set(this.light.position.x, this.light.position.y, this.light.position.z);
+        this.sol.position.set(sunPos.x, sunAlt.y -1, sunPos.z);
     }
 
     handleSunPathClicked(sunPathClicked){
@@ -372,8 +372,8 @@ class Morfologia extends Component {
         camara2D.updateProjectionMatrix ();
         this.camara2D = camara2D;
         //CAMARA 3D
-        let camara3D = new THREE.PerspectiveCamera(20, width / height, 1, 1000);
-        camara3D.position.set(0, 8, 27);
+        let camara3D = new THREE.PerspectiveCamera(45, width / height, 1, 1000);
+        camara3D.position.set(0, 6, 15);
         camara3D.lookAt(new THREE.Vector3());
         this.camara3D = camara3D;
 
@@ -438,7 +438,7 @@ class Morfologia extends Component {
 
 
         //Plano se agrega a objetos
-        let planoGeometria = new THREE.PlaneBufferGeometry(20, 20);
+        let planoGeometria = new THREE.PlaneBufferGeometry(50, 50);
         planoGeometria.rotateX(-Math.PI / 2);
 
         planoGeometria.computeFaceNormals();
@@ -465,7 +465,7 @@ class Morfologia extends Component {
         this.objetos.push(plano);
 
         //Grid del plano
-        let gridHelper = new THREE.GridHelper(20, 20, 0xCCCCCC, 0xCCCCCC);
+        let gridHelper = new THREE.GridHelper(50, 50, 0xCCCCCC, 0xCCCCCC);
         escena.add(gridHelper);
 
         //Indicador de puntos cardinales

@@ -4,6 +4,23 @@ import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
 import {MapControl} from 'react-leaflet';
 
 
+class ChileProvider{
+    getComunas(){
+
+    }
+    async search({ getComunas }) {
+        return [{
+            x: Number,                      // lon
+            y: Number,                      // lat
+            label: String,                  // formatted address
+            bounds: [
+                [Number, Number],             // s, w - lat, lon
+                [Number, Number],             // n, e - lat, lon
+            ],
+        }]
+    }
+}
+
 export default class SearchBar extends MapControl{
   constructor(props){
     super(props);

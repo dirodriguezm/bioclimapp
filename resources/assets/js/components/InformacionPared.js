@@ -21,6 +21,7 @@ import Add from '@material-ui/icons/Add';
 import Clear from '@material-ui/icons/Clear';
 import IconButton from '@material-ui/core/IconButton';
 import Grid from "@material-ui/core/Grid";
+import SvgIcon from "@material-ui/core/SvgIcon/SvgIcon";
 
 const ITEM_HEIGHT = 48;
 
@@ -84,6 +85,15 @@ const styles = theme => ({
 
 });
 
+function SunPathIcon() {
+    return (
+        <SvgIcon viewBox="0 0 64 64">
+            <path d="M62 30H47.9a15.9 15.9 0 0 0-3.2-7.8l10-10a2 2 0 0 0-2.8-2.8l-10 10a15.9 15.9 0 0 0-7.9-3.3V2a2 2 0 0 0-4 0v14.2a15.9 15.9 0 0 0-7.8 3.2l-10-10a2 2 0 1 0-2.8 2.8l10 10a15.9 15.9 0 0 0-3.2 7.8H2a2 2 0 1 0 0 4h14.2a15.9 15.9 0 0 0 3.2 7.8l-10 10a2 2 0 1 0 2.8 2.8l10-10a15.9 15.9 0 0 0 7.8 3.3V62a2 2 0 0 0 4 0V47.9a15.9 15.9 0 0 0 7.8-3.2l10 10a2 2 0 1 0 2.8-2.8l-10-10a15.9 15.9 0 0 0 3.3-7.9H62a2 2 0 1 0 0-4z"
+                  fill="#757575"></path>
+        </SvgIcon>
+    );
+}
+
 
 class InformacionPared extends Component {
 
@@ -135,63 +145,73 @@ class InformacionPared extends Component {
                 if(this.props.seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR) {
                     this.info_rb = <div/>;
                     if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde == null) {
-                        this.info_rb = <div>
-                            <ExpansionPanelDetails>
-                                La pared recibe sol
-                                desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
-                                Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
+                        this.info_rb = <Grid container spacing={8} justify="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                            <Grid item xs={6} container spacing={0}>
+                                <Grid item xs={12} >Hoy el muro recibe sol</Grid>
+                                <Grid item xs={12}>
+                                    Desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
+                                </Grid>
+                                <Grid item xs={12}>
+                                    Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={6}>
                                 RB: {this.props.seleccionado.userData.omegas.rb}
-                            </ExpansionPanelDetails>
-                        </div>
+                            </Grid>
+                        </Grid>
                     }
                     else if (this.props.seleccionado.userData.omegas.wm.desde == null && this.props.seleccionado.userData.omegas.wt.desde != null) {
-                        this.info_rb = <div>
-                            <ExpansionPanelDetails>
-                                La pared recibe sol
-                                desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
-                                Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
+                        this.info_rb = <Grid container spacing={8} justify="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                            <Grid item xs={6} container spacing={0}>
+                                <Grid item xs={12} >Hoy el muro recibe sol</Grid>
+                                <Grid item xs={12}>
+                                    Desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
+                                </Grid>
+                                <Grid item xs={12}>
+                                    Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={6}>
                                 RB: {this.props.seleccionado.userData.omegas.rb}
-                            </ExpansionPanelDetails>
-                        </div>
+                            </Grid>
+                        </Grid>
                     }
                     else if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde != null) {
-                        this.info_rb = <div>
-                            <ExpansionPanelDetails>
-                                La pared recibe sol
-                                desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
-                                Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
-                                Y luego desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
-                                Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
+                        this.info_rb = <Grid container spacing={8} justify="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                            <Grid item xs={6} container spacing={0}>
+                                <Grid item xs={12} >Hoy el muro recibe sol</Grid>
+                                <Grid item xs={6}>
+                                    Desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
+                                </Grid>
+                                <Grid item xs={12} >Y luego</Grid>
+                                <Grid item xs={6}>
+                                    desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
+                                </Grid>
+                            </Grid>
+                            <Grid item xs={6}>
                                 RB: {this.props.seleccionado.userData.omegas.rb}
-                            </ExpansionPanelDetails>
-                        </div>
+                            </Grid>
+                        </Grid>
                     }
                     else {
-                        this.info_rb = <div>
-                            <ExpansionPanelDetails>
-                                La pared no recibe sol.
-                            </ExpansionPanelDetails>
-                            <ExpansionPanelDetails>
+                        this.info_rb = <Grid container spacing={8} justify="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                            <Grid item xs={6} container spacing={0}>
+                                <Grid item xs={12} >Hoy el muro no recibe sol</Grid>
+                            </Grid>
+                            <Grid item xs={6}>
                                 RB: {this.props.seleccionado.userData.omegas.rb}
-                            </ExpansionPanelDetails>
-                        </div>
-
+                            </Grid>
+                        </Grid>
                     }
                 }
             }
@@ -436,6 +456,9 @@ class InformacionPared extends Component {
                         >
                             {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
                         </Typography>
+                        {seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR &&
+                        <Paper style={{padding:20, margin:0}}>{this.info_rb}</Paper>
+                        }
 
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
@@ -751,18 +774,6 @@ class InformacionPared extends Component {
                                 </Grid>
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
-
-                        {seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR &&
-                        <ExpansionPanel>
-                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>Radiación Solar</Typography>
-                            </ExpansionPanelSummary>
-
-                            {this.info_rb}
-
-                        </ExpansionPanel>
-                        }
-
 
                     </div>
                     :

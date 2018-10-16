@@ -102,7 +102,6 @@ function transmitanciaSuperficie(elemento,zona) {
 
         case Morfologia.tipos.PUERTA:
             transmitancia += elemento.userData.info_material.espesor / elemento.userData.info_material.conductividad;
-            console.log(elemento.userData.info_material.espesor / elemento.userData.info_material.conductividad);
             transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.parent.userData.separacion];
 
             u = 1 / transmitancia;

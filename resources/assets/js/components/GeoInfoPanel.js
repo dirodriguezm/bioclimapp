@@ -1,20 +1,11 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import axios from 'axios';
 import {Bar} from 'react-chartjs-2';
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
-import Button from '@material-ui/core/Button';
 import Typography from '@material-ui/core/Typography';
-import Paper from '@material-ui/core/Paper';
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import DetalleBalance from "./DetalleBalance";
-import SwipeableViews from "react-swipeable-views";
-import AppBar from "@material-ui/core/AppBar/AppBar";
 import CardHeader from "@material-ui/core/CardHeader/CardHeader";
 
 function TabContainer(props) {
@@ -70,7 +61,7 @@ class GeoInfoPanel extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
+        this.state = {temperaturaConfort: 14};
     }
 
 
@@ -98,6 +89,9 @@ class GeoInfoPanel extends Component {
                     });
                     props.onRadiationsChanged(global.data, direct.data, difuse.data);
                 }));
+        }
+        if(this.props.temperatura !== prevProps.temperatura){
+            this.setState({temperaturaConfort: this.props.temperatura});
         }
     }
 
@@ -145,10 +139,10 @@ class GeoInfoPanel extends Component {
                     }) : null
                 },
                 {
-                    label: 'Temperatura promedio anual',
+                    label: 'Temperatura de confort',
                     yAxisID: 'temperatura',
                     type: 'line',
-                    data: Array(12).fill(tempAnual ? tempAnual.valor : null),
+                    data: Array(12).fill(tempAnual ? this.state.temperaturaConfort : null),
                     fill: false,
                     borderColor: '#c51162',
                     backgroundColor: "#c51162",
@@ -168,18 +162,6 @@ class GeoInfoPanel extends Component {
                         return rad.valor;
                     }) : null
                 },
-                {
-                    label: 'Radiación global promedio anual',
-                    yAxisID: 'radiacion',
-                    type: 'line',
-                    data: Array(12).fill(radAnual ? radAnual.valor / 12 : null),
-                    fill: false,
-                    borderColor: '#30a159',
-                    backgroundColor: "#30a159",
-                    borderWidth: 1,
-                    pointRadius: 0,
-                    pointHoverRadius: 0
-                }
             ]
         };
         const optionsTemp = {
@@ -236,7 +218,6 @@ class GeoInfoPanel extends Component {
                                 <CardContent>
                                     <Bar
                                         height={280}
-                                        //width={this.state.width - 50}
                                         data={dataTemp}
                                         options={optionsTemp}
                                     />

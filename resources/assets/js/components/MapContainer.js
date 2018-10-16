@@ -25,15 +25,15 @@ export default class MapContainer extends Component {
     componentWillMount(){
         axios.get("https://bioclimapp.host/api/comuna/" + this.state.lat + "/" + this.state.lng)
             .then(response => {
-                    this.setState({
-                        lat: this.state.lat,
-                        lng: this.state.lng,
+                    this.setState( (state) => ({
                         comuna: response.data[0],
-                        sunPosition: this.getSunPosition(this.state.lat, this.state.lng),
-                        sunPath: this.getSunPath(this.state.lat, this.state.lng),
+                        sunPosition: this.getSunPosition(state.lat, state.lng),
+                        sunPath: this.getSunPath(state.lat, state.lng),
+                    }), function () {
+                        this.createMarker(this.state.lat, this.state.lng);
+                        this.props.onComunaChanged(this.state);
                     });
-                    this.createMarker(this.state.lat, this.state.lng);
-                    this.props.onComunaChanged(this.state);
+
                 }
             );
     }
@@ -105,10 +105,8 @@ export default class MapContainer extends Component {
                         lng: e.latlng.lng,
                         comuna: response.data[0],
                         sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng),
-                        //sunTimes: this.getSolarTimes(e.latlng.lat, e.latlng.lng),
                         sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
-                    });
-                    this.props.onComunaChanged(this.state);
+                    },this.props.onComunaChanged(this.state));
                 }
             );
 
@@ -126,9 +124,8 @@ export default class MapContainer extends Component {
                         lng: lng,
                         comuna: response.data[0],
                         sunPosition: this.getSunPosition(lat, lng),
-                        //sunTimes: this.getSolarTimes(lat, lng),
-                    });
-                    this.props.onComunaChanged(this.state);
+                        sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
+                    },this.props.onComunaChanged(this.state));
                 }
             );
     }
