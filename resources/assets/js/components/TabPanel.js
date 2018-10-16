@@ -155,6 +155,9 @@ const styles = theme => ({
     hidden: {
         display: 'none',
     },
+    grow: {
+        flexGrow: 1,
+    }
 });
 
 
@@ -247,6 +250,7 @@ class TabPanel extends Component {
         else this.setState({openVarDash: !this.state.openVarDash, openMorf: false, mapDrawer:false, drawer_localidad:!this.state.drawer_localidad, seleccionadoMorf: null});
 
     }
+
 
     componentDidMount() {
         this.setState({
@@ -439,7 +443,9 @@ class TabPanel extends Component {
                 <AppBar  className={classNames(classes.appBar, {
                     [classes.appBarShift]: this.state.openDashboard ,
                     [classes.appBarShiftLeft]: this.state.openDashboard,
-                })}>
+                })}
+
+                >
                     <Toolbar>
                         <IconButton
                             color="inherit"
@@ -461,6 +467,20 @@ class TabPanel extends Component {
                         >
                             <People />
                         </IconButton>
+                        <div style={{
+                            marginLeft: 'auto',}}>
+                            <Typography variant="button" color="inherit"  >
+                                Diseño bioclimático de viviendas
+                            </Typography>
+                            <Typography style={{
+                                fontSize: 'x-small',}}align={'center'} variant="button" color="inherit"  >
+                                Por
+                            </Typography>
+                            <Typography style={{
+                                fontSize: 'x-small',}}align={'center'} variant="button" color="inherit"  >
+                                Matias Medina y Diego Rodriguez
+                            </Typography>
+                        </div>
                     </Toolbar>
                 </AppBar>
                 <Drawer
@@ -514,6 +534,7 @@ class TabPanel extends Component {
                                 }
                                 <Paper className={classes.paper}>
                                     <BarraHerramientasContexto
+                                        width={this.state.width}
                                         agregarContexto={this.agregarContexto}
                                         seleccionar={this.seleccionar}
                                         borrarContexto={this.borrarContexto}
@@ -592,8 +613,9 @@ class TabPanel extends Component {
                                     />:
                                     <div></div>
                                 }
-                                <Paper className={classes.paper}>
+                                <Paper className={classes.paper} >
                                     <BarraHerramientasMorfologia
+                                        width={this.state.width}
                                         click2D={click2D}
                                         dibujando={dibujandoMorf}
                                         borrando={borrandoMorf}
