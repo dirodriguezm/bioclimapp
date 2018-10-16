@@ -27,7 +27,6 @@ const styles = theme => ({
         display: 'flex',
     },
     paper: {
-        marginRight: theme.spacing.unit * 2,
     },
     popperClose: {
         pointerEvents: 'none',

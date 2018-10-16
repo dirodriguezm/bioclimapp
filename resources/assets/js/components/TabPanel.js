@@ -34,15 +34,15 @@ function TabContainer(props) {
 
 const drawerWidth = 500;
 const drawerRightWidth = 500;
+const barHeight = 90;
+const barraHerramientasHeight = 70;
 
 TabContainer.propTypes = {
     children: PropTypes.node.isRequired,
 };
 const styles = theme => ({
-    root: {
-        flexGrow: 1,
-    },
     appBar: {
+        height: barHeight,
         position: 'absolute',
         transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
@@ -63,11 +63,8 @@ const styles = theme => ({
         marginRight: drawerWidth,
     },
     toolbar: {
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        padding: '0 8px',
-        ...theme.mixins.toolbar,
+        position: 'relative',
+        height: '100%',
     },
     menuButton: {
         marginLeft: 12,
@@ -75,13 +72,13 @@ const styles = theme => ({
     },
     drawerPaper: {
         position: 'relative',
-        height: '100vh',
+        height: '83vh',
         width: drawerWidth,
         background: '#F0F0F0'
     },
     drawerRightPaper:{
         position: 'relative',
-        height: '90vh',
+        height: '80vh',
         width: drawerRightWidth,
         background: '#F0F0F0'
     },
@@ -94,16 +91,16 @@ const styles = theme => ({
         }),
     },
     content: {
-        flexGrow: 1,
+        height: `calc(100vh - ${barHeight}px)`,
         backgroundColor: theme.palette.background.default,
-        paddingTop: theme.spacing.unit * 9,
+        marginTop: barHeight+'px',
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
         }),
     },
     contentInside: {
-        flexGrow: 1,
+        height: `calc(100vh - ${barHeight}px)`,
         backgroundColor: theme.palette.background.default,
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
@@ -130,20 +127,22 @@ const styles = theme => ({
     },
     appFrame: {
         zIndex: 1,
-        overflow: 'hidden',
-        position: 'relative',
+        position: 'absolute',
         display: 'flex',
         width: '100%',
+        height: '100vh',
     },
     frameTabs: {
+        /*height: '100vh',*/
+        height: `calc(100vh - ${barHeight}px)`,
         zIndex: 1,
         display: 'flex',
-        width: '100%',
     },
     hide: {
         display: 'none',
     },
     paper: {
+        height: barraHerramientasHeight+'px',
         //padding: theme.spacing.unit * 2,
         textAlign: 'center',
         color: theme.palette.text.secondary,
@@ -177,7 +176,7 @@ class TabPanel extends Component {
             alturaPiso: null,
             openDashboard: false,
             openVarDash: false,
-            drawer_localidad: true,
+            drawer_localidad: false,
             sunPathClicked: false,
             paredCapaChange: false,
             rotando: false,
@@ -219,6 +218,7 @@ class TabPanel extends Component {
         this.handleChangeVariable = this.handleChangeVariable.bind(this);
         this.handleCloseVarDash = this.handleCloseVarDash.bind(this);
         this.onAlturaVentanaChanged = this.onAlturaVentanaChanged.bind(this);
+        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
 
     }
 
@@ -254,9 +254,14 @@ class TabPanel extends Component {
 
     componentDidMount() {
         this.setState({
-            height: window.innerHeight - 150,
+            height: this.tab.clientHeight,
             width: this.tab.clientWidth
         });
+
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
+
+
     }
 
     handleChange(event, value) {
@@ -277,6 +282,14 @@ class TabPanel extends Component {
         this.setState(prevState => ({
             click2D: !prevState.click2D
         }));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+
+    updateWindowDimensions() {
+        this.setState({ width: window.innerWidth, height: window.innerHeight });
     }
 
     onComunaChanged(mapState) {
@@ -440,13 +453,12 @@ class TabPanel extends Component {
             <div className={classes.appFrame} ref={(tab) => {
                 this.tab = tab
             }} style={{margin:0, padding:0}}>
-                <AppBar  className={classNames(classes.appBar, {
-                    [classes.appBarShift]: this.state.openDashboard ,
-                    [classes.appBarShiftLeft]: this.state.openDashboard,
-                })}
+                <AppBar  className={classNames(classes.appBar)} ref={(appbar) => {
+                    this.appbar = appbar
+                }}
 
                 >
-                    <Toolbar>
+                    <Toolbar className={classes.toolbar}>
                         <IconButton
                             color="inherit"
                             aria-label="Dashboard"
@@ -504,18 +516,19 @@ class TabPanel extends Component {
                     />
                 </Drawer>
                 <SwipeableViews
+                    className={classNames(classes.content, classes.contentLeft, /*{
+                        [classes.contentShift]: this.state.openDashboard,
+                        [classes.contentShiftLeft]: this.state.openDashboard,
+                    }*/)}
                     axis={theme.direction === 'rtl' ? 'x-reverse' : 'x'}
                     index={this.state.value}
                     onChangeIndex={this.handleChangeIndex}
-                    className={classNames(classes.content, classes.contentLeft, {
-                        [classes.contentShift]: this.state.openDashboard,
-                        [classes.contentShiftLeft]: this.state.openDashboard,
-                    })}
+
                 >
-                    <div className={classes.frameTabs}>
+                    <div className={classes.frameTabs} >
                         <div className={classNames(classes.contentInside, classes.contentRight, {
-                            [classes.contentShift]: this.state.drawer_localidad ,
-                            [classes.contentShiftRight]: this.state.drawer_localidad ,
+                            /*[classes.contentShift]: this.state.drawer_localidad ,*/
+                            [classes.contentShiftRight]: !this.state.drawer_localidad ,
 
                         })}>
                             <TabContainer dir={theme.direction}>
@@ -547,8 +560,9 @@ class TabPanel extends Component {
                             variant="persistent"
                             anchor={'right'}
                             open={this.state.drawer_localidad}
+                            hidden={!this.state.drawer_localidad}
                             classes={{
-                                paper: classes.drawerRightPaper,
+                                paper: classes.drawerPaper,
                             }}
                         >
                             <div  style={this.state.mapDrawer ? {display:'none'}:{}}>
@@ -575,16 +589,16 @@ class TabPanel extends Component {
                         </Drawer>
                     </div>
 
-                    <div className={classes.frameTabs}>
+                    <div className={classes.frameTabs} >
                         <div className={classNames(classes.contentInside, classes.contentRight, {
-                            [classes.contentShift]: !openMorf && !this.state.openVarDash,
-                            [classes.contentShiftRight]: !openMorf && !this.state.openVarDash,
+                            /*[classes.contentShift]: !openMorf && !this.state.openVarDash,*/
+                            [classes.contentShiftRight]: !openMorf ,
                         })}>
-                            <TabContainer dir={theme.direction}>
+                            <TabContainer dir={theme.direction} >
                                 {this.state.width ?
                                     <Morfologia
                                         width={width}
-                                        height={height}
+                                        height={this.state.height-barHeight-barraHerramientasHeight-100}
                                         onParedesChanged={this.onParedesChanged}
                                         onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
                                         sunPosition={this.state.sunPosition}
@@ -636,8 +650,8 @@ class TabPanel extends Component {
                         <Drawer
                             variant='persistent'
                             anchor='right'
-                            open={openMorf || this.state.openVarDash}
-                            hidden={!openMorf && !this.state.openVarDash}
+                            open={openMorf}
+                            hidden={!openMorf}
                             classes={{
                                 paper: classes.drawerPaper,
                             }}

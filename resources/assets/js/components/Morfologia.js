@@ -26,6 +26,8 @@ class Morfologia extends Component {
         this.temperaturaConfort = props.temperatura;
         this.angleRotated = 0;
 
+        console.log(props.appbar)
+
         this.state  = {
             height: props.height,
             width: props.width,
@@ -217,7 +219,7 @@ class Morfologia extends Component {
         this.props.onVentanasChanged(this.ventanas);
 
 
-        
+
 
         this.managerCasas.agregarHabitacionDibujada();
         let casa = this.managerCasas.getCasa();
@@ -446,7 +448,7 @@ class Morfologia extends Component {
 
 
 
-            this.positionParedes = [];
+        this.positionParedes = [];
         for (let i = 0; i < 50; i++) {
             this.positionParedes[i] = [];
             for (let j = 0; j < 50; j++) {
@@ -466,6 +468,12 @@ class Morfologia extends Component {
 
         //Grid del plano
         let gridHelper = new THREE.GridHelper(20, 20, 0xCCCCCC, 0xCCCCCC);
+        gridHelper.material = new THREE.LineBasicMaterial( {
+            color: 0xffffff,
+            linewidth: 4,
+            linecap: 'round', //ignored by WebGLRenderer
+            linejoin:  'round' ,//ignored by WebGLRenderer
+        } );
         escena.add(gridHelper);
 
         //Indicador de puntos cardinales
@@ -1054,7 +1062,7 @@ class Morfologia extends Component {
         this.mouse.y = -((event.clientY - rect.top) / (rect.height)) * 2 + 1;
         this.raycaster.setFromCamera(this.mouse, this.camara);
 
-                //seleccionado construccion de pared
+        //seleccionado construccion de pared
         if (this.props.dibujando === 0) {
             //click derecho
             if (event.button === 0) {
@@ -1074,7 +1082,7 @@ class Morfologia extends Component {
 
         if(this.dragging && this.props.rotando){
             this.dragging = false;
-            
+
             let ventanas = [];
             for(let pared of this.paredes){
                 let resultAngle = pared.userData.gamma + this.angleRotated;
@@ -1177,7 +1185,7 @@ class Morfologia extends Component {
             let intersect;
             //si se dibujan paredes
             if (this.props.dibujando === 0) {
-                
+
                 let intersects = this.raycaster.intersectObjects(this.objetos);
                 if (intersects.length > 0) {
                     intersect = intersects[0];
@@ -1186,12 +1194,12 @@ class Morfologia extends Component {
                     this.indicador_dibujado.position.round();
                     //si es pared
 
-                        this.indicador_dibujado.position.y = this.heightWall / 2;
-                        if (this.construyendo) {
-                            var nextPosition = (intersect.point).add(intersect.face.normal).clone();
-                            nextPosition.round();
-                            this.managerCasas.crecerHabitacion(nextPosition);
-                        }
+                    this.indicador_dibujado.position.y = this.heightWall / 2;
+                    if (this.construyendo) {
+                        var nextPosition = (intersect.point).add(intersect.face.normal).clone();
+                        nextPosition.round();
+                        this.managerCasas.crecerHabitacion(nextPosition);
+                    }
 
 
                 }
@@ -1291,7 +1299,7 @@ class Morfologia extends Component {
     }
 
     onDrag(event){
-        
+
     }
 
     handleSeleccionado(){
