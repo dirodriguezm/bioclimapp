@@ -194,7 +194,7 @@ class ManagerCasas {
 
     setZona(zona){
         this.zona = zona;
-        console.log("seteando zona",this.zona,zona);
+        //console.log("seteando zona",this.zona,zona);
     }
 
     setPersonas(personas){
@@ -692,7 +692,7 @@ class ManagerCasas {
         habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
         habitacion.userData.perdidaPorVentilacionObjetivo = perdidaPorVentilacionObjetivo;
         habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
-        console.log("perdida objetivo",perdidaPorConduccionObjetivo,transmitanciaSuperficiesObjetivo,this.gradoDias,puenteTermico.objetivo);
+        //console.log("perdida objetivo",perdidaPorConduccionObjetivo,transmitanciaSuperficiesObjetivo,this.gradoDias,puenteTermico.objetivo);
 
         let nivel = this.casa.children[habitacion.userData.nivel - 1];
         nivel.add(habitacion);

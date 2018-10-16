@@ -108,7 +108,7 @@ export default class MapContainer extends Component {
                         sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
                     },function(){
                         this.props.onComunaChanged(this.state);
-                        console.log("onCOmunaChanged",this.state);
+                        //console.log("onCOmunaChanged",this.state);
                     });
                 }
             );

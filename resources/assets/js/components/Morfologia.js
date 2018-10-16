@@ -401,8 +401,8 @@ class Morfologia extends Component {
 
         //this.escena.add(this.light);
 
-        this.light.shadow.mapSize.width = 512;  // default
-        this.light.shadow.mapSize.height = 512; // default
+        this.light.shadow.mapSize.width = 512*2;  // default
+        this.light.shadow.mapSize.height = 512*2; // default
         this.light.shadow.camera.near = 0.5;    // default
         this.light.shadow.camera.far = 500;
 
@@ -467,12 +467,18 @@ class Morfologia extends Component {
 
         //Grid del plano
         let gridHelper = new THREE.GridHelper(50, 50, 0xCCCCCC, 0xCCCCCC);
+        gridHelper.material = new THREE.LineBasicMaterial( {
+            color: 0xffffff,
+            linewidth: 4,
+            linecap: 'round', //ignored by WebGLRenderer
+            linejoin:  'round' //ignored by WebGLRenderer
+        } );
         escena.add(gridHelper);
 
         //Indicador de puntos cardinales
         let curve = new THREE.EllipseCurve(
             0, 0,            // ax, aY
-            10, 10,           // xRadius, yRadius
+            15, 15,           // xRadius, yRadius
             0, 2 * Math.PI,  // aStartAngle, aEndAngle
             false,            // aClockwise
             0                 // aRotation
@@ -497,7 +503,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, -10, 0.0);
+        sprite.position.set(0, -15, 0.0);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("N", {
             align: textAlign.center,
@@ -507,7 +513,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(0, 11.2, 0.0);
+        sprite.position.set(0, 15, 0.0);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("E", {
             align: textAlign.center,
@@ -517,7 +523,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(10.5, 0.3, 0);
+        sprite.position.set(15, 0.3, 0);
         cardinalPointsCircle.add(sprite);
         sprite = new MeshText2D("O", {
             align: textAlign.center,
@@ -527,7 +533,7 @@ class Morfologia extends Component {
         });
         sprite.scale.setX(0.03);
         sprite.scale.setY(0.03);
-        sprite.position.set(-10.5, 0.3, 0);
+        sprite.position.set(-15, 0.3, 0);
         cardinalPointsCircle.add(sprite);
 
 
