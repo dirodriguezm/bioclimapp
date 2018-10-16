@@ -155,6 +155,9 @@ const styles = theme => ({
     hidden: {
         display: 'none',
     },
+    grow: {
+        flexGrow: 1,
+    }
 });
 
 
@@ -235,6 +238,7 @@ class TabPanel extends Component {
         }
         this.setState({openDashboard: !this.state.openDashboard});
     }
+
 
     componentDidMount() {
         this.setState({
@@ -415,7 +419,6 @@ class TabPanel extends Component {
     render() {
         const {classes, theme} = this.props;
         const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensiones, alturaPiso, paredCapaChange} = this.state;
-        console.log(new Date());
         return (
 
             <div className={classes.appFrame} ref={(tab) => {
@@ -424,7 +427,9 @@ class TabPanel extends Component {
                 <AppBar  className={classNames(classes.appBar, {
                     [classes.appBarShift]: this.state.openDashboard ,
                     [classes.appBarShiftLeft]: this.state.openDashboard,
-                })}>
+                })}
+
+                >
                     <Toolbar>
                         <IconButton
                             color="inherit"
@@ -439,6 +444,28 @@ class TabPanel extends Component {
                             <Tab label="Morfología"/>
                             <Tab label="Variables Internas"/>
                         </Tabs>
+                        <IconButton
+                            color="inherit"
+                            aria-label="Dashboard"
+                            onClick={this.handleVarDashOpen}
+                            className={classNames(classes.menuButton)}
+                        >
+                            <People />
+                        </IconButton>
+                        <div style={{
+                            marginLeft: 'auto',}}>
+                            <Typography variant="button" color="inherit"  >
+                                Diseño bioclimático de viviendas
+                            </Typography>
+                            <Typography style={{
+                                fontSize: 'x-small',}}align={'center'} variant="button" color="inherit"  >
+                                Por
+                            </Typography>
+                            <Typography style={{
+                                fontSize: 'x-small',}}align={'center'} variant="button" color="inherit"  >
+                                Matias Medina y Diego Rodriguez
+                            </Typography>
+                        </div>
                     </Toolbar>
                 </AppBar>
                 <Drawer
@@ -492,6 +519,7 @@ class TabPanel extends Component {
                                 }
                                 <Paper className={classes.paper}>
                                     <BarraHerramientasContexto
+                                        width={this.state.width}
                                         agregarContexto={this.agregarContexto}
                                         seleccionar={this.seleccionar}
                                         borrarContexto={this.borrarContexto}
@@ -561,8 +589,9 @@ class TabPanel extends Component {
                                     />:
                                     <div></div>
                                 }
-                                <Paper className={classes.paper}>
+                                <Paper className={classes.paper} >
                                     <BarraHerramientasMorfologia
+                                        width={this.state.width}
                                         click2D={click2D}
                                         dibujando={dibujandoMorf}
                                         borrando={borrandoMorf}
