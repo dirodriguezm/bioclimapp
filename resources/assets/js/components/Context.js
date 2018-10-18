@@ -609,7 +609,7 @@ class Context extends Component {
             zIndex: 1
         }
         return (
-            <div>
+            <div style={{height:this.props.height}}>
                 <div
                     ref={(popper) => {
                         this.popper = popper

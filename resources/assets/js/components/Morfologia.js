@@ -79,7 +79,7 @@ class Morfologia extends Component {
             let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
             this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
         }
-        if(this.props.width !== prevProps.width ){
+        if(this.props.width !== prevProps.width || this.props.height !== prevProps.height ){
             this.renderer.setSize(this.props.width, this.props.height);
             this.camara.aspect = this.props.width / this.props.height;
             this.camara.updateProjectionMatrix();
@@ -903,7 +903,7 @@ class Morfologia extends Component {
 
     render() {
         return (
-            <div
+            <div style={{height:this.props.height}}
                 //tabIndex="0"
                 onMouseDown={this.onMouseDown}
                 onMouseUp={this.onMouseUp}

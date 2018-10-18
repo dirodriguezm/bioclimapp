@@ -125,8 +125,7 @@ class BarraHerramientasContexto extends Component {
                     </IconButton>
                 </Tooltip>
 
-                <Tooltip title="Seleccionar localidad" style={{
-                }}>
+                <Tooltip title="Seleccionar localidad" >
                     <IconButton className={classes.button} aria-label="Undo" onClick={this.handleSeleccionarLocalidad}>
                         <MapIcon/>
                     </IconButton>

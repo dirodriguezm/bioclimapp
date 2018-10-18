@@ -16,7 +16,7 @@ const htmlToReactParser = new HtmlToReactParser();
 const styles = theme => ({
     root: {
         //flexGrow: 1,
-        background: '#F0F0F0'
+        background: '#fdfdfd'
     },
     paper: {
         //padding: theme.spacing.unit * 2,

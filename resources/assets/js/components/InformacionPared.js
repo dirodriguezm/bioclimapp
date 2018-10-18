@@ -45,7 +45,7 @@ const styles = theme => ({
         width: 100,
     },
     textRotation: {
-        marginLeft: '75%',
+        marginLeft: '80%',
         '-mozTransform': 'rotate(90deg)',
         '-webkitTransform' : 'rotate(90deg)',
         '-msTransform' : 'rotate(90deg)',
@@ -53,7 +53,6 @@ const styles = theme => ({
         'transform:' : 'rotate(90deg)',
         '-msFilter' : 'progid:DXImageTransform.Microsoft.BasicImage(rotation=1)',
         whiteSpace: 'nowrap',
-        left: '50%',
         height: 0,
         width: 0,
         '-webkitUserSelect' : 'none',
@@ -71,16 +70,18 @@ const styles = theme => ({
         marginTop: theme.spacing.unit * 2,
     },
     paper: {
-        height: 250,
-        flexDirection: 'column',
-        textAlign: 'center',
+        height: 200,
         overflow: 'hidden',
-        elevation:24
+        elevation:24,
+        width: 0,
+        minWidth: '100%',
     },
     paperAdd: {
-        height: 250,
+        height: 200,
         overflow: 'hidden',
-        elevation:24
+        elevation:24,
+        width: 0,
+        minWidth: '100%',
     },
 
 });
@@ -477,7 +478,11 @@ class InformacionPared extends Component {
                                                                onClick={this.clickCapa}
                                                                elevation={0}
                                                         >
-                                                            <IconButton style={{color: this.colorSelected[1]}}
+                                                            <IconButton style={{color: this.colorSelected[1],
+                                                                    margin: 0,
+                                                                    position: 'relative',
+                                                                    left: '50%',
+                                                                    transform: 'translate(-50%, 0%)',}}
                                                                         className={classes.button}
                                                                         value={capa.index}
                                                                         onClick={this.handleClickBorrar}
@@ -506,12 +511,19 @@ class InformacionPared extends Component {
                                                             }
                                                         </Paper> :
                                                         <Paper className={classes.paper}
-                                                               style={{backgroundColor: this.info_material[capa.material].color}}
+                                                               style={{backgroundColor: this.info_material[capa.material].color
+                                                               }}
                                                                value={capa.index}
                                                                onClick={this.clickCapa}
                                                                 elevation={10}
                                                         >
-                                                            <IconButton style={{color: this.info_material[capa.material].textColor}}
+                                                            <IconButton
+                                                                style={{color: this.info_material[capa.material].textColor,
+                                                                    margin: 0,
+                                                                    position: 'relative',
+                                                                    left: '50%',
+                                                                    transform: 'translate(-50%, 0%)',
+                                                                   }}
                                                                         className={classes.button}
                                                                         value={capa.index}
                                                                         onClick={this.handleClickBorrar}
@@ -520,7 +532,7 @@ class InformacionPared extends Component {
                                                                 <Clear/>
                                                             </IconButton>
                                                             {this.info_material[capa.material].hasOwnProperty('tipos') ?
-                                                                <div>
+                                                                <div >
                                                                     <Typography
                                                                         className={classes.textRotation}
                                                                         style={{color: this.info_material[capa.material].textColor}}
@@ -531,7 +543,7 @@ class InformacionPared extends Component {
 
                                                                 </div>
                                                                 :
-                                                                <div>
+                                                                <div >
                                                                     <Typography
                                                                         className={classes.textRotation}
                                                                         style={{color: this.info_material[capa.material].textColor}}
