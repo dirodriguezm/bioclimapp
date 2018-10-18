@@ -510,6 +510,7 @@ class InformacionPisoTecho extends Component {
                         <Typography
                             variant={"title"}
                             className={classes.titulo}
+                            align={"center"}
                         >
                             {techoSeleccionado !== undefined ?
                                 <div>{'Configuracion '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo]

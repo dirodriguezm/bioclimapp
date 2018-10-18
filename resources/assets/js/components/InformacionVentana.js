@@ -279,6 +279,7 @@ class InformacionVentana extends Component {
                     <div className={classes.root}>
                         <Typography
                             variant={"title"}
+                            align={"center"}
                             className={classes.titulo}
                         >
                             {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }

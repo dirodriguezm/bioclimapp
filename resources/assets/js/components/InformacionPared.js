@@ -454,6 +454,7 @@ class InformacionPared extends Component {
                         <Typography
                             variant={"title"}
                             className={classes.titulo}
+                            align={"center"}
                         >
                             {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
                         </Typography>
