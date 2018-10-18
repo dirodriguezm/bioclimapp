@@ -7,6 +7,7 @@ import Graph from '../Utils/Graph';
 import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 import axios from "axios";
 import ManagerCasas from "../Utils/ManagerCasas";
+import Typography from "@material-ui/core/Typography/Typography";
 
 class Morfologia extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -903,16 +904,27 @@ class Morfologia extends Component {
 
     render() {
         return (
-            <div style={{height:this.props.height}}
-                //tabIndex="0"
-                onMouseDown={this.onMouseDown}
-                onMouseUp={this.onMouseUp}
-                onMouseMove={this.onMouseMove}
-                onClick={this.onClick}
-                ref={(mount) => {
-                    this.mount = mount
-                }}
-            />
+            <div style={{height: this.props.height}}>
+                <div style={{height: 10}}
+                    //tabIndex="0"
+                     onMouseDown={this.onMouseDown}
+                     onMouseUp={this.onMouseUp}
+                     onMouseMove={this.onMouseMove}
+                     onClick={this.onClick}
+                     ref={(mount) => {
+                         this.mount = mount
+                     }}
+                />
+                <Typography style={{
+                                fontSize: 'x-small',
+                            }}
+                            align={"center"}
+                            variant={"button"}
+                            color={"textSecondary"}>
+                    Rotar camara: botón secundario
+                </Typography>
+            </div>
+
         )
     }
 }

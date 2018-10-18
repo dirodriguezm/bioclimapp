@@ -225,7 +225,7 @@ class BarraHerramientasMorfologia extends Component {
     constructor(props) {
         super(props);
 
-        var dibujandoStatesButtons = new Array(4).fill(false);
+        var dibujandoStatesButtons = new Array(5).fill(false);
 
         this.state = {
             spacing: '16',
@@ -296,11 +296,25 @@ class BarraHerramientasMorfologia extends Component {
     };
 
     handleClickCasa(event) {
-        this.setState({anchor: event.currentTarget});
+        let dibujandoStatesButtons = this.state.dibujandoStatesButtons;
+        dibujandoStatesButtons[this.state.dibujando] = false;
+        dibujandoStatesButtons[event.currentTarget.value] = true;
+        this.setState({
+            anchor: event.currentTarget,
+            dibujandoStatesButtons: dibujandoStatesButtons,
+            dibujando: parseInt(event.currentTarget.value),
+        });
     };
 
     handleCloseCasa() {
-        this.setState({anchor: null});
+        let dibujandoStatesButtons = this.state.dibujandoStatesButtons;
+        dibujandoStatesButtons[this.state.dibujando] = false;
+        this.setState({
+            anchor: null,
+            dibujando: -1,
+            dibujandoStatesButtons: dibujandoStatesButtons,
+        });
+
     };
 
     handleClose() {
@@ -406,7 +420,8 @@ class BarraHerramientasMorfologia extends Component {
                 }}>
             <div className={classes.root} align="center" >
 
-                <Tooltip title="Cambiar tipo camara">
+                <Tooltip title="Cambiar tipo camara"
+                         disableFocusListener={true}>
                     <div>
                         <IconButton
                             className={classes.button}
@@ -432,7 +447,7 @@ class BarraHerramientasMorfologia extends Component {
                     elevation={9}
                 >
                     <Tooltip title="Tipo 2D"
-                             disableFocusListener={!click2D}
+                             disableFocusListener={true}
                     >
                         <MenuItem onClick={this.handleCloseCamara}
                                   disabled={click2D}>
@@ -446,7 +461,7 @@ class BarraHerramientasMorfologia extends Component {
                         </MenuItem>
                     </Tooltip>
                     <Tooltip title="Tipo 3D"
-                             disableFocusListener={click2D}
+                             disableFocusListener={true}
                     >
                         <MenuItem onClick={this.handleCloseCamara}
                                   disabled={!click2D}>
@@ -462,7 +477,8 @@ class BarraHerramientasMorfologia extends Component {
 
                 </Menu>
 
-                <Tooltip title="Agregar elementos">
+                <Tooltip title="Agregar elementos"
+                         disableFocusListener={true}>
                     <div>
                         <IconButton
                             className={classes.button}
@@ -487,8 +503,8 @@ class BarraHerramientasMorfologia extends Component {
                     }}
                     elevation={9}
                 >
-                    <Tooltip title="!gregar bloques de paredes"
-                             disableFocusListener={!dibujandoStatesButtons[0]}
+                    <Tooltip title="Agregar bloques de paredes"
+                             disableFocusListener={true}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
                                   disabled={dibujandoStatesButtons[0]}>
@@ -504,7 +520,7 @@ class BarraHerramientasMorfologia extends Component {
                     </Tooltip>
 
                     <Tooltip title="Agregar ventanas"
-                             disableFocusListener={!dibujandoStatesButtons[1]}
+                             disableFocusListener={true}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
                                   disabled={dibujandoStatesButtons[1]}>
@@ -520,7 +536,7 @@ class BarraHerramientasMorfologia extends Component {
                     </Tooltip>
 
                     <Tooltip title="Agregar puertas"
-                             disableFocusListener={!dibujandoStatesButtons[2]}
+                             disableFocusListener={true}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
                                   disabled={dibujandoStatesButtons[2]}>
@@ -536,7 +552,7 @@ class BarraHerramientasMorfologia extends Component {
                     </Tooltip>
                     {/*{borrar si no se peude}*/}
                     <Tooltip title="Agregar techo"
-                             disableFocusListener={!dibujandoStatesButtons[3]}
+                             disableFocusListener={true}
                              placement="left">
                         <MenuItem onClick={this.handleClose}
                                   disabled={dibujandoStatesButtons[3]}>
@@ -552,13 +568,16 @@ class BarraHerramientasMorfologia extends Component {
                     </Tooltip>
 
                     <Tooltip title="Cambiar a casa predefinida"
+                             disableFocusListener={true}
                              placement="left">
-                        <MenuItem >
+                        <MenuItem disabled={dibujandoStatesButtons[4]}>
                             <IconButton
                                 className={classes.button}
                                 aria-label="Predefinida"
                                 aria-owns={anchor ? 'simple-menu2' : null}
-                                aria-haspopup="true"
+                                aria-haspopup="false"
+                                disabled={dibujandoStatesButtons[4]}
+                                value={4}
                                 onClick={this.handleClickCasa}>
                                 <Home/>
                             </IconButton>
@@ -577,6 +596,7 @@ class BarraHerramientasMorfologia extends Component {
                         elevation={9}
                     >
                         <Tooltip title="Casa simple"
+                                 disableFocusListener={true}
                                  placement="left">
                             <MenuItem onClick={this.handleCloseCasa}>
                                 <IconButton
@@ -590,6 +610,7 @@ class BarraHerramientasMorfologia extends Component {
                         </Tooltip>
 
                         <Tooltip title="Casa pareada"
+                                 disableFocusListener={true}
                                  placement="left">
                             <MenuItem onClick={this.handleCloseCasa}>
                                 <IconButton
@@ -603,6 +624,7 @@ class BarraHerramientasMorfologia extends Component {
                         </Tooltip>
 
                         <Tooltip title="Casa simple dos pisos"
+                                 disableFocusListener={true}
                                  placement="left">
                             <MenuItem onClick={this.handleCloseCasa}>
                                 <IconButton
@@ -616,6 +638,7 @@ class BarraHerramientasMorfologia extends Component {
                         </Tooltip>
 
                         <Tooltip title="Casa pareada dos pisos"
+                                 disableFocusListener={true}
                                  placement="left">
                             <MenuItem onClick={this.handleCloseCasa}>
                                 <IconButton
@@ -632,7 +655,7 @@ class BarraHerramientasMorfologia extends Component {
                 </Menu>
 
                 <Tooltip title="Seleccionar elementos"
-                         disableFocusListener={!seleccionando}>
+                         disableFocusListener={true}>
                     <div>
                         <IconButton
                             className={classes.button}
@@ -645,7 +668,7 @@ class BarraHerramientasMorfologia extends Component {
                 </Tooltip>
 
                 <Tooltip title="Eliminar elementos"
-                         disableFocusListener={!borrando}>
+                         disableFocusListener={true}>
                     <div>
                         <IconButton
                             className={classes.button}
@@ -657,7 +680,8 @@ class BarraHerramientasMorfologia extends Component {
                     </div>
                 </Tooltip>
 
-                <Tooltip title="Configuración sol">
+                <Tooltip title="Configuración sol"
+                         disableFocusListener={true}>
                     <div>
                         <IconButton
                             className={classes.button}
@@ -683,7 +707,9 @@ class BarraHerramientasMorfologia extends Component {
                     elevation={9}
                 >
 
-                    <Tooltip title="Ver/Ocultar sol">
+                    <Tooltip title="Ver/Ocultar sol"
+                             disableFocusListener={true}
+                            placement="left">
                         <MenuItem onClick={this.handleCloseSol}>
                             <IconButton
                                 className={classes.button}
@@ -697,6 +723,7 @@ class BarraHerramientasMorfologia extends Component {
 
                     <Tooltip title="Rotar coordenadas"
                              disableFocusListener={!this.state.rotando}
+                             placement="left"
                     >
                         <MenuItem onClick={this.handleCloseSol}
                                   disabled={this.state.rotando}>
