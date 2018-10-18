@@ -145,15 +145,21 @@ class InformacionPared extends Component {
                 if(this.props.seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR && this.props.seleccionado.userData.hasOwnProperty('omegas')) {
                     this.info_rb = <div/>;
                     if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde == null) {
-                        this.info_rb = <Grid container spacing={8} justify="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                        this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro recibe sol</Grid>
-                                <Grid item xs={12}>
-                                    Desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
+                                <Grid item xs={6}>
+                                    Desde:
                                 </Grid>
-                                <Grid item xs={12}>
-                                    Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
+                                <Grid item xs={6}>
+                                    Hasta:
+                                </Grid>
+                                <Grid item xs={6}>
+                                    {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
                                 </Grid>
                             </Grid>
                             <Grid item xs={6}>
@@ -162,15 +168,21 @@ class InformacionPared extends Component {
                         </Grid>
                     }
                     else if (this.props.seleccionado.userData.omegas.wm.desde == null && this.props.seleccionado.userData.omegas.wt.desde != null) {
-                        this.info_rb = <Grid container spacing={8} justify="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                        this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro recibe sol</Grid>
-                                <Grid item xs={12}>
-                                    Desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
+                                <Grid item xs={6}>
+                                    Desde:
                                 </Grid>
-                                <Grid item xs={12}>
-                                    Hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
+                                <Grid item xs={6}>
+                                    Hasta:
+                                </Grid>
+                                <Grid item xs={6}>
+                                    {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
                                 </Grid>
                             </Grid>
                             <Grid item xs={6}>
@@ -179,22 +191,27 @@ class InformacionPared extends Component {
                         </Grid>
                     }
                     else if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde != null) {
-                        this.info_rb = <Grid container spacing={8} justify="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                        this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro recibe sol</Grid>
                                 <Grid item xs={6}>
-                                    Desde: {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString()}
+                                    Desde:
                                 </Grid>
                                 <Grid item xs={6}>
-                                    Hasta: {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString()}
-                                </Grid>
-                                <Grid item xs={12} >Y luego</Grid>
-                                <Grid item xs={6}>
-                                    desde: {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString()}
+                                    Hasta:
                                 </Grid>
                                 <Grid item xs={6}>
-                                    hasta: {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString()}
+                                    {this.props.seleccionado.userData.omegas.wm.desde.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    {this.props.seleccionado.userData.omegas.wm.hasta.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    {this.props.seleccionado.userData.omegas.wt.desde.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
+                                </Grid>
+                                <Grid item xs={6}>
+                                    {this.props.seleccionado.userData.omegas.wt.hasta.toLocaleTimeString([],{hour: '2-digit', minute:'2-digit'})}
                                 </Grid>
                             </Grid>
                             <Grid item xs={6}>
@@ -203,8 +220,8 @@ class InformacionPared extends Component {
                         </Grid>
                     }
                     else {
-                        this.info_rb = <Grid container spacing={8} justify="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}>Información Solar</Grid>
+                        this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro no recibe sol</Grid>
                             </Grid>

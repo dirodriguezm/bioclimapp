@@ -269,7 +269,7 @@ class InformacionVentana extends Component {
             fm = info_material_marco.fs;
         }
 
-        //console.log(material,info_material_ventana);
+        seleccionado != null ? console.log("seleccionado",seleccionado.uuid, seleccionado.userData) : seleccionado;
 
 
         return (
@@ -283,6 +283,50 @@ class InformacionVentana extends Component {
                         >
                             {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
                         </Typography>
+
+                        <ExpansionPanel>
+                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                <Typography className={classes.heading}>Información Solar</Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails>
+                                <Grid container spacing={8} justify="center" style={{textAlign:"center"}}>
+                                    <Grid item xs={12}>
+                                        <Typography>
+                                            FAR de la ventana: {seleccionado.userData.far.toFixed(3)}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {seleccionado.userData.obstrucciones !== null && seleccionado.userData.obstrucciones.length > 0 ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
+                                            <ExpansionPanel>
+                                                <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                                    <Typography className={classes.heading}>Obstruccion: {index}</Typography>
+                                                </ExpansionPanelSummary>
+                                                <ExpansionPanelDetails>
+                                                    <Grid container spacing={40}>
+                                                        <Grid item xs>
+                                                            <Typography>FAR obstruccion: {obstruccion.far.toFixed(3)}</Typography>
+                                                        </Grid>
+                                                        <Grid item xs>
+                                                            <Typography>Altura respecto a la ventana: {obstruccion.aDistance.toFixed(3)}</Typography>
+                                                        </Grid>
+                                                        <Grid item xs>
+                                                            <Typography>Distancia respecto a la ventana: {obstruccion.bDistance.toFixed(3)}</Typography>
+                                                        </Grid>
+                                                        <Grid item xs>
+                                                            <Typography>Ángulo(s) que obstruye:</Typography>
+                                                            {obstruccion.betaAngle != null ?obstruccion.betaAngle.map(angle => (
+                                                                <Typography>{angle.toFixed(3)}</Typography>
+                                                            )):<div/>}
+                                                        </Grid>
+                                                    </Grid>
+                                                </ExpansionPanelDetails>
+                                            </ExpansionPanel>
+                                        )) : <div></div>}
+                                    </Grid>
+                                </Grid>
+
+                            </ExpansionPanelDetails>
+                        </ExpansionPanel>
 
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
@@ -564,44 +608,7 @@ class InformacionVentana extends Component {
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
-                        <ExpansionPanel>
-                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>FAR</Typography>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails>
-                                <FormControl className={classes.formControl}>
-                                    <Typography>
-                                        FAR de la ventana: {seleccionado.userData.far}
-                                    </Typography>
-                                    {seleccionado.userData.obstrucciones != null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
-                                        <ExpansionPanel>
-                                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                                <Typography className={classes.heading}>Obstruccion: {index}</Typography>
-                                            </ExpansionPanelSummary>
-                                            <ExpansionPanelDetails>
-                                                <Grid container spacing={40}>
-                                                    <Grid item xs>
-                                                        <Typography>FAR obstruccion: {obstruccion.far.toFixed(3)}</Typography>
-                                                    </Grid>
-                                                    <Grid item xs>
-                                                        <Typography>Altura respecto a la ventana: {obstruccion.aDistance.toFixed(3)}</Typography>
-                                                    </Grid>
-                                                    <Grid item xs>
-                                                        <Typography>Distancia respecto a la ventana: {obstruccion.bDistance.toFixed(3)}</Typography>
-                                                    </Grid>
-                                                    <Grid item xs>
-                                                        <Typography>Ángulo(s) que obstruye:</Typography>
-                                                        {obstruccion.betaAngle.map(angle => (
-                                                            <Typography>{angle.toFixed(3)}</Typography>
-                                                        ))}
-                                                    </Grid>
-                                                </Grid>
-                                            </ExpansionPanelDetails>
-                                        </ExpansionPanel>
-                                    )) : <div></div>}
-                                </FormControl>
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
+
                     </div>
                     :
                     <div/>

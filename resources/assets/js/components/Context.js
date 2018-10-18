@@ -477,11 +477,10 @@ class Context extends Component {
                 if (!obstruccionesVentana.includes(current)) {
                     obstruccionesVentana.push(current);
                 }
-                //let arrowHelper = new THREE.ArrowHelper(angle, ventana.userData.pos, 50, 0x00ff00, 0,0);
-                //this.escena.add(arrowHelper);
                 //pasamos al siguiente angulo
                 angle.applyAxisAngle(axisY, -Math.PI / 180);
             }
+            console.log("current",current);
             //se calcula el far de la ventana en base a la formula
             ventana.userData.obstrucciones = obstruccionesVentana;
             let f1 = 1;
@@ -494,7 +493,6 @@ class Context extends Component {
                     continue;
                 }
                 obs.startPoint = null; //reseteamos el punto de inicio de la obstruccion para futuros cálculos
-
                 obs.material.color.setHex(0xff0000);
                 obs.currentHex = 0xff0000;
                 if(ventana.userData.obstrucciones.length === 1 && obs.betaAngle.length > 1){

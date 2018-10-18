@@ -24,7 +24,8 @@ class Morfologia extends Component {
 
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
         this.temperaturaConfort = props.temperatura;
-        this.angleRotated = 0;
+        this.angleRotatedTemp = 0;
+        this.coordenadasRotadas = false;
 
         this.state  = {
             height: props.height,
@@ -214,10 +215,6 @@ class Morfologia extends Component {
         this.props.onCasaPredefinidaChanged(-1);
         this.props.onParedesChanged(this.paredes);
         this.props.onVentanasChanged(this.ventanas);
-
-
-        
-
         this.managerCasas.agregarHabitacionDibujada();
         let casa = this.managerCasas.getCasa();
         let aporte_interno = casa.userData.aporteInterno;
@@ -1060,6 +1057,9 @@ class Morfologia extends Component {
             //click derecho
             if (event.button === 0) {
                 this.managerCasas.agregarHabitacionDibujada();
+                if(this.coordenadasRotadas){
+                    BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+                }
                 let casa = this.managerCasas.getCasa();
                 let aporte_interno = casa.userData.aporteInterno;
                 let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
@@ -1078,7 +1078,7 @@ class Morfologia extends Component {
             
             let ventanas = [];
             for(let pared of this.paredes){
-                let resultAngle = pared.userData.gamma + this.angleRotated;
+                let resultAngle = pared.userData.gamma + this.angleRotatedTemp;
                 if(resultAngle > 180){
                     pared.userData.gamma = resultAngle - 360;
                 }
@@ -1090,15 +1090,16 @@ class Morfologia extends Component {
                 }
                 for(let child of pared.children){
                     if(child.userData.tipo === Morfologia.tipos.VENTANA){
-                        child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotated * Math.PI / 180);
+                        child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotatedTemp * Math.PI / 180);
                         ventanas.push(child);
                     }
                 }
             }
-            this.angleRotated = 0;
-            this.props.onParedesChanged(this.paredes);
-
+            this.angleRotated = this.angleRotatedTemp;
+            this.angleRotatedTemp = 0;
+            if(this.paredes.length > 0) this.props.onParedesChanged(this.paredes);
             if(ventanas.length > 0) this.props.onVentanasChanged(ventanas);
+            this.coordenadasRotadas = true;
         }
     }
 
@@ -1228,11 +1229,11 @@ class Morfologia extends Component {
         //si se está rotando
         if(this.dragging){
             // 
-            // this.angleRotated += (angle*180/Math.PI);
+            // this.angleRotatedTemp += (angle*180/Math.PI);
             let movementX = event.screenX - this.prevX;
             this.prevX = event.screenX;
             let angle = Math.PI * movementX / 180;
-            this.angleRotated += (angle*180/Math.PI);
+            this.angleRotatedTemp += (angle*180/Math.PI);
             this.cardinalPointsCircle.rotateZ(angle);
             this.sunPath.rotateY(angle);
             this.light.target.position.set(0,0,0);
