@@ -76,6 +76,7 @@ function transmitanciaSuperficie(elemento,zona) {
             elemento.userData.transmitanciaObjetivo = uObjetivoTecho[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;
             elemento.userData.transSupObjetivo = uObjetivoTecho[zona-1] * elemento.userData.superficie;
+            console.log("techo",elemento);
             break;
         case Morfologia.tipos.PISO:
             for(let capa of elemento.userData.capas){
@@ -83,6 +84,8 @@ function transmitanciaSuperficie(elemento,zona) {
             }
             transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
             u = 1 / transmitancia;
+
+            console.log('resistencias',resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion]);
             elemento.userData.transmitancia = u;
             elemento.userData.transmitanciaObjetivo = uObjetivoPiso[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;
@@ -126,10 +129,8 @@ function puenteTermico(piso,zona){
     let aislacionObjetivo = Morfologia.aislacionPiso.CORRIENTE;
     if(rtObjetivoPiso[zona-1] > 0.6) aislacionObjetivo = Morfologia.aislacionPiso.AISLADO;
     else if(rtObjetivoPiso[zona-1] < 0.6 && rtObjetivoPiso[zona-1] > 0.26) aislacionObjetivo = Morfologia.aislacionPiso.MEDIO;
-    return {
-        normal: piso.userData.perimetro * transmitanciaLineal[piso.userData.aislacion],
-        objetivo: piso.userData.perimetro * transmitanciaLineal[aislacionObjetivo],
-    }
+    piso.userData.puenteTermico = piso.userData.perimetro * transmitanciaLineal[piso.userData.aislacion];
+    piso.userData.puenteTermicoObjetivo = piso.userData.perimetro * transmitanciaLineal[aislacionObjetivo];
 }
 
 function perdidasVentilacion(volumenInterno, volmenAire, gradosDias) {
