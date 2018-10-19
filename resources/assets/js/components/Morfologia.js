@@ -810,7 +810,7 @@ class Morfologia extends Component {
             casa.userData.perdidaPorConduccionObjetivo,
             casa.userData.volumen,
         );
-        console.log("cambio: "+this.count,casa);
+        //console.log("cambio: "+this.count,casa);
         this.count++;
     }
 

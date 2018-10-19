@@ -76,7 +76,7 @@ function transmitanciaSuperficie(elemento,zona) {
             elemento.userData.transmitanciaObjetivo = uObjetivoTecho[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;
             elemento.userData.transSupObjetivo = uObjetivoTecho[zona-1] * elemento.userData.superficie;
-            console.log("techo",elemento);
+            //console.log("techo",elemento);
             break;
         case Morfologia.tipos.PISO:
             for(let capa of elemento.userData.capas){
@@ -85,7 +85,7 @@ function transmitanciaSuperficie(elemento,zona) {
             transmitancia += resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion];
             u = 1 / transmitancia;
 
-            console.log('resistencias',resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion]);
+            //console.log('resistencias',resistenciasTermicasSuperficie[elemento.userData.tipo][elemento.userData.separacion]);
             elemento.userData.transmitancia = u;
             elemento.userData.transmitanciaObjetivo = uObjetivoPiso[zona-1];
             elemento.userData.transSup = u * elemento.userData.superficie;

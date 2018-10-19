@@ -408,7 +408,7 @@ class ManagerCasas {
         this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
         this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
         
-        console.log("estructura "+Morfologia.tipos_texto[estructura.userData.tipo],estructura.userData.transSup);
+        //console.log("estructura "+Morfologia.tipos_texto[estructura.userData.tipo],estructura.userData.transSup);
     }
 
     casasChocan(habitacion) {
@@ -804,7 +804,7 @@ class ManagerCasas {
         this.casa.userData.perdidaVentilacion += perdidaVentilacion;
         this.casa.userData.perdidaVentilacionObjetivo += perdidaVentilacionObjetivo;
         
-        console.log("casa en recalculo aporte y perdida por volumen",this.casa);
+        //console.log("casa en recalculo aporte y perdida por volumen",this.casa);
     }
 
     aumentarNivelHabitacion(habitacion){
@@ -899,22 +899,22 @@ class ManagerCasas {
         this.crearCasaVacia();
         switch(casaPredefinida) {
             case 0:
-                console.log("SIMPLE");
+                //console.log("SIMPLE");
                 this.crearCasaSimple();
 
                 break;
             case 1:
-                console.log("DOBLE");
+                //console.log("DOBLE");
                 this.crearCasaDoble();
 
                 break;
             case 2:
-                console.log("SIMPLE DOS PISOS");
+                //console.log("SIMPLE DOS PISOS");
                 this.crearCasaSimpleDosPisos();
 
                 break;
             case 3:
-                console.log("DOBLE DOS PISOS")
+                //console.log("DOBLE DOS PISOS")
                 this.crearCasaDobleDosPisos();
                 break;
         }
