@@ -16,7 +16,7 @@ const htmlToReactParser = new HtmlToReactParser();
 const styles = theme => ({
     root: {
         //flexGrow: 1,
-        background: '#F0F0F0'
+        background: '#fdfdfd'
     },
     paper: {
         //padding: theme.spacing.unit * 2,
@@ -265,7 +265,7 @@ class DetalleBalance extends Component {
     }
 
     componentDidUpdate(prevProps) {
-        console.log("PROPS", this.props);
+        //console.log("PROPS", this.props);
         if (this.props.aporte_solar !== prevProps.aporte_solar) {
             this.setState({
                 dataAportes: {

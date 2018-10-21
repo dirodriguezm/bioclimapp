@@ -55,6 +55,9 @@ const styles = theme => ({
         display: 'flex',
         width: '100%',
     },
+    card: {
+        position: 'relative'
+    }
 });
 
 class GeoInfoPanel extends Component {

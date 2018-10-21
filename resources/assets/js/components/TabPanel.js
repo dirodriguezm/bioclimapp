@@ -21,7 +21,6 @@ import MapContainer from "./MapContainer";
 import IconButton from '@material-ui/core/IconButton';
 import PieChart from '@material-ui/icons/PieChart';
 import Toolbar from "@material-ui/core/Toolbar/Toolbar";
-import People from "@material-ui/icons/People";
 import InfoVariablesInternas from "./InfoVariablesInternas";
 
 function TabContainer(props) {
@@ -33,7 +32,9 @@ function TabContainer(props) {
 }
 
 const drawerWidth = 500;
-const drawerRightWidth = 500;
+const drawerRightWidth = 400;
+const heightBar = 80;
+const heightBarra = 70;
 
 TabContainer.propTypes = {
     children: PropTypes.node.isRequired,
@@ -43,6 +44,7 @@ const styles = theme => ({
         flexGrow: 1,
     },
     appBar: {
+        height: heightBar+'px',
         position: 'absolute',
         transition: theme.transitions.create(['margin', 'width'], {
             easing: theme.transitions.easing.sharp,
@@ -66,8 +68,7 @@ const styles = theme => ({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'flex-end',
-        padding: '0 8px',
-        ...theme.mixins.toolbar,
+        height: '100%',
     },
     menuButton: {
         marginLeft: 12,
@@ -77,13 +78,14 @@ const styles = theme => ({
         position: 'relative',
         height: '100vh',
         width: drawerWidth,
-        background: '#F0F0F0'
     },
     drawerRightPaper:{
+        display: 'flex',
+        overflow: 'auto',
         position: 'relative',
-        height: '90vh',
+        height: 0,
+        minHeight: `calc(100% - ${heightBarra}px)`,
         width: drawerRightWidth,
-        background: '#F0F0F0'
     },
     contentBarra: {
         flexGrow: 1,
@@ -94,9 +96,10 @@ const styles = theme => ({
         }),
     },
     content: {
-        flexGrow: 1,
+        overflow: 'hidden',
         backgroundColor: theme.palette.background.default,
-        paddingTop: theme.spacing.unit * 9,
+        height: `calc(100% - ${heightBar}px)`,
+        marginTop: heightBar,
         transition: theme.transitions.create('margin', {
             easing: theme.transitions.easing.sharp,
             duration: theme.transitions.duration.leavingScreen,
@@ -134,6 +137,7 @@ const styles = theme => ({
         position: 'relative',
         display: 'flex',
         width: '100%',
+        height: '100vh'
     },
     frameTabs: {
         zIndex: 1,
@@ -144,7 +148,7 @@ const styles = theme => ({
         display: 'none',
     },
     paper: {
-        //padding: theme.spacing.unit * 2,
+        height: heightBarra,
         textAlign: 'center',
         color: theme.palette.text.secondary,
         background: '#fdfdfd',
@@ -176,7 +180,7 @@ class TabPanel extends Component {
             dimensiones: null,
             alturaPiso: null,
             openDashboard: false,
-            drawer_localidad: true,
+            drawer_localidad: false,
             sunPathClicked: false,
             paredCapaChange: false,
             rotando: false,
@@ -186,6 +190,7 @@ class TabPanel extends Component {
             iluminacion: 3,
             temperatura: 14,
             aire: 3,
+            rotated: false,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -216,6 +221,9 @@ class TabPanel extends Component {
         this.onCasaPredefinidaChanged = this.onCasaPredefinidaChanged.bind(this);
         this.handleChangeVariable = this.handleChangeVariable.bind(this);
         this.onAlturaVentanaChanged = this.onAlturaVentanaChanged.bind(this);
+        this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.onRotationChanged = this.onRotationChanged.bind(this);
+        this.onRef = this.onRef.bind(this);
 
     }
 
@@ -242,9 +250,12 @@ class TabPanel extends Component {
 
     componentDidMount() {
         this.setState({
-            height: window.innerHeight - 150,
-            width: this.tab.clientWidth
+            height: this.tab.clientHeight,
+            width: this.tab.clientWidth,
         });
+
+        this.updateWindowDimensions();
+        window.addEventListener('resize', this.updateWindowDimensions);
     }
 
     handleChange(event, value) {
@@ -265,6 +276,13 @@ class TabPanel extends Component {
         this.setState(prevState => ({
             click2D: !prevState.click2D
         }));
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('resize', this.updateWindowDimensions);
+    }
+    updateWindowDimensions() {
+        this.setState({ width: window.innerWidth, height: window.innerHeight });
     }
 
     onComunaChanged(mapState) {
@@ -411,18 +429,30 @@ class TabPanel extends Component {
     onCasaPredefinidaChanged(casaPredefinida){
         this.setState({
             casaPredefinida : casaPredefinida,
-        })
+        });
+        this.contexto.resetObstrucciones();
+        console.log("SE LLAMA");
     }
 
     handleChangeVariable(prop,value){
         this.setState({[prop]: value});
     };
 
+    onRotationChanged(){
+        this.setState({rotated: true});
+    }
+    onRef(ref){
+        this.contexto = ref;
+    }
+
 
 
     render() {
         const {classes, theme} = this.props;
         const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensiones, alturaPiso, paredCapaChange} = this.state;
+        const heightContent = height-heightBarra;
+        console.log("height",height);
+        console.log("heightMorfologia",height - (heightBar+heightBarra));
         return (
 
             <div className={classes.appFrame} ref={(tab) => {
@@ -434,7 +464,7 @@ class TabPanel extends Component {
                 })}
 
                 >
-                    <Toolbar>
+                    <Toolbar className={classes.toolbar}>
                         <IconButton
                             color="inherit"
                             aria-label="Dashboard"
@@ -444,8 +474,8 @@ class TabPanel extends Component {
                             <PieChart />
                         </IconButton>
                         <Tabs value={value} onChange={this.handleChange}  centered>
-                            <Tab label="Emplazamiento"/>
                             <Tab label="Morfología"/>
+                            <Tab label="Emplazamiento"/>
                             <Tab label="Variables Internas"/>
                         </Tabs>
                         <div style={{
@@ -495,60 +525,6 @@ class TabPanel extends Component {
                 >
                     <div className={classes.frameTabs}>
                         <div className={classNames(classes.contentInside, classes.contentRight, {
-                            [classes.contentShift]: this.state.drawer_localidad ,
-                            [classes.contentShiftRight]: this.state.drawer_localidad ,
-
-                        })}>
-                            <TabContainer dir={theme.direction}>
-                                {this.state.width ?
-                                    <Context
-                                        width={this.state.width}
-                                        height={this.state.height}
-                                        sunPosition={this.state.sunPosition}
-                                        agregarContexto={this.state.agregarContexto}
-                                        seleccionar={this.state.seleccionar}
-                                        borrarContexto={this.state.borrarContexto}
-                                        onFarChanged={this.onFarChanged}
-                                        ventanas={this.state.ventanas}
-                                    /> :
-                                    <div></div>
-                                }
-                                <Paper className={classes.paper}>
-                                    <BarraHerramientasContexto
-                                        width={this.state.width}
-                                        agregarContexto={this.agregarContexto}
-                                        seleccionar={this.seleccionar}
-                                        borrarContexto={this.borrarContexto}
-                                        onSeleccionarLocalidad={this.onSeleccionarLocalidad}
-                                    />
-                                </Paper>
-                            </TabContainer>
-                        </div>
-                        <Drawer
-                            variant="persistent"
-                            anchor={'right'}
-                            open={this.state.drawer_localidad}
-                            classes={{
-                                paper: classes.drawerRightPaper,
-                            }}
-                        >
-                            <MapContainer
-                                lat={-36.82013519999999}
-                                lng={-73.0443904}
-                                zoom={12}
-                                markers={[]}
-                                onComunaChanged={this.onComunaChanged}
-                            />
-                            <GeoInfoPanel
-                                comuna={this.state.comuna}
-                                temperatura={this.state.temperatura}
-                                onRadiationsChanged={this.onRadiationsChanged}
-                            />
-                        </Drawer>
-                    </div>
-
-                    <div className={classes.frameTabs}>
-                        <div className={classNames(classes.contentInside, classes.contentRight, {
                             [classes.contentShift]: !openMorf,
                             [classes.contentShiftRight]: !openMorf,
                         })}>
@@ -556,7 +532,7 @@ class TabPanel extends Component {
                                 {this.state.width ?
                                     <Morfologia
                                         width={width}
-                                        height={height}
+                                        height={height - (heightBar+heightBarra)}
                                         onParedesChanged={this.onParedesChanged}
                                         onSeleccionadoChanged={this.onSeleccionadoMorfChanged}
                                         sunPosition={this.state.sunPosition}
@@ -582,6 +558,7 @@ class TabPanel extends Component {
                                         iluminacion={this.state.iluminacion}
                                         temperatura={this.state.temperatura}
                                         aire={this.state.aire}
+                                        onRotationChanged={this.onRotationChanged}
                                     />:
                                     <div></div>
                                 }
@@ -609,9 +586,10 @@ class TabPanel extends Component {
                             variant='persistent'
                             anchor='right'
                             open={openMorf}
-                            hidden={!openMorf}
+
+                            style={{visibility: openMorf ? 'visible' : 'hidden'}}
                             classes={{
-                                paper: classes.drawerPaper,
+                                paper: classes.drawerRightPaper,
                             }}
                         >
                             <InformacionEstructura
@@ -625,7 +603,66 @@ class TabPanel extends Component {
                             />
                         </Drawer>
                     </div>
-                    <TabContainer dir={theme.direction}>
+                    <div className={classes.frameTabs}>
+                        <div className={classNames(classes.contentInside, classes.contentRight, {
+                            [classes.contentShift]: !this.state.drawer_localidad ,
+                            [classes.contentShiftRight]: !this.state.drawer_localidad ,
+
+                        })}>
+                            <TabContainer dir={theme.direction}>
+                                {this.state.width ?
+                                    <Context
+                                        width={this.state.width}
+                                        height={height - (heightBar+heightBarra)}
+                                        sunPosition={this.state.sunPosition}
+                                        agregarContexto={this.state.agregarContexto}
+                                        seleccionar={this.state.seleccionar}
+                                        borrarContexto={this.state.borrarContexto}
+                                        onFarChanged={this.onFarChanged}
+                                        ventanas={this.state.ventanas}
+                                        rotated={this.state.rotated}
+                                        onRef={this.onRef}
+                                    /> :
+                                    <div></div>
+                                }
+                                <Paper className={classes.paper}>
+                                    <BarraHerramientasContexto
+                                        width={this.state.width}
+                                        agregarContexto={this.agregarContexto}
+                                        seleccionar={this.seleccionar}
+                                        borrarContexto={this.borrarContexto}
+                                        onSeleccionarLocalidad={this.onSeleccionarLocalidad}
+                                    />
+                                </Paper>
+                            </TabContainer>
+                        </div>
+                        <Drawer
+                            variant="persistent"
+                            anchor={'right'}
+                            open={this.state.drawer_localidad}
+                            style={{visibility: this.state.drawer_localidad ? 'visible' : 'hidden'}}
+
+                            classes={{
+                                paper: classes.drawerRightPaper,
+                            }}
+                        >
+                            <MapContainer
+                                lat={-36.82013519999999}
+                                lng={-73.0443904}
+                                zoom={12}
+                                markers={[]}
+                                onComunaChanged={this.onComunaChanged}
+                            />
+                            <GeoInfoPanel
+                                comuna={this.state.comuna}
+                                temperatura={this.state.temperatura}
+                                onRadiationsChanged={this.onRadiationsChanged}
+                            />
+                        </Drawer>
+                    </div>
+
+
+                    <TabContainer  dir={theme.direction}>
                         <InfoVariablesInternas
                             handleChange={this.handleChangeVariable}
                             handleClose={this.handleCloseVarDash}

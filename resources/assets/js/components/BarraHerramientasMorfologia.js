@@ -402,7 +402,8 @@ class BarraHerramientasMorfologia extends Component {
         return (
             <div style={{display: 'table',
                 marginLeft: 'auto',
-                marginRight: 'auto'}}>
+                marginRight: 'auto',
+                }}>
             <div className={classes.root} align="center" >
 
                 <Tooltip title="Cambiar tipo camara">

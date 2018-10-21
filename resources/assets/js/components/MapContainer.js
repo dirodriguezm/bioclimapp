@@ -23,19 +23,24 @@ export default class MapContainer extends Component {
     }
 
     componentWillMount(){
+        let comuna, sunPosition, sunPath;
         axios.get("https://bioclimapp.host/api/comuna/" + this.state.lat + "/" + this.state.lng)
             .then(response => {
-                    this.setState( (state) => ({
-                        comuna: response.data[0],
-                        sunPosition: this.getSunPosition(state.lat, state.lng),
-                        sunPath: this.getSunPath(state.lat, state.lng),
-                    }), function () {
+                comuna = response.data[0];
+                sunPosition = this.getSunPosition(this.state.lat,this.state.lng);
+                sunPath = this.getSunPath(this.state.lat,this.state.lng);
+                    this.setState({
+                        comuna:comuna,
+                        sunPosition: sunPosition,
+                        sunPath:sunPath
+                    }, () => {
+                        console.log("llega");
                         this.createMarker(this.state.lat, this.state.lng);
                         this.props.onComunaChanged(this.state);
                     });
-
                 }
             );
+
     }
 
 
@@ -108,7 +113,7 @@ export default class MapContainer extends Component {
                         sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
                     },function(){
                         this.props.onComunaChanged(this.state);
-                        console.log("onCOmunaChanged",this.state);
+                        //console.log("onCOmunaChanged",this.state);
                     });
                 }
             );
