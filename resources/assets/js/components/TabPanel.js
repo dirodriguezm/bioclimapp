@@ -597,6 +597,7 @@ class TabPanel extends Component {
                                         temperatura={this.state.temperatura}
                                         aire={this.state.aire}
                                         onRotationChanged={this.onRotationChanged}
+                                        fecha={this.state.fecha}
                                     />:
                                     <div></div>
                                 }
@@ -689,6 +690,7 @@ class TabPanel extends Component {
                                 lng={-73.0443904}
                                 zoom={12}
                                 markers={[]}
+                                fecha={this.state.fecha}
                                 onComunaChanged={this.onComunaChanged}
                             />
                             <GeoInfoPanel

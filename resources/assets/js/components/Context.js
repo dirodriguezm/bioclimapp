@@ -545,7 +545,6 @@ class Context extends Component {
                 }
             }
             ventana.userData.far = f1 + f2;
-            console.log("ventana far",ventana.userData);
         }
         this.props.onFarChanged(ventanas);
     }
@@ -648,7 +647,6 @@ class Context extends Component {
             top: this.state.popperCoords != null ? this.state.popperCoords.y + 'px' : 0,
             zIndex: 1
         };
-        console.log("popperPosition",divStyle);
         return (
             <div style={{height:this.props.height}}>
                 <div

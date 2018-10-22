@@ -37,10 +37,12 @@ class Morfologia extends Component {
     componentDidUpdate(prevProps) {
         if (this.props.sunPosition !== prevProps.sunPosition || (this.sunPath == null && this.props.sunPosition != null)) {
             this.onSunpositionChanged();
+            if(this.props.fecha != null) this.getSunPath(new Date(this.props.fecha));
+            else this.getSunPath();
         }
-        if(this.props.sunPath !== prevProps.sunPath || (this.sunPath == null && this.props.sunPosition != null)){
+        /*if(this.props.sunPath !== prevProps.sunPath || (this.sunPath == null && this.props.sunPosition != null)){
             this.getSunPath();
-        }
+        }*/
         if (this.props.click2D !== prevProps.click2D) {
             this.onPerspectiveChanged();
         }
@@ -184,13 +186,12 @@ class Morfologia extends Component {
 
     }
 
-    getSunPath(){
+    getSunPath(now = new Date()){
         let sunPath = this.escena.getObjectByName("sunPath");
         if(sunPath != null){
             this.escena.remove(sunPath);
         }
         let allPoints= [];
-        let now = new Date();
         let start = new Date(now.getFullYear(), 0, 0);
         let diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
         let oneDay = 1000 * 60 * 60 * 24;
