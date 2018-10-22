@@ -606,7 +606,15 @@ class Morfologia extends Component {
                     BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 }
                 let casa = this.managerCasas.getCasa();
-                this.props.onCasaChanged(casa);
+                this.props.onCasaChanged(
+                    casa.userData.aporteInterno,
+                    casa.userData.perdidaVentilacion,
+                    casa.userData.perdidaPorVentilacionObjetivo,
+                    casa.userData.perdidaPorConduccion,
+                    casa.userData.perdidaPorConduccionObjetivo,
+                    casa.userData.volumen,
+                    casa.userData.area,
+                );
                 this.props.onParedesChanged(this.paredes);
 
                 this.construyendo = false;
@@ -814,6 +822,7 @@ class Morfologia extends Component {
             casa.userData.perdidaPorConduccion,
             casa.userData.perdidaPorConduccionObjetivo,
             casa.userData.volumen,
+            casa.userData.area,
         );
         //console.log("cambio: "+this.count,casa);
         this.count++;
