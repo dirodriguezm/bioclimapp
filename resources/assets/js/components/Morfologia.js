@@ -7,6 +7,7 @@ import Graph from '../Utils/Graph';
 import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 import axios from "axios";
 import ManagerCasas from "../Utils/ManagerCasas";
+import Typography from "@material-ui/core/Typography/Typography";
 
 class Morfologia extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
@@ -72,13 +73,7 @@ class Morfologia extends Component {
                 this.managerCasas.modificarHabitacionDesdePiso(this.props.dimensiones.elemento, this.props.dimensiones.width, this.props.dimensiones.height );
                 this.props.onVentanasChanged(this.ventanas);
             }
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
         }
         if(this.props.width !== prevProps.width || this.props.height !== prevProps.height ){
             this.renderer.setSize(this.props.width, this.props.height);
@@ -92,13 +87,7 @@ class Morfologia extends Component {
             if(this.props.seleccionadoMorf.userData.tipo === Morfologia.tipos.VENTANA){
                 this.props.onVentanasChanged(this.ventanas);
             }
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
             this.props.onCapaReady();
         }
         if(this.props.sunPathClicked !== prevProps.sunPathClicked){
@@ -111,13 +100,7 @@ class Morfologia extends Component {
         if(this.props.personas !== prevProps.personas) {
             this.ocupantes = this.props.personas;
             this.managerCasas.setPersonas(this.props.personas);
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
         }
         if(this.props.temperatura !== prevProps.temperatura) {
             this.temperaturaConfort = this.props.temperatura;
@@ -125,35 +108,17 @@ class Morfologia extends Component {
             let gradoDias = res[0];
             let periodo = res[1];
             this.managerCasas.setGradosDias(gradoDias, periodo);
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
         }
         if(this.props.iluminacion !== prevProps.iluminacion) {
             this.horasIluminacion = this.props.iluminacion;
             this.managerCasas.setIluminacion(this.props.iluminacion);
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
         }
         if(this.props.aire !== prevProps.aire) {
             this.aireRenovado = this.props.aire;
             this.managerCasas.setAire(this.props.aire);
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
         }
     }
 
@@ -213,14 +178,9 @@ class Morfologia extends Component {
         this.props.onParedesChanged(this.paredes);
         this.props.onVentanasChanged(this.ventanas);
 
-        this.managerCasas.agregarHabitacionDibujada();
-        let casa = this.managerCasas.getCasa();
-        let aporte_interno = casa.userData.aporteInterno;
-        let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-        let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-        let perdida_conduccion = casa.userData.perdidaPorConduccion;
-        let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-        this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+        //this.managerCasas.agregarHabitacionDibujada();
+        this.handleChangeCasa();
+
 
     }
 
@@ -321,10 +281,9 @@ class Morfologia extends Component {
         this.paredes = [];
         this.ventanas = [];
         this.puertas = [];
+        this.pisos = [];
         this.objetoSeleccionado = null;
         this.objetoSeleccionadoClick = null;
-
-        this.casas = new THREE.Group();
 
         //Hay que cargar escena, camara, y renderer,
         //Escena
@@ -343,6 +302,7 @@ class Morfologia extends Component {
             this.paredes,
             this.ventanas,
             this.puertas,
+            this.pisos,
             this.allObjects,
             this.ocupantes,
             this.horasIluminacion,
@@ -381,7 +341,7 @@ class Morfologia extends Component {
         this.renderer = renderer;
 
         this.escena.add(new THREE.AmbientLight(0xB1B1B1));
-        this.escena.add(this.casas);
+        //this.escena.add(this.casas);
 
         //Luz
         this.light = new THREE.DirectionalLight(0xffff00, 1, 100);
@@ -646,13 +606,9 @@ class Morfologia extends Component {
                     BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 }
                 let casa = this.managerCasas.getCasa();
-                let aporte_interno = casa.userData.aporteInterno;
-                let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-                let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-                let perdida_conduccion = casa.userData.perdidaPorConduccion;
-                let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-                this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+                this.props.onCasaChanged(casa);
                 this.props.onParedesChanged(this.paredes);
+
                 this.construyendo = false;
 
             }
@@ -813,7 +769,18 @@ class Morfologia extends Component {
                     }
                 }
             }
+            else if(this.props.dibujando === 3){
+                let intersects = this.raycaster.intersectObjects(this.paredes);
+                if( intersects.length > 0){
+                    intersect = intersects[0];
+                    let piso = intersect.object;
+                    this.managerCasas.moverTechoConstruccion(piso);
+                }else{
+                   this.managerCasas.ocultarTechoConstruccion();
+                }
+            }
         }
+
         else{
             if(this.indicador_dibujado != null){
                 this.indicador_dibujado.visible = false;
@@ -835,6 +802,23 @@ class Morfologia extends Component {
         }
     }
 
+    handleChangeCasa(){
+        if(!this.count){
+            this.count = 0;
+        }
+        let casa = this.managerCasas.getCasa();
+        this.props.onCasaChanged(
+            casa.userData.aporteInterno,
+            casa.userData.perdidaVentilacion,
+            casa.userData.perdidaPorVentilacionObjetivo,
+            casa.userData.perdidaPorConduccion,
+            casa.userData.perdidaPorConduccionObjetivo,
+            casa.userData.volumen,
+        );
+        //console.log("cambio: "+this.count,casa);
+        this.count++;
+    }
+
     onClick(event) {
         event.preventDefault();
 
@@ -842,25 +826,17 @@ class Morfologia extends Component {
             this.managerCasas.agregarVentana();
             this.props.onVentanasChanged(this.ventanas);
 
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
         }
 
         if (this.props.dibujando === 2 && this.props.dibujando !== -1) {
             this.managerCasas.agregarPuerta();
 
-            let casa = this.managerCasas.getCasa();
-            let aporte_interno = casa.userData.aporteInterno;
-            let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-            let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-            let perdida_conduccion = casa.userData.perdidaPorConduccion;
-            let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-            this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+            this.handleChangeCasa();
+        }
+        if(this.props.dibujando === 3 && this.props.dibujando !== -1){
+            this.managerCasas.agregarTechoConstruccion();
+            this.handleChangeCasa();
         }
 
         if(this.props.borrando){
@@ -896,28 +872,33 @@ class Morfologia extends Component {
             }
             this.objetoSeleccionadoClick = null;
         }
-        let casa = this.managerCasas.getCasa();
-        let aporte_interno = casa.userData.aporteInterno;
-        let perdida_ventilacion =  casa.userData.perdidaPorVentilacion;
-        let perdida_ventilacion_objetivo = casa.userData.perdidaPorVentilacionObjetivo;
-        let perdida_conduccion = casa.userData.perdidaPorConduccion;
-        let perdida_conduccion_objetivo = casa.userData.perdidaPorConduccionObjetivo;
-        this.props.onCasaChanged(aporte_interno, perdida_ventilacion,perdida_ventilacion_objetivo, perdida_conduccion, perdida_conduccion_objetivo, casa.userData.volumen, casa.userData.area);
+        this.handleChangeCasa();
 
     }
 
     render() {
         return (
-            <div style={{height:this.props.height}}
-                //tabIndex="0"
-                onMouseDown={this.onMouseDown}
-                onMouseUp={this.onMouseUp}
-                onMouseMove={this.onMouseMove}
-                onClick={this.onClick}
-                ref={(mount) => {
-                    this.mount = mount
-                }}
-            />
+            <div style={{height: this.props.height}}>
+                <div style={{height: 10}}
+                    //tabIndex="0"
+                     onMouseDown={this.onMouseDown}
+                     onMouseUp={this.onMouseUp}
+                     onMouseMove={this.onMouseMove}
+                     onClick={this.onClick}
+                     ref={(mount) => {
+                         this.mount = mount
+                     }}
+                />
+                <Typography style={{
+                                fontSize: 'x-small',
+                            }}
+                            align={"center"}
+                            variant={"button"}
+                            color={"textSecondary"}>
+                    Rotar camara: botón secundario
+                </Typography>
+            </div>
+
         )
     }
 }
@@ -936,7 +917,7 @@ Morfologia.propTypes = {
 };
 
 Morfologia.tipos = {PARED : 0, VENTANA : 1, PUERTA : 2, TECHO : 3, PISO : 4,};
-Morfologia.separacion = {EXTERIOR : 0, PAREADA : 1, INTERIOR : 2};
+Morfologia.separacion = {EXTERIOR : 0,  INTERIOR : 1};
 Morfologia.aislacionPiso = {CORRIENTE: 0, MEDIO : 1, AISLADO : 2};
 Morfologia.tipos_texto = {
     0 : 'Pared',

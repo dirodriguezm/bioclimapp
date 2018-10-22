@@ -4,14 +4,14 @@ import axios from "axios";
 import Morfologia from "../components/Morfologia";
 
 class ManagerCasas {
-    constructor(escena, paredes, ventanas, puertas, allObjects, ocupantes, horasIluminacion, aireRenovado, heightWall) {
+    constructor(escena, paredes, ventanas, puertas, pisos, allObjects, ocupantes, horasIluminacion, aireRenovado, heightWall) {
         this.escena = escena;
         this.paredes = paredes;
         this.paredesX = [];
         this.paredesZ = [];
         this.ventanas = ventanas;
         this.puertas = puertas;
-        this.pisos = [];
+        this.pisos = pisos;
         this.allObjects = allObjects;
 
         this.ocupantes = ocupantes;
@@ -58,7 +58,7 @@ class ManagerCasas {
 
         this.materialTechoConstruccion = new THREE.MeshBasicMaterial({
             color: '#3d8179',
-            opacity: 0,
+            opacity: 0.7,
             transparent: true,
             side: THREE.DoubleSide,
         });
@@ -120,7 +120,7 @@ class ManagerCasas {
         });
 
         //habitacion que dibuja nuevas habitaciones
-        this.habitacionConstruccion = this.crearHabitacion(0, heightWall, 0, 1).clone();
+        this.habitacionConstruccion = this.crearHabitacion(0, heightWall, 0, 1);
         this.habitacionConstruccion.visible = false;
         //Ventana que dibuja nuevas ventanas
         this.ventanaConstruccion = this.crearMeshVentana(0.9, 0.6);
@@ -130,11 +130,15 @@ class ManagerCasas {
         this.puertaConstruccion = this.crearMeshPuerta(0.6, 1.8);
         this.puertaConstruccion.visible = false;
         this.puertaConstruccion.error = false;
-
+        //Techo que se dibuja arriba de las habitaciones
+        this.techoConstruccion = this.crearMeshTecho(0,0,0);
+        this.techoConstruccion.visible = false;
+        this.techoConstruccion.error = false;
 
         escena.add(this.habitacionConstruccion);
         escena.add(this.ventanaConstruccion);
         escena.add(this.puertaConstruccion);
+        escena.add(this.techoConstruccion);
 
         //raycaster
         var ray = new THREE.Raycaster();
@@ -199,64 +203,46 @@ class ManagerCasas {
 
     setPersonas(personas){
         this.ocupantes = personas;
-        let aporteInternoTotal = 0;
         for(let nivel of this.casa.children){
             for(let habitacion of nivel.children){
-                let superficie = habitacion.userData.depth * habitacion.userData.width;
-                let aporteInterno = BalanceEnergetico.aporteInterno(personas,superficie,this.horasIluminacion,this.periodo);
-                habitacion.userData.aporteInterno = aporteInterno;
-                aporteInternoTotal += aporteInterno;
+                this.recalcularBalancePorVolumen(habitacion);
             }
         }
-        this.casa.userData.aporteInterno = aporteInternoTotal;
     }
     setIluminacion(iluminacion){
         this.horasIluminacion = iluminacion;
-        let aporteInternoTotal = 0;
+        //let aporteInternoTotal = 0;
         for(let nivel of this.casa.children){
             for(let habitacion of nivel.children){
-                let superficie = habitacion.userData.depth * habitacion.userData.width;
-                let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes,superficie,iluminacion,this.periodo);
-                habitacion.userData.aporteInterno = aporteInterno;
-                aporteInternoTotal += aporteInterno;
+                this.recalcularBalancePorVolumen(habitacion);
             }
         }
-        this.casa.userData.aporteInterno = aporteInternoTotal;
+        //this.casa.userData.aporteInterno = aporteInternoTotal;
     }
     setAire(aire){
         this.aireRenovado = aire;
-        let perdidaPorVentilacionTotal = 0;
+        //let perdidaVentilacionTotal = 0;
         for(let nivel of this.casa.children){
             for(let habitacion of nivel.children){
-                let volumen = habitacion.userData.volumen;
-                let perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(volumen,aire,this.gradoDias);
-                habitacion.userData.perdidaPorVentilacion = perdidaVentilacion;
-                perdidaPorVentilacionTotal += perdidaVentilacion;
+                this.recalcularBalancePorVolumen(habitacion);
             }
         }
-        this.casa.userData.perdidaPorVentilacion = perdidaPorVentilacionTotal;
+        //this.casa.userData.perdidaVentilacion = perdidaVentilacionTotal;
     }
 
     setGradosDias(gradoDias, periodo) {
         this.gradoDias = gradoDias;
         this.periodo = periodo;
         this.casa.userData.periodo = periodo;
-        let perdidaPorVentilacionTotal = 0;
-        let perdidaPorConduccionTotal = 0;
+        //let perdidaVentilacionTotal = 0;
+        //let perdidaPorConduccionTotal = 0;
         for(let nivel of this.casa.children){
             for(let habitacion of nivel.children){
-                let volumen = habitacion.userData.volumen;
-                let transSup = habitacion.userData.transmitanciaSuperficies;
-                let perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(volumen,this.aireRenovado,gradoDias);
-                let perdidaConduccion = BalanceEnergetico.perdidasConduccion(transSup,gradoDias,habitacion.userData.puenteTermico)
-                habitacion.userData.perdidaPorVentilacion = perdidaVentilacion;
-                habitacion.userData.perdidaPorConduccion = perdidaConduccion;
-                perdidaPorVentilacionTotal += perdidaVentilacion;
-                perdidaPorConduccionTotal += perdidaConduccion;
+                this.recalcularBalancePorVolumen(habitacion);
             }
         }
-        this.casa.userData.perdidaPorVentilacion = perdidaPorVentilacionTotal;
-        this.casa.userData.perdidaPorConduccion = perdidaPorConduccionTotal;
+        //this.casa.userData.perdidaVentilacion = perdidaVentilacionTotal;
+        //this.casa.userData.perdidaPorConduccion = perdidaPorConduccionTotal;
     }
 
     setStartHabitacion(start, raycaster) {
@@ -299,6 +285,97 @@ class ManagerCasas {
         }
     }
 
+    //para cuando se quita una estructura a una habitacion, se asume que no será piso por que si es piso o pared ya que
+    //en esos casos se borra la habitacion.
+    quitarTransmitanciaSuperficie(estructura, habitacion){
+
+        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+        let transmitanciaSuperficiesObjetivo = habitacion.userData.transmitanciaSuperficiesObjetivo;
+
+        transmitanciaSuperficies -= estructura.userData.transSup;
+        transmitanciaSuperficiesObjetivo -= estructura.userData.transSupObjetivo;
+
+        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+            transmitanciaSuperficies,
+            this.gradoDias,
+            habitacion.userData.puenteTermico
+        );
+        let perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
+            transmitanciaSuperficiesObjetivo,
+            this.gradoDias,
+            habitacion.userData.puenteTermicoObjetivo
+        );
+
+        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+        this.casa.userData.transmitanciaSuperficiesObjetivo -= habitacion.userData.transmitanciaSuperficiesObjetivo;
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
+
+        habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
+        habitacion.userData.transmitanciaSuperficiesObjetivo = transmitanciaSuperficiesObjetivo;
+        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
+        habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
+
+        this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
+        this.casa.userData.transmitanciaSuperficiesObjetivo += transmitanciaSuperficiesObjetivo;
+        this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
+
+    }
+
+    //para cuando se agrega una estructura a una habitacion, aqui si se afecta al objetivo
+    agregarTransmitanciaSuperficie(estructura){
+        let habitacion;
+        if(estructura.userData.tipo === Morfologia.tipos.PISO || estructura.userData.tipo === Morfologia.tipos.TECHO){
+            habitacion = estructura.parent;
+        }else if(estructura.userData.tipo === Morfologia.tipos.VENTANA || estructura.userData.tipo === Morfologia.tipos.PUERTA){
+            habitacion = estructura.parent.parent.parent;
+        }else{
+            habitacion = estructura.parent.parent;
+        }
+
+        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+        let transmitanciaSuperficiesObjetivo = habitacion.userData.transmitanciaSuperficiesObjetivo;
+
+        BalanceEnergetico.transmitanciaSuperficie(estructura,this.zona);
+
+        transmitanciaSuperficies += estructura.userData.transSup;
+        transmitanciaSuperficiesObjetivo += estructura.userData.transSupObjetivo;
+
+        if(estructura.userData.tipo === Morfologia.tipos.PISO){
+            BalanceEnergetico.puenteTermico(estructura);
+            habitacion.userData.puenteTermico = estructura.userData.puenteTermico;
+            habitacion.userData.puenteTermicoObjetivo = estructura.userData.puenteTermicoObjetivo;
+        }
+        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
+            transmitanciaSuperficies,
+            this.gradoDias,
+            habitacion.userData.puenteTermico
+        );
+        let perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
+            transmitanciaSuperficiesObjetivo,
+            this.gradoDias,
+            habitacion.userData.puenteTermicoObjetivo
+        );
+
+        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+        this.casa.userData.transmitanciaSuperficiesObjetivo -= habitacion.userData.transmitanciaSuperficiesObjetivo;
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
+
+        habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
+        habitacion.userData.transmitanciaSuperficiesObjetivo = transmitanciaSuperficiesObjetivo;
+        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
+        habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
+
+        this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
+        this.casa.userData.transmitanciaSuperficiesObjetivo += transmitanciaSuperficiesObjetivo;
+        this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
+    }
+
+
+    //Para cuando cambia algo de una estructura, como las capas, espesor, material. no se necesita recalcular el objetivo.
     actualizarTransmitanciaSuperficie(estructura){
         let habitacion;
         if(estructura.userData.tipo === Morfologia.tipos.PISO || estructura.userData.tipo === Morfologia.tipos.TECHO){
@@ -316,10 +393,8 @@ class ManagerCasas {
         BalanceEnergetico.transmitanciaSuperficie(estructura,this.zona);
         transmitanciaSuperficies += estructura.userData.transSup;
         if(estructura.userData.tipo === Morfologia.tipos.PISO){
-            let puenteTermico = BalanceEnergetico.puenteTermico(estructura);
-
-            estructura.userData.puenteTermico = puenteTermico.normal;
-            estructura.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+            BalanceEnergetico.puenteTermico(estructura);
+            habitacion.userData.puenteTermico = estructura.userData.puenteTermico;
         }
         let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
 
@@ -332,10 +407,11 @@ class ManagerCasas {
 
         this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
         this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+
+        //console.log("estructura "+Morfologia.tipos_texto[estructura.userData.tipo],estructura.userData.transSup);
     }
 
     casasChocan(habitacion) {
-
         let start = habitacion.userData.start.clone();
         start.y = 0;
         let end = habitacion.userData.end.clone();
@@ -581,12 +657,7 @@ class ManagerCasas {
     }
 
     agregarHabitacion(habitacion){
-        let transmitanciaSuperficies = 0;
-        let transmitanciaSuperficiesObjetivo = 0;
-
         let paredes = habitacion.getObjectByName("Paredes");
-
-        //Se agregan las paredes al arreglo de paredes y objetos
 
         let capas =
             [
@@ -613,10 +684,10 @@ class ManagerCasas {
             pared.userData.superficie = pared.userData.width * pared.userData.height;
             pared.userData.capas = capas.slice();
 
-
-            BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
-            transmitanciaSuperficies += pared.userData.transSup;
-            transmitanciaSuperficiesObjetivo += pared.userData.transSupObjetivo;
+            this.agregarTransmitanciaSuperficie(pared);
+            //BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
+            //transmitanciaSuperficies += pared.userData.transSup;
+            //transmitanciaSuperficiesObjetivo += pared.userData.transSupObjetivo;
 
             this.paredes.push(pared);
             if(pared.userData.orientacion.z !== 0){
@@ -656,55 +727,84 @@ class ManagerCasas {
 
         piso.userData.superficie = piso.userData.width * piso.userData.depth;
 
-        BalanceEnergetico.transmitanciaSuperficie(piso,this.zona);
-        transmitanciaSuperficies += piso.userData.transSup;
-        transmitanciaSuperficiesObjetivo += piso.userData.transSupObjetivo;
+        this.agregarTransmitanciaSuperficie(piso);
 
-        let puenteTermico = BalanceEnergetico.puenteTermico(piso);
+        //BalanceEnergetico.transmitanciaSuperficie(piso,this.zona);
+        //transmitanciaSuperficies += piso.userData.transSup;
+        //transmitanciaSuperficiesObjetivo += piso.userData.transSupObjetivo;
 
-        piso.userData.puenteTermico = puenteTermico.normal;
-        piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+        //let puenteTermico = BalanceEnergetico.puenteTermico(piso);
+
+        //piso.userData.puenteTermico = puenteTermico.normal;
+        //piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
 
 
         let techo = habitacion.getObjectByName("Techo");
         if(techo){
             techo.userData.superficie = techo.userData.width * techo.userData.depth;
 
-            BalanceEnergetico.transmitanciaSuperficie(techo,this.zona);
-            transmitanciaSuperficies += techo.userData.transSup;
-            transmitanciaSuperficiesObjetivo += techo.userData.transSup;
+            this.agregarTransmitanciaSuperficie(techo);
+
+            //BalanceEnergetico.transmitanciaSuperficie(techo,this.zona);
+            //transmitanciaSuperficies += techo.userData.transSup;
+            //transmitanciaSuperficiesObjetivo += techo.userData.transSup;
 
             piso.userData.techo = techo;
         }
 
-        let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
+        this.recalcularBalancePorVolumen(habitacion);
+        //let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
 
-        let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
-        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, puenteTermico.normal);
-        let perdidaPorVentilacionObjetivo = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen,this.aireRenovadoObjetivo,this.gradoDias);
-        let perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficiesObjetivo,this.gradoDias,puenteTermico.objetivo);
-        habitacion.userData.puenteTermico = puenteTermico.normal;
-        habitacion.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
-        habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
-        habitacion.userData.transmitanciaSuperficiesObjetivo = transmitanciaSuperficiesObjetivo;
-        habitacion.userData.aporteInterno = aporteInterno;
-        habitacion.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
-        habitacion.userData.perdidaPorVentilacionObjetivo = perdidaPorVentilacionObjetivo;
-        habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
+        //let perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
+        //let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, puenteTermico.normal);
+        //let perdidaVentilacionObjetivo = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen,this.aireRenovadoObjetivo,this.gradoDias);
+        //let perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficiesObjetivo,this.gradoDias,puenteTermico.objetivo);
+        //habitacion.userData.puenteTermico = puenteTermico.normal;
+        //habitacion.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+        //habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
+        //habitacion.userData.transmitanciaSuperficiesObjetivo = transmitanciaSuperficiesObjetivo;
+        //habitacion.userData.aporteInterno = aporteInterno;
+        //habitacion.userData.perdidaVentilacion = perdidaVentilacion;
+        //habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
+        //habitacion.userData.perdidaVentilacionObjetivo = perdidaVentilacionObjetivo;
+        //habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
         //console.log("perdida objetivo",perdidaPorConduccionObjetivo,transmitanciaSuperficiesObjetivo,this.gradoDias,puenteTermico.objetivo);
 
         let nivel = this.casa.children[habitacion.userData.nivel - 1];
         nivel.add(habitacion);
 
-        this.casa.userData.aporteInterno += aporteInterno;
-        this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
-        this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
-        this.casa.userData.perdidaPorVentilacionObjetivo += perdidaPorVentilacionObjetivo;
-        this.casa.userData.perdidaPorConduccionObjetivo += perdidaPorConduccionObjetivo;
+        //this.casa.userData.aporteInterno += aporteInterno;
+        //this.casa.userData.perdidaVentilacion += perdidaVentilacion;
+        //this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
+        //this.casa.userData.perdidaVentilacionObjetivo += perdidaVentilacionObjetivo;
+        //this.casa.userData.perdidaPorConduccionObjetivo += perdidaPorConduccionObjetivo;
         this.casa.userData.area += habitacion.userData.depth * habitacion.userData.width;
         this.casa.userData.volumen += habitacion.userData.volumen;
         this.casa.updateMatrixWorld();
+
+        //console.log(habitacion);
+    }
+
+    recalcularBalancePorVolumen(habitacion){
+        let piso = habitacion.getObjectByName('Piso');
+
+        this.casa.userData.aporteInterno -= habitacion.userData.aporteInterno;
+        this.casa.userData.perdidaVentilacion -= habitacion.userData.perdidaVentilacion;
+        this.casa.userData.perdidaVentilacionObjetivo -= habitacion.userData.perdidaVentilacionObjetivo;
+
+        let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
+        let perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
+        let perdidaVentilacionObjetivo = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen,this.aireRenovadoObjetivo,this.gradoDias);
+
+        habitacion.userData.aporteInterno = aporteInterno;
+        habitacion.userData.perdidaVentilacion = perdidaVentilacion;
+        habitacion.userData.perdidaVentilacionObjetivo = perdidaVentilacionObjetivo;
+
+        this.casa.userData.aporteInterno += aporteInterno;
+        this.casa.userData.perdidaVentilacion += perdidaVentilacion;
+        this.casa.userData.perdidaVentilacionObjetivo += perdidaVentilacionObjetivo;
+
+        //console.log("casa en recalculo aporte y perdida por volumen",this.casa);
     }
 
     aumentarNivelHabitacion(habitacion){
@@ -715,32 +815,38 @@ class ManagerCasas {
         let piso = habitacion.getObjectByName("Piso");
         piso.userData.separacion =  Morfologia.separacion.INTERIOR;
 
-       let puenteTermico = BalanceEnergetico.puenteTermico(piso);
+        this.actualizarTransmitanciaSuperficie(piso);
 
-        piso.userData.puenteTermico = puenteTermico.normal;
-        piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+       //let puenteTermico = BalanceEnergetico.puenteTermico(piso);
 
-        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
-        habitacion.userData.puenteTermico = piso.userData.puenteTermico;
-        habitacion.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+        //piso.userData.puenteTermico = puenteTermico.normal;
+        //piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+
+        //let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
+        //habitacion.userData.puenteTermico = piso.userData.puenteTermico;
+        //habitacion.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
 
 
 
 
-        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
-        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
-        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+        //let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
+        //this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+        //this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
 
        //habitacion.position.y = (nivel - 1) *habitacion.userData.height;
 
         let nivel = habitacion.parent;
         nivel.remove(habitacion);
 
-        nivel = new THREE.Group();
-        this.casa.add(nivel);
+        nivel = this.casa.children[habitacion.userData.nivel-1];
+        if(!nivel){
+            nivel = new THREE.Group();
+            this.casa.add(nivel);
+            nivel.position.y = (habitacion.userData.nivel - 1) * habitacion.userData.height;
+            nivel.userData.nivel = prevNivel + 1;
+        }
 
-        nivel.position.y = (habitacion.userData.nivel - 1) * habitacion.userData.height;
-        nivel.userData.nivel = prevNivel + 1;
+
         nivel.add(habitacion);
 
 
@@ -749,7 +855,6 @@ class ManagerCasas {
     }
 
     agregarHabitacionDibujada() {
-
         if (this.habitacionConstruccion.userData.error) {
             this.crecerHabitacion(this.habitacionConstruccion.userData.start);
             this.habitacionConstruccion.userData.error = false;
@@ -790,15 +895,7 @@ class ManagerCasas {
     }
 
     handleCasaPredefinida(casaPredefinida){
-        this.paredesX.splice(0, this.paredesX.length);
-        this.paredesZ.splice(0, this.paredesZ.length);
-        this.paredes.splice(0, this.paredes.length);
-        this.ventanas.splice(0, this.ventanas.length);
-        this.puertas.splice(0, this.puertas.length);
-        this.pisos.splice(0, this.pisos.length);
-        this.allObjects.splice(0, this.allObjects.length);
-        let casa = this.escena.getObjectByName("casa");
-        this.escena.remove(casa);
+
         this.crearCasaVacia();
         switch(casaPredefinida) {
             case 0:
@@ -825,10 +922,9 @@ class ManagerCasas {
 
         let ventanas = pared.children;
 
-        //TODO: ver por que no se están borrando
-
         for(let ventana of ventanas){
             this.ventanas.splice(this.ventanas.indexOf(ventana),1);
+            this.quitarTransmitanciaSuperficie(ventana,habitacion1);
             this.allObjects.splice(this.allObjects.indexOf(ventana),1);
 
         }
@@ -845,6 +941,9 @@ class ManagerCasas {
         pared.geometry = new THREE.ShapeBufferGeometry( shape ).clone();
         pared.geometry.userData.shape = shape;
         pared.geometry.verticesNeedUpdate = true;
+        pared.userData.superficie = pared.userData.width * pared.userData.height;
+
+        this.quitarTransmitanciaSuperficie(pared,habitacion1);
 
         let habitacion2 = this.crearCasaSimple();
 
@@ -855,22 +954,20 @@ class ManagerCasas {
         ventanas = pared.children;
 
         for(let ventana of ventanas){
-            
+            this.quitarTransmitanciaSuperficie(ventana,habitacion2);
             this.ventanas.splice(this.ventanas.indexOf(ventana),1);
             this.allObjects.splice(this.allObjects.indexOf(ventana),1);
         }
 
-        
-
         paredes2.remove(pared);
-        this.paredes.splice( this.paredes.indexOf(pared), 1 );
+        this.quitarTransmitanciaSuperficie(pared,habitacion2);
 
+        this.paredes.splice( this.paredes.indexOf(pared), 1 );
 
         habitacion1.position.x = habitacion1.position.x - this.widthPredefinida/2 + 0.5;
         habitacion2.position.x = habitacion2.position.x + this.widthPredefinida/2 + 0.5;
 
         return [habitacion1, habitacion2];
-        //habitacion2.rotation.y = Math.PI ;
 
     }
 
@@ -882,7 +979,7 @@ class ManagerCasas {
         for(let habitacion of habitaciones){
             let techo = habitacion.getObjectByName("Techo");
             habitacion.remove(techo);
-
+            this.quitarTransmitanciaSuperficie(techo,habitacion);
         }
 
         let nuevaHabitacion = this.crearCasaDoble();
@@ -892,8 +989,10 @@ class ManagerCasas {
                 for(let objeto of pared.children){
                     if(objeto.userData.tipo === Morfologia.tipos.PUERTA){
                         this.quitarObjetoPuerta(objeto);
+                        this.quitarTransmitanciaSuperficie(objeto,habitacion);
                     }
                 }
+                this.actualizarTransmitanciaSuperficie(pared);
             }
 
             this.aumentarNivelHabitacion(habitacion);
@@ -905,6 +1004,8 @@ class ManagerCasas {
         let habitacion = this.crearCasaSimple();
 
         let techo = habitacion.getObjectByName("Techo");
+
+        this.quitarTransmitanciaSuperficie(techo, habitacion);
         habitacion.remove(techo);
 
         habitacion = this.crearCasaSimple();
@@ -912,9 +1013,12 @@ class ManagerCasas {
         let pared = habitacion.getObjectByName("Paredes").children[2];
         for(let objeto of pared.children){
             if(objeto.userData.tipo === Morfologia.tipos.PUERTA){
+
+                this.quitarTransmitanciaSuperficie(objeto,habitacion);
                 this.quitarObjetoPuerta(objeto);
             }
         }
+        this.actualizarTransmitanciaSuperficie(pared);
         this.aumentarNivelHabitacion(habitacion);
 
     }
@@ -922,9 +1026,11 @@ class ManagerCasas {
     borrarEstructura(objeto){
         switch (objeto.userData.tipo) {
             case Morfologia.tipos.PUERTA:
+                this.quitarTransmitanciaSuperficie(objeto,objeto.parent.parent.parent);
                 this.quitarObjetoPuerta(objeto);
                 break;
             case Morfologia.tipos.VENTANA:
+                this.quitarTransmitanciaSuperficie(objeto,objeto.parent.parent.parent);
                 this.quitarObjetoVentana(objeto);
                 break;
         }
@@ -950,28 +1056,8 @@ class ManagerCasas {
         pared.geometry.userData.shape = shape;
         pared.geometry.verticesNeedUpdate = true;
 
-        pared.remove(ventana);
-
-        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
-
-        habitacion.userData.transmitanciaSuperficies -= ventana.userData.transSup;
-        habitacion.userData.transmitanciaSuperficiesObjetivo -= ventana.userData.transSupObjetivo;
-        habitacion.userData.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
-            habitacion.userData.transmitanciaSuperficies,
-            this.gradoDias,
-            habitacion.userData.puenteTermico
-        );
-        habitacion.userData.perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
-            habitacion.userData.transmitanciaSuperficiesObjetivo,
-            this.gradoDias,
-            habitacion.userData.puenteTermicoObjetivo
-        );
-
         pared.userData.superficie += ventana.userData.superficie;
-
-        this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
-        this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
+        pared.remove(ventana);
 
         this.ventanas.splice(this.ventanas.indexOf(ventana),1);
         this.allObjects.splice(this.allObjects.indexOf(ventana),1);
@@ -997,32 +1083,11 @@ class ManagerCasas {
         pared.geometry.userData.shape = shape;
         pared.geometry.verticesNeedUpdate = true;
 
-
-
-        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
-
-        habitacion.userData.transmitanciaSuperficies -= puerta.userData.transSup;
-        habitacion.userData.transmitanciaSuperficiesObjetivo -= puerta.userData.transSupObjetivo;
-        habitacion.userData.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
-            habitacion.userData.transmitanciaSuperficies,
-            this.gradoDias,
-            habitacion.userData.puenteTermico
-        );
-        habitacion.userData.perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
-            habitacion.userData.transmitanciaSuperficiesObjetivo,
-            this.gradoDias,
-            habitacion.userData.puenteTermicoObjetivo
-        );
-
         pared.userData.superficie += puerta.userData.superficie;
-
-        this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
-        this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
+        pared.remove(puerta);
 
         this.puertas.splice(this.puertas.indexOf(puerta),1);
         this.allObjects.splice(this.allObjects.indexOf(puerta),1);
-        pared.remove(puerta);
     }
 
     crearCasaSimple(){
@@ -1041,9 +1106,9 @@ class ManagerCasas {
             habitacion.position.z + this.depthPredefinida/2
         );
 
-        this.agregarTecho(habitacion);
-
         this.agregarHabitacion(habitacion);
+
+        this.agregarTecho(habitacion);
 
         let paredes = habitacion.getObjectByName("Paredes");
         for(let pared of paredes.children){
@@ -1170,31 +1235,25 @@ class ManagerCasas {
             };
             //Por ahora el calculo se hace sin marco
 
-            this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-
-            BalanceEnergetico.transmitanciaSuperficie(puerta,this.zona);
-            habitacion.userData.transmitanciaSuperficies += puerta.userData.transSup;
-            habitacion.userData.transmitanciaSuperficiesObjetivo += puerta.userData.transSupObjetivo;
-            habitacion.userData.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
-                habitacion.userData.transmitanciaSuperficies,
-                this.gradoDias,
-                habitacion.userData.puenteTermico
-            );
-            habitacion.userData.perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
-                habitacion.userData.transmitanciaSuperficiesObjetivo,
-                this.gradoDias,
-                habitacion.userData.puenteTermicoObjetivo
-            );
-
             pared.userData.superficie -= puerta.userData.superficie;
 
-            this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
-            this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
-
+            this.agregarTransmitanciaSuperficie(puerta);
+            this.actualizarTransmitanciaSuperficie(pared);
 
             this.puertas.push(puerta);
             this.allObjects.push(puerta);
         }
+    }
+
+    agregarTechoConstruccion(){
+        if(this.techoConstruccion.userData.error){
+            return;
+        }else{
+            let habitacion = this.techoConstruccion.userData.habitacion;
+            this.techoConstruccion.visible = false;
+            this.agregarTecho(habitacion);
+        }
+
     }
 
     agregarTecho(habitacion){
@@ -1207,6 +1266,7 @@ class ManagerCasas {
         techo.userData.width = width;
         techo.userData.depth = depth;
         techo.userData.height = height;
+        techo.userData.superficie = depth * width;
         techo.name = "Techo";
         techo.material = this.materialTechoConstruido.clone();
 
@@ -1232,12 +1292,13 @@ class ManagerCasas {
         piso.userData.techo = techo;
 
         habitacion.add(techo);
+
+        this.agregarTransmitanciaSuperficie(techo);
     }
 
     agregarVentana() {
-
         if (this.ventanaConstruccion.userData.error) {
-            return;
+            return null;
         }
 
         let pared = this.ventanaConstruccion.userData.pared;
@@ -1280,6 +1341,8 @@ class ManagerCasas {
             pared.geometry.userData.shape = shape;
             pared.geometry.verticesNeedUpdate = true;
 
+            pared.userData.superficie -= ventana.userData.superficie;
+
             ventana.userData.tipo = Morfologia.tipos.VENTANA;
             ventana.userData.info_material = {
                 material: 0,
@@ -1300,26 +1363,8 @@ class ManagerCasas {
             };
             //Por ahora el calculo se hace sin marco
 
-            this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-            this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
-            BalanceEnergetico.transmitanciaSuperficie(ventana,this.zona);
-            habitacion.userData.transmitanciaSuperficies += ventana.userData.transSup;
-            habitacion.userData.transmitanciaSuperficiesObjetivo += ventana.userData.transSupObjetivo;
-            habitacion.userData.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
-                habitacion.userData.transmitanciaSuperficies,
-                this.gradoDias,
-                habitacion.userData.puenteTermico
-            );
-            habitacion.userData.perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
-                habitacion.userData.transmitanciaSuperficiesObjetivo,
-                this.gradoDias,
-                habitacion.userData.puenteTermicoObjetivo
-            );
-
-            pared.userData.superficie -= ventana.userData.superficie;
-
-            this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
-            this.casa.userData.perdidaPorConduccionObjetivo += habitacion.userData.perdidaPorConduccionObjetivo;
+            this.agregarTransmitanciaSuperficie(ventana);
+            this.actualizarTransmitanciaSuperficie(pared);
 
             this.ventanas.push(ventana);
             this.allObjects.push(ventana);
@@ -1370,6 +1415,27 @@ class ManagerCasas {
         if(!this.ventanaConstruccion.userData.error){
             this.ventanaConstruccion.material = this.materialVentanaConstruccion.clone();
         }
+    }
+
+    moverTechoConstruccion(pared){
+        let habitacion = pared.parent.parent;
+        let {height, depth, width, nivel} = habitacion.userData;
+
+        this.techoConstruccion.visible = true;
+        this.techoConstruccion.userData.habitacion = habitacion;
+        this.techoConstruccion.geometry = this.crearGeometriaTecho(width, depth, height);
+        this.techoConstruccion.geometry.computeBoundingBox();
+        let pos = new THREE.Vector3(0,0,0);
+        habitacion.localToWorld(pos);
+        this.techoConstruccion.position.copy(pos);
+        this.techoConstruccion.position.y = height * (nivel-1);
+
+        let techo = habitacion.getObjectByName("Techo");
+        this.techoConstruccion.userData.error = !!techo;
+
+    }
+    ocultarTechoConstruccion(){
+        this.techoConstruccion.visible = false;
     }
 
     moverPuertaConstruccion(pared, point) {
@@ -1469,8 +1535,6 @@ class ManagerCasas {
 
         let habitacion = pared.parent.parent;
 
-        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
-
         if(oldHeight !== height || oldWidth !== width){
             if((height + ventana.position.y) <= pared.userData.height && width <= 1){
 
@@ -1513,18 +1577,8 @@ class ManagerCasas {
                 pared.geometry.userData.shape = shape;
                 pared.geometry.verticesNeedUpdate = true;
 
-                this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-
-                habitacion.transmitanciaSuperficies -= ventana.userData.transSup;
-                BalanceEnergetico.transmitanciaSuperficie(ventana,this.zona);
-                habitacion.transmitanciaSuperficies += ventana.userData.transSup;
-                habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
-                    habitacion.transmitanciaSuperficies,
-                    this.gradoDias,
-                    habitacion.puenteTermico
-                );
-
-                this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+                this.actualizarTransmitanciaSuperficie(ventana);
+                this.actualizarTransmitanciaSuperficie(pared);
 
             }
         }
@@ -1538,8 +1592,6 @@ class ManagerCasas {
         let pared = puerta.parent;
 
         let habitacion = pared.parent.parent;
-
-        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
 
         if(oldHeight !== height || oldWidth !== width){
             if(height <= pared.userData.height && width <= 1){
@@ -1583,18 +1635,8 @@ class ManagerCasas {
                 pared.geometry.userData.shape = shape;
                 pared.geometry.verticesNeedUpdate = true;
 
-                this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-
-                habitacion.transmitanciaSuperficies -= puerta.userData.transSup;
-                BalanceEnergetico.transmitanciaSuperficie(puerta,this.zona);
-                habitacion.transmitanciaSuperficies += puerta.userData.transSup;
-                habitacion.perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
-                    habitacion.transmitanciaSuperficies,
-                    this.gradoDias,
-                    habitacion.puenteTermico
-                );
-
-                this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
+                this.actualizarTransmitanciaSuperficie(puerta);
+                this.actualizarTransmitanciaSuperficie(pared);
 
             }
         }
@@ -1605,9 +1647,6 @@ class ManagerCasas {
         let oldHeight = pared.userData.height;
 
         let habitacion = pared.parent.parent;
-
-        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
-        let transmitanciaSuperficiesObjetivo = habitacion.userData.transmitanciaSuperficiesObjetivo;
 
         if (oldHeight !== height && height >= 1.9) {
             habitacion.userData.height = height;
@@ -1621,8 +1660,6 @@ class ManagerCasas {
             for (let i = 0; i < paredes.children.length; i++) {
                 let pared = paredes.children[i];
                 let paredWidth = pared.userData.width;
-
-
 
                 let superficieElementos = (pared.userData.width*pared.userData.height)-pared.userData.superficie;
                 let killElements = [];
@@ -1652,6 +1689,7 @@ class ManagerCasas {
                     holes.splice(index,1);
                     index = this.allObjects.indexOf(element);
                     this.allObjects.splice(index,1);
+                    this.quitarTransmitanciaSuperficie(element);
                     pared.remove(element);
                     superficieElementos -= element.userData.superficie;
                 }
@@ -1669,11 +1707,7 @@ class ManagerCasas {
                 pared.userData.height = height;
                 pared.userData.superficie = paredWidth * height - superficieElementos;
 
-                transmitanciaSuperficies -= pared.userData.transSup;
-                transmitanciaSuperficiesObjetivo -= pared.userData.transSupObjetivo;
-                BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
-                transmitanciaSuperficies += pared.userData.transSup;
-                transmitanciaSuperficiesObjetivo += pared.userData.transSupObjetivo;
+                this.actualizarTransmitanciaSuperficie(pared);
 
             }
 
@@ -1684,35 +1718,10 @@ class ManagerCasas {
                 }else{
                     techo.geometry = this.crearGeometriaTecho(habitacion.userData.width, width, height);
                 }
-
             }
-
-
-            let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
-            let perdidaPorVentilacionObjetivo = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen,this.aireRenovadoObjetivo,this.gradoDias);
-            let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficies, this.gradoDias, habitacion.userData.puenteTermico);
-            let perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(transmitanciaSuperficiesObjetivo, this.gradoDias,habitacion.userData.puenteTermicoObjetivo);
-            this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
-            this.casa.userData.transmitanciaSuperficiesObjetivo -= habitacion.userData.transmitanciaSuperficiesObjetivo;
-            this.casa.userData.perdidaPorVentilacion -= habitacion.userData.perdidaPorVentilacion;
-            this.casa.userData.perdidaPorVentilacionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
-            this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-            this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
-
-            habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
-            habitacion.userData.transmitanciaSuperficiesObjetivo = transmitanciaSuperficiesObjetivo;
-            habitacion.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-            habitacion.userData.perdidaPorVentilacionObjetivo = perdidaPorVentilacionObjetivo;
-            habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
-            habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
-
-            this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
-            this.casa.userData.transmitanciaSuperficiesObjetivo += transmitanciaSuperficiesObjetivo;
-            this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
-            this.casa.userData.perdidaPorVentilacionObjetivo += perdidaPorVentilacionObjetivo;
-            this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
-            this.casa.userData.perdidaPorConduccionObjetivo += perdidaPorConduccionObjetivo;
             habitacion.userData.height = height;
+
+            this.recalcularBalancePorVolumen(habitacion);
 
             let indiceNivel = habitacion.userData.nivel;
 
@@ -1803,28 +1812,10 @@ class ManagerCasas {
         let oldWidth = habitacion.userData.width;
         let oldDepth = habitacion.userData.depth;
 
-        if(oldWidth !== width){
-            if(width < oldWidth){
-                if(width % 2 === 0) habitacion.parent.position.x += 1;
-            }else{
-                if(width % 2 !== 0) habitacion.parent.position.x -= 1;
-            }
-        }
-        if(oldDepth !== depth){
-            if(depth < oldDepth){
-                if(depth % 2 === 0) habitacion.parent.position.z += 1;
-            }else{
-                if(depth % 2 !== 0) habitacion.parent.position.z -= 1;
-            }
-        }
-
         habitacion.userData.height = height;
         habitacion.userData.width = width;
         habitacion.userData.depth = depth;
         this.casa.userData.volumen += habitacion.userData.volumen;
-
-        let transmitanciaSuperficies = habitacion.userData.transmitanciaSuperficies;
-        let transmitanciaSuperficiesObjetivo = habitacion.userData.transmitanciaSuperficiesObjetivo;
 
         for (let i = 0; i < paredes.children.length; i++) {
             let pared = paredes.children[i];
@@ -1882,7 +1873,6 @@ class ManagerCasas {
 
                     if(elemento.position.x < -pared.userData.width/2 || elemento.position.x > pared.userData.width/2){
                         killElements.push(elemento);
-                        transmitanciaSuperficies -= elemento.userData.transSup;
                     }else{
                         elemento.geometry.computeBoundingBox();
                         let bound = elemento.geometry.boundingBox;
@@ -1912,6 +1902,7 @@ class ManagerCasas {
                     }
                     index = this.allObjects.indexOf(element);
                     this.allObjects.splice(index,1);
+                    this.quitarTransmitanciaSuperficie(element,habitacion);
                     pared.remove(element);
                 }
                 shape.holes = holes;
@@ -1922,16 +1913,27 @@ class ManagerCasas {
                 pared.geometry.userData.shape = shape;
                 pared.geometry.verticesNeedUpdate = true;
 
-                transmitanciaSuperficies -= pared.userData.transSup;
-                transmitanciaSuperficiesObjetivo -= pared.userData.transSupObjetivo;
-                BalanceEnergetico.transmitanciaSuperficie(pared,this.zona);
-                transmitanciaSuperficies += pared.userData.transSup;
-                transmitanciaSuperficiesObjetivo += pared.userData.transSupObjetivo;
+                this.actualizarTransmitanciaSuperficie(pared);
             }
-
-
-
         }
+
+        if(oldWidth !== width){
+            if(width < oldWidth){
+                if(width % 2 === 0) habitacion.position.x += 1;
+            }else{
+                if(width % 2 !== 0) habitacion.position.x -= 1;
+            }
+        }
+        if(oldDepth !== depth){
+            if(depth < oldDepth){
+                if(depth % 2 === 0) habitacion.position.z += 1;
+            }else{
+                if(depth % 2 !== 0) habitacion.position.z -= 1;
+            }
+        }
+
+        habitacion.userData.start = new THREE.Vector3(habitacion.position.x-width/2,0,habitacion.position.z-depth/2);
+        habitacion.userData.end = new THREE.Vector3(habitacion.position.x+width/2,0,habitacion.position.z+depth/2);
 
         let piso = habitacion.getObjectByName("Piso");
         this.casa.userData.area -= piso.userData.width * piso.userData.depth;
@@ -1941,16 +1943,8 @@ class ManagerCasas {
         piso.userData.superficie = piso.userData.width * piso.userData.depth;
         this.casa.userData.area += piso.userData.superficie;
         piso.userData.perimetro = piso.userData.width * 2 + piso.userData.depth * 2;
-        piso.userData.puenteTermico = BalanceEnergetico.puenteTermico(piso);
 
-        transmitanciaSuperficies -= piso.userData.transSup;
-        BalanceEnergetico.transmitanciaSuperficie(piso, this.zona);
-        transmitanciaSuperficies += piso.userData.transSup;
-
-
-        let puenteTermico = BalanceEnergetico.puenteTermico(piso);
-        piso.userData.puenteTermico = puenteTermico.normal;
-        piso.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
+        this.actualizarTransmitanciaSuperficie(piso);
 
         let techo = habitacion.getObjectByName("Techo");
         if(techo){
@@ -1959,61 +1953,10 @@ class ManagerCasas {
             techo.userData.depth = depth;
             techo.userData.superficie = width * depth;
 
-            transmitanciaSuperficies -= techo.userData.transSup;
-            transmitanciaSuperficiesObjetivo -= techo.userData.transSupObjetivo;
-            BalanceEnergetico.transmitanciaSuperficie(techo, this.zona);
-            transmitanciaSuperficies += techo.userData.transSup;
-            transmitanciaSuperficiesObjetivo += techo.userData.transSupObjetivo;
+            this.actualizarTransmitanciaSuperficie(techo);
         }
 
-
-        let perdidaPorVentilacion = BalanceEnergetico.perdidasVentilacion(
-            habitacion.userData.volumen,
-            this.aireRenovado,
-            this.gradoDias);
-        let perdidaPorVentilacionObjetivo = BalanceEnergetico.perdidasVentilacion(
-            habitacion.userData.volumen,
-            this.aireRenovadoObjetivo,
-            this.gradoDias);
-        let perdidaPorConduccion = BalanceEnergetico.perdidasConduccion(
-            transmitanciaSuperficies,
-            this.gradoDias,
-            puenteTermico.normal);
-        let perdidaPorConduccionObjetivo = BalanceEnergetico.perdidasConduccion(
-            transmitanciaSuperficiesObjetivo,
-            this.gradoDias,
-            puenteTermico.objetivo);
-
-        let aporteInterno = BalanceEnergetico.aporteInterno(
-            this.ocupantes,
-            piso.userData.superficie,
-            this.horasIluminacion,
-            this.periodo);
-
-        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
-        this.casa.userData.transmitanciaSuperficiesObjetivo -= habitacion.userData.transmitanciaSuperficiesObjetivo;
-        this.casa.userData.aporteInterno -= habitacion.userData.aporteInterno;
-        this.casa.userData.perdidaPorVentilacion -= habitacion.userData.perdidaPorVentilacion;
-        this.casa.userData.perdidaPorVentilacionObjetivo -= habitacion.userData.perdidaPorVentilacionObjetivo;
-        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
-        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
-
-        habitacion.userData.puenteTermico = puenteTermico.normal;
-        habitacion.userData.puenteTermicoObjetivo = puenteTermico.objetivo;
-        habitacion.userData.transmitanciaSuperficies = transmitanciaSuperficies;
-        habitacion.userData.transmitanciaSuperficiesObjetivo = transmitanciaSuperficiesObjetivo;
-        habitacion.userData.aporteIntero = aporteInterno;
-        habitacion.userData.perdidaPorVentilacion = perdidaPorVentilacion;
-        habitacion.userData.perdidaPorVentilacionObjetivo = perdidaPorVentilacionObjetivo;
-        habitacion.userData.perdidaPorConduccion = perdidaPorConduccion;
-        habitacion.userData.perdidaPorConduccionObjetivo = perdidaPorConduccionObjetivo;
-
-        this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
-        this.casa.userData.transmitanciaSuperficiesObjetivo += transmitanciaSuperficiesObjetivo;
-        this.casa.userData.aporteInterno += aporteInterno;
-        this.casa.userData.perdidaPorVentilacion += perdidaPorVentilacion;
-        this.casa.userData.perdidaPorVentilacionObjetivo += perdidaPorVentilacionObjetivo;
-        this.casa.userData.perdidaPorConduccion += perdidaPorConduccion;
+        this.recalcularBalancePorVolumen(habitacion);
     }
 
     crecerHabitacion(nextPosition) {
@@ -2101,31 +2044,53 @@ class ManagerCasas {
     }
 
     crearCasaVacia()    {
-        this.casa != null ? this.casa.children = [] : this.casa;
-        var casa = new THREE.Group();
-        casa.name = "casa";
+        this.paredesX.splice(0, this.paredesX.length);
+        this.paredesZ.splice(0, this.paredesZ.length);
+        this.paredes.splice(0, this.paredes.length);
+        this.ventanas.splice(0, this.ventanas.length);
+        this.puertas.splice(0, this.puertas.length);
+        this.pisos.splice(0, this.pisos.length);
+        this.allObjects.splice(0, this.allObjects.length);
+        let casa = this.escena.getObjectByName("casa");
+        this.escena.remove(casa);
+        this.casa = new THREE.Group();
+        this.casa.name = "casa";
         var nivel = new THREE.Group();
         nivel.userData.nivel = 1;
 
-        casa.add(nivel);
+        this.casa.add(nivel);
 
-        this.escena.add(casa);
+        this.escena.add(this.casa);
 
-        casa.userData.aporteInterno = 0;
-        casa.userData.perdidaPorVentilacion = 0;
-        casa.userData.perdidaPorConduccion = 0;
-        casa.userData.perdidaPorVentilacionObjetivo = 0;
-        casa.userData.perdidaPorConduccionObjetivo = 0;
-        casa.userData.volumen = 0;
-        casa.userData.area = 0;
+        this.casa.userData.aporteInterno = 0;
+        this.casa.userData.perdidaVentilacion = 0;
+        this.casa.userData.perdidaPorConduccion = 0;
+        this.casa.userData.perdidaVentilacionObjetivo = 0;
+        this.casa.userData.perdidaPorConduccionObjetivo = 0;
+        this.casa.userData.transmitanciaSuperficies = 0;
+        this.casa.userData.transmitanciaSuperficiesObjetivo = 0;
+        this.casa.userData.volumen = 0;
+        this.casa.userData.area = 0;
 
-        this.casa = casa;
         this.casa.userData.periodo = this.periodo;
     }
 
 
     crearHabitacion(width, height, depth, nivel) {
         var habitacion = new THREE.Group();
+        var axesHelper = new THREE.AxesHelper( 5 );
+        habitacion.add(axesHelper);
+        axesHelper.position.y += 0.01;
+
+        habitacion.userData.aporteInterno = 0;
+        habitacion.userData.perdidaVentilacion = 0;
+        habitacion.userData.perdidaVentilacionObjetivo = 0;
+        habitacion.userData.perdidaPorConduccion = 0;
+        habitacion.userData.perdidaPorConduccionObjetivo = 0;
+        habitacion.userData.transmitanciaSuperficies = 0;
+        habitacion.userData.transmitanciaSuperficiesObjetivo = 0;
+        habitacion.userData.puenteTermico = 0;
+        habitacion.userData.puenteTermicoObjetivo = 0;
 
         habitacion.position.y = (nivel - 1) * height;
 

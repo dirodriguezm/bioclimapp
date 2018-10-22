@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Sound from 'react-sound';
 import classNames from 'classnames';
 import PropTypes from 'prop-types';
 import {withStyles} from '@material-ui/core/styles';
@@ -22,6 +23,10 @@ import IconButton from '@material-ui/core/IconButton';
 import PieChart from '@material-ui/icons/PieChart';
 import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 import InfoVariablesInternas from "./InfoVariablesInternas";
+import Dialog from "@material-ui/core/Dialog/Dialog";
+import DialogTitle from "@material-ui/core/DialogTitle/DialogTitle";
+import DialogContent from "@material-ui/core/DialogContent/DialogContent";
+import CircularProgress from "@material-ui/core/CircularProgress/CircularProgress";
 
 function TabContainer(props) {
     return (
@@ -161,9 +166,32 @@ const styles = theme => ({
     },
     grow: {
         flexGrow: 1,
+    },
+    progress: {
+        marginRight: 'auto',
+        marginLeft: 'auto',
+        display: 'block',
+        width: '100%'
     }
 });
 
+function AlertDialog(props){
+    const {classes, open} = props;
+    return (
+        <Dialog
+            disableBackdropClick
+            disableEscapeKeyDown
+            maxWidth="xs"
+            aria-labelledby="confirmation-dialog-title"
+            open={open}
+        >
+            <DialogTitle id="confirmation-dialog-title">Cargando</DialogTitle>
+            <DialogContent>
+                <CircularProgress className={classes.progress} size={50} />
+            </DialogContent>
+        </Dialog>
+    );
+}
 
 class TabPanel extends Component {
     constructor(props, context) {
@@ -190,6 +218,7 @@ class TabPanel extends Component {
             iluminacion: 3,
             temperatura: 14,
             aire: 3,
+            loaded: false,
             rotated: false,
         };
         this.handleChange = this.handleChange.bind(this);
@@ -292,6 +321,7 @@ class TabPanel extends Component {
             longitud: mapState.lng,
             sunPosition: mapState.sunPosition,
             sunPath: mapState.sunPath,
+            loaded: true,
         });
         if(this.state.paredes != null){
             let paredes_calculadas = BalanceEnergetico.calcularRbParedes(this.state.paredes.slice(), this.state.latitud, this.state.longitud);
@@ -431,7 +461,6 @@ class TabPanel extends Component {
             casaPredefinida : casaPredefinida,
         });
         this.contexto.resetObstrucciones();
-        console.log("SE LLAMA");
     }
 
     handleChangeVariable(prop,value){
@@ -449,15 +478,24 @@ class TabPanel extends Component {
 
     render() {
         const {classes, theme} = this.props;
-        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensiones, alturaPiso, paredCapaChange} = this.state;
+        const {value, click2D, dibujandoMorf, seleccionandoMorf, borrandoMorf, width, height, openMorf, seleccionadoMorf, dimensiones, alturaPiso, paredCapaChange,loaded} = this.state;
         const heightContent = height-heightBarra;
-        console.log("height",height);
-        console.log("heightMorfologia",height - (heightBar+heightBarra));
         return (
 
             <div className={classes.appFrame} ref={(tab) => {
                 this.tab = tab
             }} style={{margin:0, padding:0}}>
+                <Sound
+                    url="https://bioclimapp.host/music/jazz.mp3"
+                    playStatus={Sound.status.PLAYING}
+                    loop={true}
+                />
+                <AlertDialog
+                            open={!loaded}
+                            classes={{
+                                 paper: classes.paper,
+                                 progress : classes.progress,
+                             }}/>
                 <AppBar  className={classNames(classes.appBar, {
                     [classes.appBarShift]: this.state.openDashboard ,
                     [classes.appBarShiftLeft]: this.state.openDashboard,
