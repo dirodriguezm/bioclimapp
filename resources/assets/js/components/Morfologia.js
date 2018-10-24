@@ -24,7 +24,8 @@ class Morfologia extends Component {
 
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
         this.temperaturaConfort = props.temperatura;
-        this.angleRotated = 0;
+        this.angleRotatedTemp = 0;
+        this.coordenadasRotadas = false;
 
         this.state  = {
             height: props.height,
@@ -34,12 +35,14 @@ class Morfologia extends Component {
     };
 
     componentDidUpdate(prevProps) {
-        if (this.props.sunPosition !== prevProps.sunPosition || this.sunPath == null) {
+        if (this.props.sunPosition !== prevProps.sunPosition || (this.sunPath == null && this.props.sunPosition != null)) {
             this.onSunpositionChanged();
+            if(this.props.fecha != null) this.getSunPath(new Date(this.props.fecha));
+            else this.getSunPath();
         }
-        if(this.props.sunPath !== prevProps.sunPath || this.sunPath == null){
+        /*if(this.props.sunPath !== prevProps.sunPath || (this.sunPath == null && this.props.sunPosition != null)){
             this.getSunPath();
-        }
+        }*/
         if (this.props.click2D !== prevProps.click2D) {
             this.onPerspectiveChanged();
         }
@@ -155,7 +158,6 @@ class Morfologia extends Component {
         sunPos = sunPos.clone().multiplyScalar(Math.abs(f));
 
         this.light.position.set(sunPos.x, (sunAlt.y-1), sunPos.z);
-        //this.light.target = this.plano;
 
         this.sol.position.set(sunPos.x, sunAlt.y -1, sunPos.z);
     }
@@ -176,7 +178,7 @@ class Morfologia extends Component {
         this.managerCasas.handleCasaPredefinida(casaPredefinida);
         this.props.onCasaPredefinidaChanged(-1);
         this.props.onParedesChanged(this.paredes);
-        this.props.onVentanasChanged(this.ventanas);        
+        this.props.onVentanasChanged(this.ventanas);
 
         //this.managerCasas.agregarHabitacionDibujada();
         this.handleChangeCasa();
@@ -184,13 +186,12 @@ class Morfologia extends Component {
 
     }
 
-    getSunPath(){
+    getSunPath(now = new Date()){
         let sunPath = this.escena.getObjectByName("sunPath");
         if(sunPath != null){
             this.escena.remove(sunPath);
         }
         let allPoints= [];
-        let now = new Date();
         let start = new Date(now.getFullYear(), 0, 0);
         let diff = (now - start) + ((start.getTimezoneOffset() - now.getTimezoneOffset()) * 60 * 1000);
         let oneDay = 1000 * 60 * 60 * 24;
@@ -309,7 +310,7 @@ class Morfologia extends Component {
             this.aireRenovado,
             this.heightWall,
         );
-        
+
         if(this.props.comuna != null){
             this.managerCasas.setZona(this.props.comuna.zona);
         }
@@ -602,8 +603,19 @@ class Morfologia extends Component {
             //click derecho
             if (event.button === 0) {
                 this.managerCasas.agregarHabitacionDibujada();
+                if(this.coordenadasRotadas){
+                    BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
+                }
                 let casa = this.managerCasas.getCasa();
-                this.props.onCasaChanged(casa);
+                this.props.onCasaChanged(
+                    casa.userData.aporteInterno,
+                    casa.userData.perdidaVentilacion,
+                    casa.userData.perdidaPorVentilacionObjetivo,
+                    casa.userData.perdidaPorConduccion,
+                    casa.userData.perdidaPorConduccionObjetivo,
+                    casa.userData.volumen,
+                    casa.userData.area,
+                );
                 this.props.onParedesChanged(this.paredes);
 
                 this.construyendo = false;
@@ -616,7 +628,7 @@ class Morfologia extends Component {
             
             let ventanas = [];
             for(let pared of this.paredes){
-                let resultAngle = pared.userData.gamma + this.angleRotated;
+                let resultAngle = pared.userData.gamma + this.angleRotatedTemp;
                 if(resultAngle > 180){
                     pared.userData.gamma = resultAngle - 360;
                 }
@@ -628,15 +640,17 @@ class Morfologia extends Component {
                 }
                 for(let child of pared.children){
                     if(child.userData.tipo === Morfologia.tipos.VENTANA){
-                        child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotated * Math.PI / 180);
+                        child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotatedTemp * Math.PI / 180);
                         ventanas.push(child);
                     }
                 }
             }
-            this.angleRotated = 0;
-            this.props.onParedesChanged(this.paredes);
-
+            this.angleRotated = this.angleRotatedTemp;
+            this.angleRotatedTemp = 0;
+            if(this.paredes.length > 0) this.props.onParedesChanged(this.paredes);
             if(ventanas.length > 0) this.props.onVentanasChanged(ventanas);
+            this.props.onRotationChanged();
+            this.coordenadasRotadas = true;
         }
     }
 
@@ -784,11 +798,11 @@ class Morfologia extends Component {
         //si se está rotando
         if(this.dragging){
             // 
-            // this.angleRotated += (angle*180/Math.PI);
+            // this.angleRotatedTemp += (angle*180/Math.PI);
             let movementX = event.screenX - this.prevX;
             this.prevX = event.screenX;
             let angle = Math.PI * movementX / 180;
-            this.angleRotated += (angle*180/Math.PI);
+            this.angleRotatedTemp += (angle*180/Math.PI);
             this.cardinalPointsCircle.rotateZ(angle);
             this.sunPath.rotateY(angle);
             this.light.target.position.set(0,0,0);
@@ -809,6 +823,7 @@ class Morfologia extends Component {
             casa.userData.perdidaPorConduccion,
             casa.userData.perdidaPorConduccionObjetivo,
             casa.userData.volumen,
+            casa.userData.area,
         );
         //console.log("cambio: "+this.count,casa);
         this.count++;

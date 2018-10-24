@@ -355,6 +355,8 @@ class DetalleBalance extends Component {
         let balance = Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
             this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )
         let ahorro = balance * 100 / this.state.balanceObjetivo;
+        console.log("balance", balance, "ahorro", ahorro, "perdidaConduccion", this.state.dataPerdidas.datasets[0].data[0], "perdidaVentilacion", this.state.dataPerdidas.datasets[0].data[1],
+            "aporteSolar", this.state.dataAportes.datasets[0].data[0], "aporteInterno", this.state.dataAportes.datasets[0].data[1])
 
         return (
             <Grid container spacing={16} className={classes.root} style={{

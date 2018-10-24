@@ -269,7 +269,7 @@ class InformacionVentana extends Component {
             fm = info_material_marco.fs;
         }
 
-        //console.log(material,info_material_ventana);
+        seleccionado != null ? console.log("seleccionado",seleccionado.uuid, seleccionado.userData) : seleccionado;
 
 
         return (
@@ -287,6 +287,54 @@ class InformacionVentana extends Component {
 
                         <ExpansionPanel>
                             <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                <Typography className={classes.heading}>Información Solar</Typography>
+                            </ExpansionPanelSummary>
+                            <ExpansionPanelDetails>
+                                <Grid container spacing={8} justify="center" style={{textAlign:"center"}}>
+                                    <Grid item xs={12}>
+                                        <Typography>
+                                            FAR de la ventana: {seleccionado.userData.far.toFixed(3)}
+                                        </Typography>
+                                    </Grid>
+                                    <Grid item xs={12}>
+                                        {seleccionado.userData.obstrucciones !== null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
+                                            obstruccion.ventanas.map(ventana => (
+                                                ventana.id === seleccionado.uuid ?
+                                                <ExpansionPanel key={index}>
+                                                    <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
+                                                        <Typography className={classes.heading}>Obstruccion: {index}</Typography>
+                                                    </ExpansionPanelSummary>
+                                                    <ExpansionPanelDetails>
+                                                        <Grid container spacing={40}>
+                                                            <Grid item xs>
+                                                                <Typography>FAR obstruccion: {ventana.far.toFixed(3)}</Typography>
+                                                            </Grid>
+                                                            <Grid item xs>
+                                                                <Typography>Altura respecto a la ventana: {ventana.aDistance.toFixed(3)}</Typography>
+                                                            </Grid>
+                                                            <Grid item xs>
+                                                                <Typography>Distancia respecto a la ventana: {ventana.bDistance.toFixed(3)}</Typography>
+                                                            </Grid>
+                                                            <Grid item xs>
+                                                                <Typography>Ángulo(s) que obstruye:</Typography>
+                                                                {ventana.betaAngle != null ? ventana.betaAngle.map((angle,index) => (
+                                                                        <Typography key={index}>{angle.toFixed(3)}</Typography>
+                                                                    )): <div/>
+                                                                }
+                                                            </Grid>
+                                                        </Grid>
+                                                    </ExpansionPanelDetails>
+                                                </ExpansionPanel>: <div/>
+                                            ))
+                                        )) : <div/>}
+                                    </Grid>
+                                </Grid>
+
+                            </ExpansionPanelDetails>
+                        </ExpansionPanel>
+
+                        <ExpansionPanel>
+                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
                                 <Typography className={classes.heading}>Material ventana</Typography>
                             </ExpansionPanelSummary>
                             <ExpansionPanelDetails>
@@ -299,8 +347,8 @@ class InformacionVentana extends Component {
                                                 onChange={this.handleChangeMaterial}
                                                 input={<Input name="material" id="material-ventana"/>}
                                             >
-                                                {this.info_material.map(material => (
-                                                    <MenuItem value={material.index}>
+                                                {this.info_material.map( (material,index) => (
+                                                    <MenuItem value={material.index} key={index}>
                                                         {material.material}
                                                     </MenuItem>
                                                 ))}
@@ -315,8 +363,8 @@ class InformacionVentana extends Component {
                                                 onChange={this.handleChangeMaterial}
                                                 input={<Input name="tipo" id="tipo-ventana"/>}
                                             >
-                                                {this.info_material[material].tipos.map(tipo => (
-                                                    <MenuItem value={tipo.index}>
+                                                {this.info_material[material].tipos.map((tipo,index) => (
+                                                    <MenuItem value={tipo.index} key={index}>
                                                         {tipo.nombre}
                                                     </MenuItem>
                                                 ))}
@@ -382,8 +430,8 @@ class InformacionVentana extends Component {
                                                     onChange={this.handleChangeMarco}
                                                     input={<Input name="material" id="material-marco"/>}
                                                 >
-                                                    {this.info_marcos.map(marco => (
-                                                        <MenuItem value={marco.index}>
+                                                    {this.info_marcos.map((marco, index) => (
+                                                        <MenuItem value={marco.index} key={index}>
                                                             {marco.material}
                                                         </MenuItem>
                                                     ))}
@@ -398,8 +446,8 @@ class InformacionVentana extends Component {
                                                     onChange={this.handleChangeMarco}
                                                     input={<Input name="tipo" id="tipo-marco"/>}
                                                 >
-                                                    {this.info_marcos[marco].tipos.map(tipo => (
-                                                        <MenuItem value={tipo.index}>
+                                                    {this.info_marcos[marco].tipos.map((tipo, index) => (
+                                                        <MenuItem value={tipo.index} key={index}>
                                                             {tipo.nombre}
                                                         </MenuItem>
                                                     ))}
@@ -457,8 +505,8 @@ class InformacionVentana extends Component {
                                                     onChange={this.handleChangeMarco}
                                                     input={<Input name="material" id="material-marco"/>}
                                                 >
-                                                    {this.info_marcos.map(marco => (
-                                                        <MenuItem value={marco.index}>
+                                                    {this.info_marcos.map((marco,index) => (
+                                                        <MenuItem value={marco.index} key={index}>
                                                             {marco.material}
                                                         </MenuItem>
                                                     ))}
@@ -565,44 +613,7 @@ class InformacionVentana extends Component {
                             </ExpansionPanelDetails>
                         </ExpansionPanel>
 
-                        <ExpansionPanel>
-                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                <Typography className={classes.heading}>FAR</Typography>
-                            </ExpansionPanelSummary>
-                            <ExpansionPanelDetails>
-                                <FormControl className={classes.formControl}>
-                                    <Typography>
-                                        FAR de la ventana: {seleccionado.userData.far}
-                                    </Typography>
-                                    {seleccionado.userData.obstrucciones != null ? seleccionado.userData.obstrucciones.map((obstruccion,index) => (
-                                        <ExpansionPanel>
-                                            <ExpansionPanelSummary expandIcon={<ExpandMoreIcon/>}>
-                                                <Typography className={classes.heading}>Obstruccion: {index}</Typography>
-                                            </ExpansionPanelSummary>
-                                            <ExpansionPanelDetails>
-                                                <Grid container spacing={40}>
-                                                    <Grid item xs>
-                                                        <Typography>FAR obstruccion: {obstruccion.far.toFixed(3)}</Typography>
-                                                    </Grid>
-                                                    <Grid item xs>
-                                                        <Typography>Altura respecto a la ventana: {obstruccion.aDistance.toFixed(3)}</Typography>
-                                                    </Grid>
-                                                    <Grid item xs>
-                                                        <Typography>Distancia respecto a la ventana: {obstruccion.bDistance.toFixed(3)}</Typography>
-                                                    </Grid>
-                                                    <Grid item xs>
-                                                        <Typography>Ángulo(s) que obstruye:</Typography>
-                                                        {obstruccion.betaAngle.map(angle => (
-                                                            <Typography>{angle.toFixed(3)}</Typography>
-                                                        ))}
-                                                    </Grid>
-                                                </Grid>
-                                            </ExpansionPanelDetails>
-                                        </ExpansionPanel>
-                                    )) : <div></div>}
-                                </FormControl>
-                            </ExpansionPanelDetails>
-                        </ExpansionPanel>
+
                     </div>
                     :
                     <div/>

@@ -221,6 +221,7 @@ class TabPanel extends Component {
             temperatura: 14,
             aire: 3,
             loaded: false,
+            rotated: false,
         };
         this.handleChange = this.handleChange.bind(this);
         this.handleChangeIndex = this.handleChangeIndex.bind(this);
@@ -252,6 +253,8 @@ class TabPanel extends Component {
         this.handleChangeVariable = this.handleChangeVariable.bind(this);
         this.onAlturaVentanaChanged = this.onAlturaVentanaChanged.bind(this);
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
+        this.onRotationChanged = this.onRotationChanged.bind(this);
+        this.onRef = this.onRef.bind(this);
 
     }
 
@@ -458,12 +461,20 @@ class TabPanel extends Component {
     onCasaPredefinidaChanged(casaPredefinida){
         this.setState({
             casaPredefinida : casaPredefinida,
-        })
+        });
+        this.contexto.resetObstrucciones();
     }
 
     handleChangeVariable(prop,value){
         this.setState({[prop]: value});
     };
+
+    onRotationChanged(){
+        this.setState({rotated: true});
+    }
+    onRef(ref){
+        this.contexto = ref;
+    }
 
 
 
@@ -592,6 +603,8 @@ class TabPanel extends Component {
                                         iluminacion={this.state.iluminacion}
                                         temperatura={this.state.temperatura}
                                         aire={this.state.aire}
+                                        onRotationChanged={this.onRotationChanged}
+                                        fecha={this.state.fecha}
                                     />:
                                     <div></div>
                                 }
@@ -653,6 +666,8 @@ class TabPanel extends Component {
                                         borrarContexto={this.state.borrarContexto}
                                         onFarChanged={this.onFarChanged}
                                         ventanas={this.state.ventanas}
+                                        rotated={this.state.rotated}
+                                        onRef={this.onRef}
                                     /> :
                                     <div></div>
                                 }
@@ -683,6 +698,7 @@ class TabPanel extends Component {
                                 lng={-73.0443904}
                                 zoom={12}
                                 markers={[]}
+                                fecha={this.state.fecha}
                                 onComunaChanged={this.onComunaChanged}
                             />
                             <GeoInfoPanel

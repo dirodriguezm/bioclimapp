@@ -407,7 +407,7 @@ class ManagerCasas {
 
         this.casa.userData.transmitanciaSuperficies += transmitanciaSuperficies;
         this.casa.userData.perdidaPorConduccion += habitacion.userData.perdidaPorConduccion;
-        
+
         //console.log("estructura "+Morfologia.tipos_texto[estructura.userData.tipo],estructura.userData.transSup);
     }
 
@@ -799,7 +799,7 @@ class ManagerCasas {
         this.casa.userData.aporteInterno += aporteInterno;
         this.casa.userData.perdidaVentilacion += perdidaVentilacion;
         this.casa.userData.perdidaVentilacionObjetivo += perdidaVentilacionObjetivo;
-        
+
         //console.log("casa en recalculo aporte y perdida por volumen",this.casa);
     }
 
@@ -905,22 +905,15 @@ class ManagerCasas {
         this.crearCasaVacia();
         switch(casaPredefinida) {
             case 0:
-                //console.log("SIMPLE");
                 this.crearCasaSimple();
-
                 break;
             case 1:
-                //console.log("DOBLE");
                 this.crearCasaDoble();
-
                 break;
             case 2:
-                //console.log("SIMPLE DOS PISOS");
                 this.crearCasaSimpleDosPisos();
-
                 break;
             case 3:
-                //console.log("DOBLE DOS PISOS")
                 this.crearCasaDobleDosPisos();
                 break;
         }

@@ -141,6 +141,31 @@ function perdidasConduccion(transmitanciaSuperficies, gradosDias, puenteTermico)
     return 24 * ((transmitanciaSuperficies + puenteTermico) * gradosDias );
 }
 
+function calcularGammaParedes(paredes, cardinalPointsCircle, circlePoints) {
+    for (let pared of paredes) {
+        let orientacionRaycaster = new THREE.Raycaster();
+        orientacionRaycaster.set(new THREE.Vector3(), pared.userData.orientacion);
+        let inter = orientacionRaycaster.intersectObject(cardinalPointsCircle);
+        let interPoint = inter[0].point.add(inter[1].point);
+        interPoint = interPoint.multiplyScalar(0.5);
+        let closestDistance = 99;
+        let closestPoint = {};
+        let i = 0;
+        let index = 0;
+        for (let point of circlePoints) {
+            let circlePoint = new THREE.Vector3(point.x, 0.001, point.y);
+            let temp = circlePoint.distanceTo(interPoint);
+            if (temp < closestDistance) {
+                closestDistance = temp;
+                closestPoint = circlePoint;
+                index = i;
+            }
+            i++;
+        }
+        pared.userData.gamma = transformDegreeToGamma(index);
+    }
+}
+
 
 function transformDegreeToGamma(degree) {
     if (degree > 270 && degree <= 360) degree = 180 - degree;
@@ -342,7 +367,7 @@ function calcularRbParedes(paredes, latitud, longitud) {
                 let omega_tde = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma2, latitud, longitud);
                 let omegas = calcularHoraIncidencia(pared.userData.gamma, angulo.w1, angulo.w2, omega_mna, omega_tde);
                 let Rb = calcularRB(angulo, pared.userData.gamma, omegas);
-                rbPared.push(Rb);
+                rbPared.push(Rb.toFixed(3));
                 if (angulo.date.getMonth() === new Date().getMonth()) {
                     let omegasDate = {
                         wm: {
@@ -361,7 +386,7 @@ function calcularRbParedes(paredes, latitud, longitud) {
                                 hourAngleToDate(angulo.date, omegas.wt[1], latitud, longitud) : null,
                             //new Date((omegas.wt[1] / 15) * 36e5): null
                         },
-                        rb: Rb
+                        rb: Rb.toFixed(3)
                     };
                     pared.userData.omegas = omegasDate;
                 }
@@ -417,4 +442,4 @@ function calcularIgb(difusa, directa, rb){
 
 export {perdidasConduccion, puenteTermico, cambioTransmitanciaSuperficie, transmitanciaSuperficie , aporteInterno , gradosDias, perdidasVentilacion, calcularF,
     calcularIgb, calcularAngulos, calcularHoraIncidencia, calcularOmegaPared, calcularRB,
-    calcularGammasPared, hourAngleToDate, getHourAngle, calcularAporteSolar, calcularRbParedes};
+    calcularGammasPared, hourAngleToDate, getHourAngle, calcularAporteSolar, calcularRbParedes, calcularGammaParedes};

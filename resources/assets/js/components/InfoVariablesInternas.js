@@ -9,8 +9,7 @@ import InputAdornment from "@material-ui/core/InputAdornment/InputAdornment";
 import SvgIcon from "@material-ui/core/SvgIcon/SvgIcon";
 import WbIncandescent from "@material-ui/icons/WbIncandescent";
 import People from "@material-ui/icons/People";
-import Clear from '@material-ui/icons/Clear';
-import IconButton from "@material-ui/core/IconButton/IconButton";
+import CalendarToday from "@material-ui/icons/CalendarToday";
 
 
 const styles = theme => ({
@@ -53,6 +52,8 @@ class InfoVariablesInternas extends React.Component {
 
 
     render(){
+        let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+        let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1).substring(0,16);
         return(
             <div style={{marginLeft:'30%',marginRight:'30%',padding:20}}>
                 <Paper>
@@ -129,6 +130,19 @@ class InfoVariablesInternas extends React.Component {
                                         </InputAdornment>
                                     ),
                                 }}
+                            />
+                        </Grid>
+                        <Grid item xs={4}>
+                            <SvgIcon viewBox="0 0 64 64">
+                                <CalendarToday/>
+                            </SvgIcon>
+                        </Grid>
+                        <Grid item xs={8}>
+                            <TextField
+                                type="datetime-local"
+                                label="Fecha y Hora"
+                                defaultValue={localISOTime}
+                                onChange={this.handleChange('fecha')}
                             />
                         </Grid>
                     </Grid>
