@@ -21,6 +21,8 @@ import GeoInfoPanel from "./GeoInfoPanel";
 import MapContainer from "./MapContainer";
 import IconButton from '@material-ui/core/IconButton';
 import PieChart from '@material-ui/icons/PieChart';
+import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft'
 import Toolbar from "@material-ui/core/Toolbar/Toolbar";
 import InfoVariablesInternas from "./InfoVariablesInternas";
 import Dialog from "@material-ui/core/Dialog/Dialog";
@@ -509,7 +511,12 @@ class TabPanel extends Component {
                             onClick={this.handleDashboardOpen}
                             className={classNames(classes.menuButton)}
                         >
+
+                            {this.state.openDashboard ?
+                                <KeyboardArrowLeft/> : <KeyboardArrowRight/>
+                            }
                             <PieChart />
+
                         </IconButton>
                         <Tabs value={value} onChange={this.handleChange}  centered>
                             <Tab label="Morfología"/>
@@ -671,6 +678,7 @@ class TabPanel extends Component {
                                         seleccionar={this.seleccionar}
                                         borrarContexto={this.borrarContexto}
                                         onSeleccionarLocalidad={this.onSeleccionarLocalidad}
+                                        iconState={this.state.drawer_localidad}
                                     />
                                 </Paper>
                             </TabContainer>
