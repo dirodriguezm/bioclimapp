@@ -412,14 +412,18 @@ class ManagerCasas {
     }
 
     casasChocan(habitacion) {
-        let start = habitacion.userData.start.clone();
-        start.y = 0;
-        let end = habitacion.userData.end.clone();
-        end.y = 0;
+        let start = new THREE.Vector3(
+            habitacion.userData.start.x,
+            0,
+            habitacion.userData.start.z);
+        let end = new THREE.Vector3(
+            habitacion.userData.end.x,
+            0,
+            habitacion.userData.end.z);
 
         var dirX = new THREE.Vector3(0,0,1).normalize();
         var dirZ = new THREE.Vector3(1,0,0).normalize();
-        let origin = new THREE.Vector3(0,0.5,0);
+        let origin = new THREE.Vector3(0, habitacion.userData.height * (habitacion.userData.nivel-1)+0.5,0);
 
         var lenX = Math.abs(start.x - end.x);
         var lenZ = Math.abs(start.z - end.z);
@@ -441,45 +445,41 @@ class ManagerCasas {
             origin.x = i;
             this.ray.set(origin, dirX);
             var intersects = this.ray.intersectObjects(this.paredesX);
-            //let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
-            //this.arrows.push(arrow);
-            //this.escena.add(arrow);
             if (intersects.length > 0) {
                 for(let pared of intersects){
+                    if(paredes.children.includes(pared.object)){
+                        continue;
+                    }
                     let distance = pared.distance;
                     distance = Math.round(distance);
                     if(distance > 0  &&  distance < lenZ){
-                        /*this.escena.remove(arrow);
-                        this.arrows.splice(this.arrows.indexOf(arrow));
-                        //arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
-                        this.arrows.push(arrow);
-                        this.escena.add(arrow);*/
                         return true;
                     }else{
                         let paredes = habitacion.getObjectByName("Paredes");
                         if(distance === 0){
                             let paredNueva = paredes.children[0];
-                            if(paredNueva.userData.choques[pared.object.id] === undefined){
-                                paredNueva.userData.choques[pared.object.id] = [i];
-                            }else{
-                                paredNueva.userData.choques[pared.object.id].push(i);
-
-                            }
-                        }else{
-                            let paredNueva = paredes.children[2];
-                            if(paredNueva.userData.choques[pared.object.id] === undefined){
-                                paredNueva.userData.choques[pared.object.id] = [i];
-                            }else{
-                                if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
+                            if(paredNueva){
+                                if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                    paredNueva.userData.choques[pared.object.id] = [i];
+                                }else{
                                     paredNueva.userData.choques[pared.object.id].push(i);
+
                                 }
                             }
+
+                        }else{
+                            let paredNueva = paredes.children[2];
+                            if(paredNueva){
+                                if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                    paredNueva.userData.choques[pared.object.id] = [i];
+                                }else{
+                                    if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
+                                        paredNueva.userData.choques[pared.object.id].push(i);
+                                    }
+                                }
+                            }
+
                         }
-                        /*this.escena.remove(arrow);
-                        this.arrows.splice(this.arrows.indexOf(arrow));
-                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
-                        this.arrows.push(arrow);
-                        this.escena.add(arrow);*/
                     }
                 }
 
@@ -492,46 +492,42 @@ class ManagerCasas {
             origin.z = i;
             this.ray.set(origin, dirZ);
             var intersects = this.ray.intersectObjects(this.paredesZ);
-            /*let arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff0000);
-            this.arrows.push(arrow);
-            this.escena.add(arrow);*/
             if (intersects.length > 0) {
                 for(let pared of intersects){
+                    if(paredes.children.includes(pared.object)){
+                        continue;
+                    }
                     let distance = pared.distance;
                     distance = Math.round(distance);
                     if(distance > 0  &&  distance < lenX){
-                        /*this.escena.remove(arrow);
-                        this.arrows.splice(this.arrows.indexOf(arrow));
-                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xffff00);
-                        this.arrows.push(arrow);
-                        this.escena.add(arrow);*/
                         return true;
                     }else{
                         let paredes = habitacion.getObjectByName("Paredes");
                         if(distance === 0){
                             let paredNueva = paredes.children[1];
-                            if(paredNueva.userData.choques[pared.object.id] === undefined){
-                                paredNueva.userData.choques[pared.object.id] = [i];
-                            }else{
-                                if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
-                                    paredNueva.userData.choques[pared.object.id].push(i);
+                            if(paredNueva){
+                                if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                    paredNueva.userData.choques[pared.object.id] = [i];
+                                }else{
+                                    if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
+                                        paredNueva.userData.choques[pared.object.id].push(i);
+                                    }
                                 }
                             }
+
                         }else{
                             let paredNueva = paredes.children[3];
-                            if(paredNueva.userData.choques[pared.object.id] === undefined){
-                                paredNueva.userData.choques[pared.object.id] = [i];
-                            }else{
-                                if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
-                                    paredNueva.userData.choques[pared.object.id].push(i);
+                            if(paredNueva){
+                                if(paredNueva.userData.choques[pared.object.id] === undefined){
+                                    paredNueva.userData.choques[pared.object.id] = [i];
+                                }else{
+                                    if(paredNueva.userData.choques[pared.object.id].indexOf(i) === -1){
+                                        paredNueva.userData.choques[pared.object.id].push(i);
+                                    }
                                 }
                             }
+
                         }
-                        /*this.escena.remove(arrow);
-                        this.arrows.splice(this.arrows.indexOf(arrow));
-                        arrow = new THREE.ArrowHelper(this.ray.ray.direction, this.ray.ray.origin, this.ray.far, 0xff00ff);
-                        this.arrows.push(arrow);
-                        this.escena.add(arrow);*/
                     }
                 }
 
@@ -878,6 +874,16 @@ class ManagerCasas {
                 }
             }
         }
+        if(habitacion.userData.start.x > habitacion.userData.end.x){
+            let aux = habitacion.userData.start.x;
+            habitacion.userData.start.x = habitacion.userData.end.x;
+            habitacion.userData.end.x = aux;
+        }
+        if(habitacion.userData.start.z > habitacion.userData.end.z){
+            let aux = habitacion.userData.start.z;
+            habitacion.userData.start.z = habitacion.userData.end.z;
+            habitacion.userData.end.z = aux;
+        }
 
         this.agregarHabitacion(habitacion);
 
@@ -966,13 +972,17 @@ class ManagerCasas {
             this.allObjects.splice(this.allObjects.indexOf(ventana),1);
         }
 
-        paredes2.remove(pared);
+        pared.visible = false;
         this.quitarTransmitanciaSuperficie(pared,habitacion2);
 
         this.paredes.splice( this.paredes.indexOf(pared), 1 );
 
         habitacion1.position.x = habitacion1.position.x - this.widthPredefinida/2 + 0.5;
+        habitacion1.userData.start.x = habitacion1.userData.start.x - this.widthPredefinida/2 + 0.5;
+        habitacion1.userData.end.x = habitacion1.userData.end.x - this.widthPredefinida/2 + 0.5;
         habitacion2.position.x = habitacion2.position.x + this.widthPredefinida/2 + 0.5;
+        habitacion2.userData.start.x = habitacion2.userData.start.x + this.widthPredefinida/2 + 0.5;
+        habitacion2.userData.end.x = habitacion2.userData.end.x + this.widthPredefinida/2 + 0.5;
 
         return [habitacion1, habitacion2];
 
@@ -1040,8 +1050,59 @@ class ManagerCasas {
                 this.quitarTransmitanciaSuperficie(objeto,objeto.parent.parent.parent);
                 this.quitarObjetoVentana(objeto);
                 break;
+            case Morfologia.tipos.TECHO:
+                this.quitarTransmitanciaSuperficie(objeto,objeto.parent);
+                this.quitarObjetoVentana(objeto);
+                break;
+            case Morfologia.tipos.PARED:
+            case Morfologia.tipos.PISO:
+                this.borrarHabitacion(objeto);
+                break;
         }
     }
+
+    borrarHabitacion(objeto){
+        let habitacion;
+        if(objeto.userData.tipo === Morfologia.tipos.PARED){
+            habitacion = objeto.parent.parent;
+        }else if(objeto.userData.tipo === Morfologia.tipos.PISO){
+            habitacion = objeto.parent;
+        }else{
+            return;
+        }
+        let piso = habitacion.getObjectByName('Piso');
+        this.pisos.splice(this.pisos.indexOf(piso),1);
+        this.allObjects.splice(this.allObjects.indexOf(piso),1);
+
+        let paredes = habitacion.getObjectByName('Paredes');
+        for(let pared of paredes.children){
+            for(let estructura of pared.children){
+                if(estructura.userData.tipo === Morfologia.tipos.VENTANA){
+                    this.ventanas.splice(this.ventanas.indexOf(estructura),1);
+                    this.allObjects.splice(this.allObjects.indexOf(estructura),1);
+                }else{
+                    this.puertas.splice(this.puertas.indexOf(estructura),1);
+                    this.allObjects.splice(this.allObjects.indexOf(estructura),1);
+                }
+            }
+            this.paredes.splice(this.paredes.indexOf(pared),1);
+            this.allObjects.splice(this.allObjects.indexOf(pared),1);
+        }
+        habitacion.parent.remove(habitacion);
+
+        this.casa.userData.aporteInterno -= habitacion.userData.aporteInterno;
+        this.casa.userData.perdidaVentilacion -= habitacion.userData.perdidaVentilacion;
+        this.casa.userData.perdidaPorConduccion -= habitacion.userData.perdidaPorConduccion;
+        this.casa.userData.perdidaVentilacionObjetivo -= habitacion.userData.perdidaVentilacionObjetivo;
+        this.casa.userData.perdidaPorConduccionObjetivo -= habitacion.userData.perdidaPorConduccionObjetivo;
+        this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
+        this.casa.userData.transmitanciaSuperficiesObjetivo -= habitacion.userData.transmitanciaSuperficiesObjetivo;
+        this.casa.userData.volumen -= habitacion.userData.volumen;
+        this.casa.userData.area -= habitacion.userData.area;
+
+    }
+
+
 
     quitarObjetoVentana(ventana){
         let pared = ventana.parent;
@@ -1796,13 +1857,17 @@ class ManagerCasas {
     }
 
     crecerHabitacionDibujada(habitacion, end, start) {
+        let prevHabitacion = habitacion.clone();
+        this.escena.remove(prevHabitacion);
         var dir = end.clone().sub(start);
         var len = dir.length();
         dir = dir.normalize().multiplyScalar(len * 0.5);
         let pos = start.clone().add(dir);
 
+
         habitacion.position.copy(pos);
         habitacion.position.y = 0;
+
         habitacion.userData.end = end.clone();
         habitacion.userData.start = start.clone();
 
@@ -1964,6 +2029,23 @@ class ManagerCasas {
         }
 
         this.recalcularBalancePorVolumen(habitacion);
+
+        habitacion.userData.error = this.casasChocan(habitacion);
+        if(habitacion.userData.error){
+            console.log('yes');
+            let prevEnd = new THREE.Vector3(
+                prevHabitacion.userData.end.x,
+                prevHabitacion.userData.end.y,
+                prevHabitacion.userData.end.z,
+            );
+            let prevStart = new THREE.Vector3(
+                prevHabitacion.userData.start.x,
+                prevHabitacion.userData.start.y,
+                prevHabitacion.userData.start.z,
+            );
+            this.crecerHabitacionDibujada(habitacion, prevEnd, prevStart);
+            habitacion.position.copy(prevHabitacion.position);
+        }
     }
 
     crecerHabitacion(nextPosition) {
@@ -2048,6 +2130,8 @@ class ManagerCasas {
         this.habitacionConstruccion.userData.height = height;
         this.habitacionConstruccion.userData.width = width;
         this.habitacionConstruccion.userData.depth = depth;
+
+
     }
 
     crearCasaVacia()    {
@@ -2085,9 +2169,6 @@ class ManagerCasas {
 
     crearHabitacion(width, height, depth, nivel) {
         var habitacion = new THREE.Group();
-        var axesHelper = new THREE.AxesHelper( 5 );
-        habitacion.add(axesHelper);
-        axesHelper.position.y += 0.01;
 
         habitacion.userData.aporteInterno = 0;
         habitacion.userData.perdidaVentilacion = 0;

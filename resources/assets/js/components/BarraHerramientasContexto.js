@@ -13,6 +13,8 @@ import SvgIcon from '@material-ui/core/SvgIcon';
 import Tooltip from '@material-ui/core/Tooltip';
 import MenuItem from '@material-ui/core/MenuItem';
 import Menu from '@material-ui/core/Menu';
+import KeyboardArrowLeft from "@material-ui/icons/KeyboardArrowLeft";
+import KeyboardArrowRight from "@material-ui/icons/KeyboardArrowRight";
 
 const styles = theme => ({
     button: {
@@ -127,6 +129,9 @@ class BarraHerramientasContexto extends Component {
 
                 <Tooltip title="Seleccionar localidad" >
                     <IconButton className={classes.button} aria-label="Undo" onClick={this.handleSeleccionarLocalidad}>
+                        {this.props.iconState ?
+                            <KeyboardArrowRight/>:<KeyboardArrowLeft/>
+                        }
                         <MapIcon/>
                     </IconButton>
                 </Tooltip>
