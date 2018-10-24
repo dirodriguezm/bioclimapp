@@ -88,7 +88,7 @@ function Chart(props){
 
 function Grades(props){
     let grades = ['A+','A','B','C','D','E','F','G'];
-    let colors = ['#00b23b','#00ca2f','#91f300','#f3ff00','#fabf00','#ff4300','#ff0000','7d009c'];
+    let colors = ['#008000','#00ca2f','#91f300','#cccc00','#fabf00','#ff6700','#ff0000','#551A8B'];
     let startPosition = [120,20];
     let ranges = ['> 85%','70 - 85','55 - 70','40 - 55','20 - 40','10 - 20','-35 - -10','< -35%'];
     let grade = null;
