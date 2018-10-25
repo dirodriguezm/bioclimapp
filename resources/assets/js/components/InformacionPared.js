@@ -350,8 +350,10 @@ class InformacionPared extends Component {
         if (event.target.name === 'altura') {
             if(parseInt(event.target.value) >= height){
                 height += 0.1;
+                height= Math.round(height * 10)/10;
             }else{
                 height -= 0.1;
+                height= Math.round(height * 10)/10;
             }
         } else {
             if(parseInt(event.target.value) >= width){

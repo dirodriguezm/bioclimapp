@@ -239,6 +239,18 @@ class ManagerCasas {
         for(let nivel of this.casa.children){
             for(let habitacion of nivel.children){
                 this.recalcularBalancePorVolumen(habitacion);
+                let piso = habitacion.getObjectByName('Piso');
+                let paredes = habitacion.getObjectByName('Paredes');
+                let techo = habitacion.getObjectByName('Techo');
+
+                for(let pared of paredes.children){
+                    this.actualizarTransmitanciaSuperficie(pared);
+                    for(let estructura of pared.children){
+                        this.actualizarTransmitanciaSuperficie(estructura);
+                    }
+                }
+                this.actualizarTransmitanciaSuperficie(piso);
+                if(techo) this.actualizarTransmitanciaSuperficie(techo);
             }
         }
         //this.casa.userData.perdidaVentilacion = perdidaVentilacionTotal;
