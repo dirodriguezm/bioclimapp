@@ -110,6 +110,8 @@ class Morfologia extends Component {
             let gradoDias = res[0];
             let periodo = res[1];
             this.managerCasas.setGradosDias(gradoDias, periodo);
+            this.props.onParedesChanged(this.paredes);
+            this.props.onFarChanged(this.ventanas);
             this.handleChangeCasa();
         }
         if(this.props.iluminacion !== prevProps.iluminacion) {
@@ -140,9 +142,9 @@ class Morfologia extends Component {
         let periodo = res[1];
         this.managerCasas.setZona(this.props.comuna.zona);
         this.managerCasas.setGradosDias(gradoDias, periodo);
+        this.props.onParedesChanged(this.paredes);
+        this.props.onFarChanged(this.ventanas);
         this.handleChangeCasa();
-        this.props.onVentanasChanged(this.ventanas);
-
     }
 
     onSunpositionChanged() {
@@ -818,9 +820,6 @@ class Morfologia extends Component {
     }
 
     handleChangeCasa(){
-        if(!this.count){
-            this.count = 0;
-        }
         let casa = this.managerCasas.getCasa();
         this.props.onCasaChanged(
             casa.userData.aporteInterno,
@@ -831,8 +830,6 @@ class Morfologia extends Component {
             casa.userData.volumen,
             casa.userData.area,
         );
-        //console.log("cambio: "+this.count,casa);
-        this.count++;
     }
 
     onClick(event) {

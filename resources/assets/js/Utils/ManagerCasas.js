@@ -799,10 +799,19 @@ class ManagerCasas {
         this.casa.userData.aporteInterno -= habitacion.userData.aporteInterno;
         this.casa.userData.perdidaVentilacion -= habitacion.userData.perdidaVentilacion;
         this.casa.userData.perdidaVentilacionObjetivo -= habitacion.userData.perdidaVentilacionObjetivo;
-
-        let aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
-        let perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
-        let perdidaVentilacionObjetivo = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen,this.aireRenovadoObjetivo,this.gradoDias);
+        let aporteInterno, perdidaVentilacion, perdidaVentilacionObjetivo;
+        if(this.periodo.length > 0) {
+            aporteInterno = BalanceEnergetico.aporteInterno(this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo);
+            perdidaVentilacion = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovado, this.gradoDias);
+            perdidaVentilacionObjetivo = BalanceEnergetico.perdidasVentilacion(habitacion.userData.volumen, this.aireRenovadoObjetivo, this.gradoDias);
+        }
+        else{
+            aporteInterno = 0;
+            perdidaVentilacion = 0
+            perdidaVentilacionObjetivo = 0;
+        }
+        console.log("calculando aporte interno", this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo, aporteInterno)
+        console.log("calculando perdida ventilacion",habitacion.userData.volumen, this.aireRenovado, this.gradoDias, perdidaVentilacion)
 
         habitacion.userData.aporteInterno = aporteInterno;
         habitacion.userData.perdidaVentilacion = perdidaVentilacion;

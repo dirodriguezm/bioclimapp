@@ -469,16 +469,7 @@ class Context extends Component {
                 vent.betaAngle = null;
             }
         }
-        let ventanaOrientacion = {userData: {orientacion: null}};
         for (let ventana of ventanas) {
-            // if(!this.compareVectors(ventana.userData.orientacion, ventanaOrientacion.userData.orientacion)){
-            //     ventanaOrientacion = ventana;
-            // }
-            // else{
-            //     ventana.userData.obstrucciones = ventanaOrientacion.userData.obstrucciones;
-            //     ventana.userData.far = ventanaOrientacion.userData.far;
-            //     continue;
-            // }
             let axisY = new THREE.Vector3(0, 1, 0);
             let raycasterFAR = new THREE.Raycaster();
             let angleLeft = ventana.userData.orientacion.clone().applyAxisAngle(axisY, Math.PI / 4);
@@ -489,7 +480,7 @@ class Context extends Component {
             ventana.getWorldPosition(pos);
             for (let x = 0; x < 90; x++) {
                 angle = angle.normalize();
-                raycasterFAR.set(pos, angle);
+                raycasterFAR.set(new THREE.Vector3(0,pos.y,0), angle);
                 let intersections = raycasterFAR.intersectObjects(this.obstrucciones);
                 let masAlto = {aDistance: 0};
                 //para cada obstruccion en el angulo actual se obtiene su aDistance y su bDistance, además se almacena el más alto
@@ -498,7 +489,7 @@ class Context extends Component {
                         intersections[i].object.fuera = true
                     }
                     let aDistance = intersections[i].object.geometry.parameters.height - pos.y;
-                    let bDistance = ventana.userData.orientacion.dot(intersections[i].object.position);
+                    let bDistance = ventana.userData.orientacion.clone().dot(intersections[i].object.position);
                     let far = Math.pow(0.2996, (aDistance / bDistance));
                     let ventanaObstruida = {
                         id: ventana.uuid,
