@@ -610,7 +610,7 @@ class Morfologia extends Component {
                 this.props.onCasaChanged(
                     casa.userData.aporteInterno,
                     casa.userData.perdidaVentilacion,
-                    casa.userData.perdidaPorVentilacionObjetivo,
+                    casa.userData.perdidaVentilacionObjetivo,
                     casa.userData.perdidaPorConduccion,
                     casa.userData.perdidaPorConduccionObjetivo,
                     casa.userData.volumen,
@@ -819,7 +819,7 @@ class Morfologia extends Component {
         this.props.onCasaChanged(
             casa.userData.aporteInterno,
             casa.userData.perdidaVentilacion,
-            casa.userData.perdidaPorVentilacionObjetivo,
+            casa.userData.perdidaVentilacionObjetivo,
             casa.userData.perdidaPorConduccion,
             casa.userData.perdidaPorConduccionObjetivo,
             casa.userData.volumen,
@@ -873,7 +873,10 @@ class Morfologia extends Component {
     handleBorrado(){
         if(this.objetoSeleccionado != null){
             this.managerCasas.borrarEstructura(this.objetoSeleccionado);
-            if(this.objetoSeleccionado.userData.tipo === Morfologia.tipos.VENTANA){
+            if(this.objetoSeleccionado.userData.tipo === Morfologia.tipos.VENTANA ||
+                this.objetoSeleccionado.userData.tipo === Morfologia.tipos.PISO ||
+                this.objetoSeleccionado.userData.tipo === Morfologia.tipos.PARED
+            ){
                 this.props.onVentanasChanged(this.ventanas);
             }
             this.objetoSeleccionado = null;

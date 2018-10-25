@@ -1079,6 +1079,11 @@ class ManagerCasas {
                 }
             }
             this.paredes.splice(this.paredes.indexOf(pared),1);
+            if(pared.userData.orientacion.z !== 0){
+                this.paredesX.splice(this.paredesX.indexOf(pared),1);
+            }else{
+                this.paredesZ.splice(this.paredesZ.indexOf(pared),1);
+            }
             this.allObjects.splice(this.allObjects.indexOf(pared),1);
         }
         habitacion.parent.remove(habitacion);
@@ -1091,7 +1096,7 @@ class ManagerCasas {
         this.casa.userData.transmitanciaSuperficies -= habitacion.userData.transmitanciaSuperficies;
         this.casa.userData.transmitanciaSuperficiesObjetivo -= habitacion.userData.transmitanciaSuperficiesObjetivo;
         this.casa.userData.volumen -= habitacion.userData.volumen;
-        this.casa.userData.area -= habitacion.userData.area;
+        this.casa.userData.area -= piso.userData.superficie;
 
     }
 
@@ -1880,6 +1885,7 @@ class ManagerCasas {
         habitacion.userData.height = height;
         habitacion.userData.width = width;
         habitacion.userData.depth = depth;
+        habitacion.userData.area = depth * height;
         this.casa.userData.volumen += habitacion.userData.volumen;
 
         for (let i = 0; i < paredes.children.length; i++) {
