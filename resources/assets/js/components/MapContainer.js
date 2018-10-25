@@ -40,7 +40,6 @@ export default class MapContainer extends Component {
                         sunPosition: sunPosition,
                         sunPath:sunPath
                     }, () => {
-                        console.log("llega");
                         this.createMarker(this.state.lat, this.state.lng);
                         this.props.onComunaChanged(this.state);
                     });
@@ -103,23 +102,30 @@ export default class MapContainer extends Component {
         markers.push([lat, lng]);
         this.setState({
             markers: markers
-        })
+        });
     }
 
 
     mapClicked(e) {
-        this.createMarker(e.latlng.lat, e.latlng.lng);
+        this.props.setLoading(false);
         axios.get("https://bioclimapp.host/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
             .then(response => {
-                    this.setState({
-                        lat: e.latlng.lat,
-                        lng: e.latlng.lng,
-                        comuna: response.data[0],
-                        sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng),
-                        sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
-                    },function(){
-                        this.props.onComunaChanged(this.state);
-                    });
+                    if(response.data.length > 0) {
+                        this.createMarker(e.latlng.lat, e.latlng.lng);
+                        this.setState({
+                            lat: e.latlng.lat,
+                            lng: e.latlng.lng,
+                            comuna: response.data[0],
+                            sunPosition: this.getSunPosition(e.latlng.lat, e.latlng.lng),
+                            sunPath: this.getSunPath(e.latlng.lat, e.latlng.lng),
+                        }, function () {
+                            this.props.onComunaChanged(this.state);
+                        });
+                    }
+                    else{
+                        this.props.setLoading(true);
+                        alert("No se encuentra comuna en la base de datos");
+                    }
                 }
             );
 

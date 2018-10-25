@@ -52,7 +52,8 @@ function Legend(props) {
                     <Grid item xs={2}>
                         <div style={{background: props.data.datasets[0].backgroundColor[index], width: 36, height:12}}/>
                     </Grid>
-                    <Grid item xs={10}>
+                    <Grid item xs={1}/>
+                    <Grid item xs={9}>
                         {label} : {props.data.datasets[0].data[index] ? porcentaje[index]  : 0} %
                     </Grid>
                 </Grid>
@@ -169,6 +170,10 @@ function Grades(props){
                     <Layer></Layer>
                 }
             </Stage>
+            <Typography>
+                La letra representa el porcentaje de ahorro de energía de la vivienda que se está evaluando con una vivienda de referencia, la cual posee las mismas
+                dimensiones, pero cumple con los parámetros mínimos de la reglamentación térmica.
+            </Typography>
         </Paper>
     );
 }
@@ -343,7 +348,7 @@ class DetalleBalance extends Component {
             this.setState({balanceObjetivo: balanceObjetivo});
         }
         if(this.props.aporte_solar_objetivo !== prevProps.aporte_solar_objetivo){
-            this.aporte_solar_objetivo = this.props.aporte_solar_objetivo;
+            this.aporte_solar_objetivo = this.props.aporte_solar_objetivo * 1000;
             let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
                 -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/(1000*this.props.area);
             this.setState({balanceObjetivo: balanceObjetivo});
@@ -353,11 +358,10 @@ class DetalleBalance extends Component {
     render() {
         const {classes} = this.props;
         let balance = Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
-            this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) / (1000*this.props.area) )
+            (this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) ) / (1000*this.props.area) )
         let ahorro = balance * 100 / this.state.balanceObjetivo;
-        console.log("balance", balance, "ahorro", ahorro, "perdidaConduccion", this.state.dataPerdidas.datasets[0].data[0], "perdidaVentilacion", this.state.dataPerdidas.datasets[0].data[1],
-            "aporteSolar", this.state.dataAportes.datasets[0].data[0], "aporteInterno", this.state.dataAportes.datasets[0].data[1])
-
+        //console.log("balance", balance, "ahorro", ahorro, "perdidaConduccion", this.state.dataPerdidas.datasets[0].data[0], "perdidaVentilacion", this.state.dataPerdidas.datasets[0].data[1],
+         //   "aporteSolar", this.state.dataAportes.datasets[0].data[0], "aporteInterno", this.state.dataAportes.datasets[0].data[1]);
         return (
             <Grid container spacing={16} className={classes.root} style={{
                 margin: 0,
@@ -370,7 +374,7 @@ class DetalleBalance extends Component {
                               alignItems="center">
                             <Grid item xs={12}>
                                 {this.props.area != null ? <Typography align="center" variant="title" style={{color: '#3a3b3d'}}>
-                                        Balance Energético: {balance} KWh/m<sup>2</sup></Typography>
+                                        Balance Energético: {balance > 0 ? balance : 0} KWh/m<sup>2</sup></Typography>
                                     : <Typography align="center" variant="title" style={{color: '#3a3b3d'}} >Balance Energético:</Typography>}
                             </Grid>
                             <Grid item xs={6}>

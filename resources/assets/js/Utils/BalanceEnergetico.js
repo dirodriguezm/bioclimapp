@@ -400,23 +400,15 @@ function calcularRbParedes(paredes, latitud, longitud) {
 function calcularAporteSolar(periodo, ventanas, difusa, directa){
     let aporte_solar = 0;
     let aporte_solar_objetivo = 0;
-    let igb_suma = 0;
-    let area_ventanas_suma = 0;
-    //let f_suma = 0;
-    //let f_suma_objetivo = 0;
     for (let ventana of ventanas){
         let f = calcularF(ventana);
-        //f_suma += f.normal;
-        //f_suma_objetivo += f.objetivo;
         let pared = ventana.parent;
         let Igb = 0;
         for(let i = 0; i < (periodo[1]-periodo[0]); i++){
             Igb += calcularIgb(difusa,directa,pared.userData.rb[i]);
         }
-        //igb_suma += Igb;
         let area_ventana = Math.abs( (ventana.geometry.boundingBox.max.x - ventana.geometry.boundingBox.min.x) *
             (ventana.geometry.boundingBox.max.y - ventana.geometry.boundingBox.min.y) );
-        //area_ventanas_suma += area_ventana;
         aporte_solar += Igb * area_ventana * f.normal;
         aporte_solar_objetivo += Igb * area_ventana * f.objetivo;
     }

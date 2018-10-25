@@ -255,6 +255,7 @@ class TabPanel extends Component {
         this.updateWindowDimensions = this.updateWindowDimensions.bind(this);
         this.onRotationChanged = this.onRotationChanged.bind(this);
         this.onRef = this.onRef.bind(this);
+        this.setLoading = this.setLoading.bind(this);
 
     }
 
@@ -474,6 +475,9 @@ class TabPanel extends Component {
     }
     onRef(ref){
         this.contexto = ref;
+    }
+    setLoading(value){
+        this.setState({loaded: value});
     }
 
 
@@ -700,6 +704,7 @@ class TabPanel extends Component {
                                 markers={[]}
                                 fecha={this.state.fecha}
                                 onComunaChanged={this.onComunaChanged}
+                                setLoading={this.setLoading}
                             />
                             <GeoInfoPanel
                                 comuna={this.state.comuna}
