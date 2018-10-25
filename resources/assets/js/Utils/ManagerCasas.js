@@ -259,6 +259,7 @@ class ManagerCasas {
 
     setStartHabitacion(start, raycaster) {
         this.habitacionConstruccion.userData.start = start.clone();
+        this.habitacionConstruccion.userData.start.y = 0;
         this.habitacionConstruccion.visible = true;
     }
 
@@ -945,7 +946,14 @@ class ManagerCasas {
         let habitacion1 = this.crearCasaSimple();
         let paredes1 = habitacion1.getObjectByName("Paredes");
 
-        let pared = paredes1.children[3];
+        let pared;
+
+        for(let paredAux of paredes1.children){
+            if(paredAux.userData.orientacion.x === -1){
+                pared = paredAux;
+                break;
+            }
+        }
 
         let ventanas = pared.children;
 
@@ -976,7 +984,13 @@ class ManagerCasas {
 
         let paredes2 = habitacion2.getObjectByName("Paredes");
 
-        pared = paredes2.children[1];
+        pared;
+        for(let paredAux of paredes2.children){
+            if(paredAux.userData.orientacion.x === 1){
+                pared = paredAux;
+                break;
+            }
+        }
 
         ventanas = pared.children;
 
@@ -1209,9 +1223,7 @@ class ManagerCasas {
                     this.moverVentanaConstruccion(pared, point);
                     this.agregarVentana();
 
-                    point = new THREE.Vector3(0,1,-this.depthPredefinida/2);
-                    this.moverPuertaConstruccion(pared, point);
-                    this.agregarPuerta();
+
 
                     point = point = new THREE.Vector3(-(Math.floor(this.widthPredefinida/2)-1),1,-this.depthPredefinida/2);
                 }else{
@@ -1222,6 +1234,10 @@ class ManagerCasas {
                     point = new THREE.Vector3(-(Math.floor(this.widthPredefinida/2)-1),1,this.depthPredefinida/2);
                     this.moverVentanaConstruccion(pared, point);
                     this.agregarVentana();
+
+                    point = new THREE.Vector3(0,1,this.depthPredefinida/2);
+                    this.moverPuertaConstruccion(pared, point);
+                    this.agregarPuerta();
 
 
                 }
@@ -1263,7 +1279,7 @@ class ManagerCasas {
             this.ocultarPuertaConstruccion();
             this.ocultarVentanaConstruccion();
         }
-        habitacion.rotation.y = Math.PI ;
+        //habitacion.rotation.y = Math.PI ;
         return habitacion;
     }
 
@@ -1394,7 +1410,7 @@ class ManagerCasas {
             let ventana = this.ventanaConstruccion.clone();
             let habitacion = pared.parent.parent;
             let orientacion = pared.userData.orientacion;
-            ventana.userData.orientacion = new THREE.Vector3(orientacion.x, orientacion.y, orientacion.z);
+            ventana.userData.orientacion = new THREE.Vector3(-orientacion.x, -orientacion.y, -orientacion.z);
             //ventana.userData.orientacion = pared.userData.orientacion;
             ventana.userData.pos = new THREE.Vector3();
             ventana.setRotationFromEuler(new THREE.Euler(0, 0, 0, 'XYZ'));
@@ -2024,8 +2040,8 @@ class ManagerCasas {
             }
         }
 
-        habitacion.userData.start = new THREE.Vector3(habitacion.position.x-width/2,0,habitacion.position.z-depth/2);
-        habitacion.userData.end = new THREE.Vector3(habitacion.position.x+width/2,0,habitacion.position.z+depth/2);
+        habitacion.userData.start = new THREE.Vector3(habitacion.position.x-width/2,0,habitacion.position.z-depth/2).round();
+        habitacion.userData.end = new THREE.Vector3(habitacion.position.x+width/2,0,habitacion.position.z+depth/2).round();
 
         let piso = habitacion.getObjectByName("Piso");
         this.casa.userData.area -= piso.userData.width * piso.userData.depth;
@@ -2069,6 +2085,7 @@ class ManagerCasas {
     }
 
     crecerHabitacion(nextPosition) {
+        nextPosition.y = 0;
         let start = this.habitacionConstruccion.userData.start.clone();
         this.habitacionConstruccion.userData.end = nextPosition.clone();
         let end = nextPosition.clone();
@@ -2096,41 +2113,37 @@ class ManagerCasas {
             pared.geometry = this.crearGeometriaPared(widths[i], height);
             pared.userData.width = widths[i];
             pared.userData.height = height;
-            switch (i) {
-                case 0:
-                    pared.position.z = -depth / 2;
-                    if(start.x < end.x){
-                        pared.userData.points = [start.x,end.x];
-                    }else{
-                        pared.userData.points = [end.x,start.x];
-                    }
-
-                    break;
-                case 1:
-                    pared.position.x = -width / 2;
-                    if(start.z < end.z){
-                        pared.userData.points = [start.z,end.z];
-                    }else{
-                        pared.userData.points = [end.z,start.z];
-                    }
-
-                    break;
-                case 2:
-                    pared.position.z = +depth / 2;
-                    if(start.x < end.x){
-                        pared.userData.points = [start.x,end.x];
-                    }else{
-                        pared.userData.points = [end.x,start.x];
-                    }
-                    break;
-                case 3:
-                    pared.position.x = +width / 2;
-                    if(start.z < end.z){
-                        pared.userData.points = [start.z,end.z];
-                    }else{
-                        pared.userData.points = [end.z,start.z];
-                    }
-                    break;
+            if(pared.userData.orientacion.z === 1){
+                pared.position.z = -depth / 2;
+                if(start.x < end.x){
+                    pared.userData.points = [start.x,end.x];
+                }else{
+                    pared.userData.points = [end.x,start.x];
+                }
+            }
+            else if(pared.userData.orientacion.z === -1){
+                pared.position.z = +depth / 2;
+                if(start.x < end.x){
+                    pared.userData.points = [start.x,end.x];
+                }else {
+                    pared.userData.points = [end.x, start.x];
+                }
+            }
+            else if(pared.userData.orientacion.x === 1){
+                pared.position.x = -width / 2;
+                if(start.z < end.z){
+                    pared.userData.points = [start.z,end.z];
+                }else{
+                    pared.userData.points = [end.z,start.z];
+                }
+            }
+            else if(pared.userData.orientacion.x === -1){
+                pared.position.x = +width / 2;
+                if(start.z < end.z){
+                    pared.userData.points = [start.z,end.z];
+                }else{
+                    pared.userData.points = [end.z,start.z];
+                }
             }
         }
 
@@ -2210,7 +2223,7 @@ class ManagerCasas {
 
         var pared1 = this.crearMeshPared(width, height);
         pared1.position.z = pared1.position.z + halfDepth;
-        pared1.userData.gamma = 180;
+        pared1.userData.gamma = 0;
         pared1.userData.orientacion = new THREE.Vector3(0,0,-1);
         pared1.userData.width = width;
         pared1.userData.height = height;
@@ -2222,7 +2235,7 @@ class ManagerCasas {
         var pared2 = this.crearMeshPared(depth, height);
         pared2.rotation.y = Math.PI / 2;
         pared2.position.x = pared2.position.x + halfWidth;
-        pared2.userData.gamma = 90;
+        pared2.userData.gamma = -90;
         pared2.userData.orientacion = new THREE.Vector3(-1,0,0);
         pared2.userData.width = depth;
         pared2.userData.height = height;
@@ -2234,7 +2247,7 @@ class ManagerCasas {
         var pared3 = this.crearMeshPared(width, height);
         pared3.rotation.y = Math.PI;
         pared3.position.z = pared3.position.z - halfDepth;
-        pared3.userData.gamma = 0;
+        pared3.userData.gamma = 180;
         pared3.userData.orientacion = new THREE.Vector3(0,0,1);
         pared3.userData.width = width;
         pared3.userData.height = height;
@@ -2246,7 +2259,7 @@ class ManagerCasas {
         var pared4 = this.crearMeshPared(depth, height);
         pared4.rotation.y = -Math.PI / 2;
         pared4.position.x = pared4.position.x - halfWidth;
-        pared4.userData.gamma = -90;
+        pared4.userData.gamma = 90;
         pared4.userData.orientacion = new THREE.Vector3(1,0,0);
         pared4.userData.width = depth;
         pared4.userData.height = height;

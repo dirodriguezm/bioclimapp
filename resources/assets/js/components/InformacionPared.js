@@ -468,8 +468,11 @@ class InformacionPared extends Component {
         }
         return (
             <div>
+
                 {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.PARED ?
                     <div className={classes.root}>
+                        {'x:'+seleccionado.position.x+' y:'+seleccionado.position.y+''+' z:'+seleccionado.position.z+''}
+                        {'\n\nx:'+seleccionado.parent.parent.userData.end.x+' y:'+seleccionado.parent.parent.userData.end.y+''+' z:'+seleccionado.parent.parent.userData.end.z+''}
                         <Typography
                             variant={"title"}
                             className={classes.titulo}
