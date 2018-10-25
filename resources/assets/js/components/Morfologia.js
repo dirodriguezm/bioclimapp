@@ -427,6 +427,23 @@ class Morfologia extends Component {
         escena.add(gridHelper);
         gridHelper.position.y+=0.001;
 
+        let lineMaterial = new THREE.LineBasicMaterial({
+            color: 0x950714,
+            linewidth: 6,
+            linecap: 'round', //ignored by WebGLRenderer
+            linejoin:  'round' //ignored by WebGLRenderer
+        });
+        let lineGeometry = new THREE.Geometry();
+        lineGeometry.vertices.push(
+            new THREE.Vector3(-sizePlano/2,0.003,0),
+            new THREE.Vector3(sizePlano/2,0.003,0),
+        );
+        let ejeX = new THREE.Line(lineGeometry, lineMaterial);
+        let ejeY = ejeX.clone();
+        ejeY.rotation.y = Math.PI / 2;
+        this.escena.add(ejeX);
+        this.escena.add(ejeY);
+
         //Indicador de puntos cardinales
         let curve = new THREE.EllipseCurve(
             0, 0,            // ax, aY
@@ -612,6 +629,7 @@ class Morfologia extends Component {
                     BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 }
                 this.handleChangeCasa();
+                this.props.onParedesChanged(this.paredes);
                 /*let casa = this.managerCasas.getCasa();
                 this.props.onCasaChanged(
                     casa.userData.aporteInterno,
@@ -632,29 +650,34 @@ class Morfologia extends Component {
         if(this.dragging && this.props.rotando){
             this.dragging = false;
             
-            let ventanas = [];
+            //let ventanas = [];
             for(let pared of this.paredes){
                 let resultAngle = pared.userData.gamma + this.angleRotatedTemp;
+
                 if(resultAngle > 180){
-                    pared.userData.gamma = resultAngle - 360;
+                    do{
+                        resultAngle = resultAngle - 360;
+                    }while(resultAngle > 180);
+
                 }
                 else if(resultAngle < -180){
-                    pared.userData.gamma = resultAngle + 360;
+                    do{
+                        resultAngle = resultAngle + 360;
+                    }while(resultAngle < -180);
                 }
-                else{
-                    pared.userData.gamma = resultAngle;
-                }
+                pared.userData.gamma = resultAngle;
+                console.log(pared.userData.gamma);
                 for(let child of pared.children){
                     if(child.userData.tipo === Morfologia.tipos.VENTANA){
                         child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotatedTemp * Math.PI / 180);
-                        ventanas.push(child);
+                        //ventanas.push(child);
                     }
                 }
             }
             this.angleRotated = this.angleRotatedTemp;
             this.angleRotatedTemp = 0;
             if(this.paredes.length > 0) this.props.onParedesChanged(this.paredes);
-            if(ventanas.length > 0) this.props.onVentanasChanged(ventanas);
+            if(this.ventanas.length > 0) this.props.onVentanasChanged(this.ventanas);
             this.props.onRotationChanged();
             this.coordenadasRotadas = true;
         }
@@ -818,9 +841,6 @@ class Morfologia extends Component {
     }
 
     handleChangeCasa(){
-        if(!this.count){
-            this.count = 0;
-        }
         let casa = this.managerCasas.getCasa();
         this.props.onCasaChanged(
             casa.userData.aporteInterno,
@@ -831,8 +851,6 @@ class Morfologia extends Component {
             casa.userData.volumen,
             casa.userData.area,
         );
-        //console.log("cambio: "+this.count,casa);
-        this.count++;
     }
 
     onClick(event) {
