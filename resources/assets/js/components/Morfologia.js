@@ -127,7 +127,6 @@ class Morfologia extends Component {
     onComunaChanged() {
         axios.get("https://bioclimapp.host/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
-        this.managerCasas.setZona(this.props.comuna.zona);
 
     }
 
@@ -139,7 +138,11 @@ class Morfologia extends Component {
         let res = BalanceEnergetico.gradosDias(this.temperaturasMes, this.temperaturaConfort);
         let gradoDias = res[0];
         let periodo = res[1];
+        this.managerCasas.setZona(this.props.comuna.zona);
         this.managerCasas.setGradosDias(gradoDias, periodo);
+        this.handleChangeCasa();
+        this.props.onVentanasChanged(this.ventanas);
+
     }
 
     onSunpositionChanged() {
@@ -591,6 +594,8 @@ class Morfologia extends Component {
         }
     }
 
+
+
     onMouseUp(event) {
         event.preventDefault();
         let rect = this.renderer.domElement.getBoundingClientRect();
@@ -606,7 +611,8 @@ class Morfologia extends Component {
                 if(this.coordenadasRotadas){
                     BalanceEnergetico.calcularGammaParedes(this.paredes, this.cardinalPointsCircle, this.circlePoints);
                 }
-                let casa = this.managerCasas.getCasa();
+                this.handleChangeCasa();
+                /*let casa = this.managerCasas.getCasa();
                 this.props.onCasaChanged(
                     casa.userData.aporteInterno,
                     casa.userData.perdidaVentilacion,
@@ -616,7 +622,7 @@ class Morfologia extends Component {
                     casa.userData.volumen,
                     casa.userData.area,
                 );
-                this.props.onParedesChanged(this.paredes);
+                this.props.onParedesChanged(this.paredes);*/
 
                 this.construyendo = false;
 
