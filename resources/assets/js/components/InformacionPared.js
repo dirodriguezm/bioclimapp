@@ -89,7 +89,7 @@ const styles = theme => ({
 function SunPathIcon() {
     return (
         <SvgIcon viewBox="0 0 64 64">
-            <path d="M62 30H47.9a15.9 15.9 0 0 0-3.2-7.8l10-10a2 2 0 0 0-2.8-2.8l-10 10a15.9 15.9 0 0 0-7.9-3.3V2a2 2 0 0 0-4 0v14.2a15.9 15.9 0 0 0-7.8 3.2l-10-10a2 2 0 1 0-2.8 2.8l10 10a15.9 15.9 0 0 0-3.2 7.8H2a2 2 0 1 0 0 4h14.2a15.9 15.9 0 0 0 3.2 7.8l-10 10a2 2 0 1 0 2.8 2.8l10-10a15.9 15.9 0 0 0 7.8 3.3V62a2 2 0 0 0 4 0V47.9a15.9 15.9 0 0 0 7.8-3.2l10 10a2 2 0 1 0 2.8-2.8l-10-10a15.9 15.9 0 0 0 3.3-7.9H62a2 2 0 1 0 0-4z"
+            <path d="M62 30H47.9a15.9 15.9 0 0 0-3.2-7.8l10-10a2 2 0 0 0-2.8-2.8l-10 10a15.9 15.9 0 0 0-7.9-3.3V2a2 2 0 0 0-4 0v14.2a15.9 15.9 0 0 0-7.8 3.2l-10-10a2 2 0 1 0-2.8 2.8l10 10a15.9 15.9 0 0 0-3.2 7.8H2a2 2 0 1 0 0 4subheading4.2a15.9 15.9 0 0 0 3.2 7.8l-10 10a2 2 0 1 0 2.8 2.8l10-10a15.9 15.9 0 0 0 7.8 3.3V62a2 2 0 0 0 4 0V47.9a15.9 15.9 0 0 0 7.8-3.2l10 10a2 2 0 1 0 2.8-2.8l-10-10a15.9 15.9 0 0 0 3.3-7.9H62a2 2 0 1 0 0-4z"
                   fill="#757575"></path>
         </SvgIcon>
     );
@@ -147,7 +147,7 @@ class InformacionPared extends Component {
                     this.info_rb = <div/>;
                     if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde == null) {
                         this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="subheading">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro recibe sol</Grid>
                                 <Grid item xs={6}>
@@ -170,7 +170,7 @@ class InformacionPared extends Component {
                     }
                     else if (this.props.seleccionado.userData.omegas.wm.desde == null && this.props.seleccionado.userData.omegas.wt.desde != null) {
                         this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="subheading">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro recibe sol</Grid>
                                 <Grid item xs={6}>
@@ -193,7 +193,7 @@ class InformacionPared extends Component {
                     }
                     else if (this.props.seleccionado.userData.omegas.wm.desde != null && this.props.seleccionado.userData.omegas.wt.desde != null) {
                         this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="subheading">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro recibe sol</Grid>
                                 <Grid item xs={6}>
@@ -222,7 +222,7 @@ class InformacionPared extends Component {
                     }
                     else {
                         this.info_rb = <Grid container spacing={8} justify="center" alignItems="center">
-                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="title">Información Solar</Typography></Grid>
+                            <Grid item xs={12} style={{textAlign:'center'}}><Typography variant="subheading">Información Solar</Typography></Grid>
                             <Grid item xs={6} container spacing={0}>
                                 <Grid item xs={12} >Hoy el muro no recibe sol</Grid>
                             </Grid>
@@ -471,14 +471,12 @@ class InformacionPared extends Component {
 
                 {seleccionado !== null && seleccionado.userData.tipo === Morfologia.tipos.PARED ?
                     <div className={classes.root}>
-                        {'x:'+seleccionado.position.x+' y:'+seleccionado.position.y+''+' z:'+seleccionado.position.z+''}
-                        {'\n\nx:'+seleccionado.parent.parent.userData.end.x+' y:'+seleccionado.parent.parent.userData.end.y+''+' z:'+seleccionado.parent.parent.userData.end.z+''}
                         <Typography
                             variant={"title"}
                             className={classes.titulo}
                             align={"center"}
                         >
-                            {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
+                            {'Configuración '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
                         </Typography>
                         {seleccionado.userData.separacion === Morfologia.separacion.EXTERIOR &&
                         <Paper style={{padding:20, margin:0}}>{this.info_rb}</Paper>

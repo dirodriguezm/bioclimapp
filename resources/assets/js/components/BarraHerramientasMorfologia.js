@@ -15,6 +15,8 @@ import Videocam from '@material-ui/icons/Videocam';
 import Home from '@material-ui/icons/Home'
 import RotateRight from '@material-ui/icons/RotateRight'
 import RemoveRedEye from '@material-ui/icons/RemoveRedEye'
+import TextField from "@material-ui/core/TextField/TextField";
+import CalendarToday from "@material-ui/core/SvgIcon/SvgIcon";
 
 const styles = theme => ({
     button: {
@@ -234,6 +236,10 @@ class BarraHerramientasMorfologia extends Component {
             anchorSol: null,
         };
 
+        this.handleChange = prop => event => {
+            this.setState({ [prop]: event.target.value });
+            this.props.handleChange(prop,event.target.value);
+        };
 
         this.handleCasaPredefinida = this.handleCasaPredefinida.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
@@ -403,6 +409,8 @@ class BarraHerramientasMorfologia extends Component {
 
 
     render() {
+        let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
+        let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1).substring(0,16);
         const {classes,width} = this.props;
         const {dibujandoStatesButtons, borrando, seleccionando, click2D, anchorEl, anchor, anchorCamara, anchorSol} = this.state;
         return (
@@ -729,6 +737,26 @@ class BarraHerramientasMorfologia extends Component {
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
+
+                    {/*<Tooltip title="Mover Sol"
+                             placement="left"
+                    >
+                        <MenuItem >
+                            <SvgIcon viewBox="0 0 64 64">
+                                <CalendarToday/>
+                            </SvgIcon>
+                            <TextField
+                                type="datetime-local"
+                                label="Fecha y Hora"
+                                defaultValue={localISOTime}
+                                onChange={this.handleChange('fecha')}
+                            />
+                        </MenuItem>
+                    </Tooltip>*/}
+
+
+
+
 
                 </Menu>
 

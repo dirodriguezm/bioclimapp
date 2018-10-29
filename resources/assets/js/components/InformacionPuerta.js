@@ -227,7 +227,7 @@ class InformacionPuerta extends Component {
                             align={"center"}
                             className={classes.titulo}
                         >
-                            {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
+                            {'Configuración '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
                         </Typography>
 
                         <ExpansionPanel>

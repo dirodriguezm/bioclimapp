@@ -513,12 +513,12 @@ class InformacionPisoTecho extends Component {
                             align={"center"}
                         >
                             {techoSeleccionado !== undefined ?
-                                <div>{'Configuracion '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo]
+                                <div>{'Configuración '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo]
                                 +' y '+ Morfologia.tipos_texto[techoSeleccionado.userData.tipo]
 
                                 }</div>
                                 :
-                                <div>{'Configuracion '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo]}</div>
+                                <div>{'Configuración '+ Morfologia.tipos_texto[pisoSeleccionado.userData.tipo]}</div>
                             }
 
                         </Typography>
