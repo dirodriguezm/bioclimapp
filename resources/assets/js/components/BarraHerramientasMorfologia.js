@@ -15,6 +15,11 @@ import Videocam from '@material-ui/icons/Videocam';
 import Home from '@material-ui/icons/Home'
 import RotateRight from '@material-ui/icons/RotateRight'
 import RemoveRedEye from '@material-ui/icons/RemoveRedEye'
+import Grid from "@material-ui/core/Grid/Grid";
+import Select from "@material-ui/core/Select/Select";
+import InputLabel from "@material-ui/core/InputLabel/InputLabel";
+import CalendarToday from "@material-ui/icons/CalendarToday";
+
 
 const styles = theme => ({
     button: {
@@ -211,6 +216,86 @@ function SunPathIcon() {
     );
 }
 
+function DatePicker(props){
+
+    return(
+        <Grid container spacing={8}>
+            <Grid item xs={4}>
+                <InputLabel htmlFor="dia-simple">Día</InputLabel>
+            </Grid>
+            <Grid item xs={4}>
+                <InputLabel htmlFor="mes-simple">Mes</InputLabel>
+            </Grid>
+            <Grid item xs={4}>
+                <InputLabel htmlFor="hora-simple">Hora</InputLabel>
+            </Grid>
+            <Grid item xs={4}>
+                <Select
+                    value={props.dia}
+                    onChange={props.onDateChange}
+                    inputProps={{
+                        name: 'dia',
+                        id: 'dia-simple',
+                    }}
+                >
+                    {Array.from(Array(new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate()), (x,index) => index+1).map(dia => (
+                        <MenuItem value={dia} key={dia}>
+                            {dia}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </Grid>
+            <Grid item xs={4}>
+                <Select
+                    value={props.mes}
+                    onChange={props.onDateChange}
+                    inputProps={{
+                        name: 'mes',
+                        id: 'mes-simple',
+                    }}
+                >
+                    {Array.from(Array(12), (x,index) => index+1).map(mes => (
+                        <MenuItem value={mes} key={mes}>
+                            {mes}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </Grid>
+            <Grid item xs={4}>
+                <Select
+                    value={props.hora}
+                    onChange={props.onDateChange}
+                    inputProps={{
+                        name: 'hora',
+                        id: 'hora-simple',
+                    }}
+                >
+                    {Array.from(Array(24), (x,index) => index+1).map(hora => (
+                        <MenuItem value={hora} key={hora}>
+                            {hora >= 10 ? hora : '0'+hora}
+                        </MenuItem>
+
+                    ))}
+                </Select>
+                <Select
+                    value={props.minutos}
+                    onChange={props.onDateChange}
+                    inputProps={{
+                        name: 'minutos',
+                        id: 'minutos-simple',
+                    }}
+                >
+                    {Array.from(Array(60), (x,index) => index+1).map(minutos => (
+                        <MenuItem value={minutos} key={minutos}>
+                            {minutos >= 10 ? minutos : '0'+minutos}
+                        </MenuItem>
+                    ))}
+                </Select>
+            </Grid>
+        </Grid>
+    );
+}
+
 
 class BarraHerramientasMorfologia extends Component {
 
@@ -232,6 +317,10 @@ class BarraHerramientasMorfologia extends Component {
             anchor: null,
             anchorCamara: null,
             anchorSol: null,
+            dia: new Date().getDate(),
+            mes: new Date().getMonth()+1,
+            hora: new Date().getHours(),
+            minutos: new Date().getMinutes(),
         };
 
 
@@ -253,6 +342,8 @@ class BarraHerramientasMorfologia extends Component {
         this.onActionChanged = this.onActionChanged.bind(this);
         this.handleSunPathClick = this.handleSunPathClick.bind(this);
         this.handleRotation = this.handleRotation.bind(this);
+        this.onDateChange = this.onDateChange.bind(this);
+        this.handleClickFecha = this.handleClickFecha.bind(this);
 
     };
 
@@ -275,7 +366,7 @@ class BarraHerramientasMorfologia extends Component {
     };
 
     handleCloseSol(event){
-        this.setState({anchorSol: null})
+        this.setState({anchorSol: null, anchorFecha: null})
     };
 
 
@@ -306,8 +397,10 @@ class BarraHerramientasMorfologia extends Component {
             dibujando: -1,
             dibujandoStatesButtons: dibujandoStatesButtons,
         });
-
     };
+    handleClickFecha(event){
+        this.setState({anchorFecha: event.currentTarget});
+    }
 
     handleClose() {
         this.setState({anchorEl: null});
@@ -400,11 +493,18 @@ class BarraHerramientasMorfologia extends Component {
         });
         this.onActionChanged(-1, false, false, true);
     }
+    onDateChange(event){
+        this.setState({ [event.target.name]: event.target.value }, () => {
+            let año = new Date().getFullYear();
+            let fecha = new Date(año,this.state.mes-1, this.state.dia, this.state.hora, this.state.minutos);
+            this.props.handleChangeFecha("fecha",fecha);
+        });
+    }
 
 
     render() {
         const {classes,width} = this.props;
-        const {dibujandoStatesButtons, borrando, seleccionando, click2D, anchorEl, anchor, anchorCamara, anchorSol} = this.state;
+        const {dibujandoStatesButtons, borrando, seleccionando, click2D, anchorEl, anchor, anchorCamara, anchorSol, anchorFecha} = this.state;
         return (
             <div style={{display: 'table',
                 marginLeft: 'auto',
@@ -729,6 +829,37 @@ class BarraHerramientasMorfologia extends Component {
                             </IconButton>
                         </MenuItem>
                     </Tooltip>
+                    <Tooltip title="Cambiar Fecha"
+                             placement="left"
+                    >
+                        <MenuItem onClick={this.handleClickFecha}>
+                            <IconButton
+                                className={classes.button}
+                                aria-label="Fecha"
+                                aria-haspopup="true">
+                                <CalendarToday/>
+                            </IconButton>
+                        </MenuItem>
+                    </Tooltip>
+
+                    <Menu
+                        id="simple-menu-sol"
+                        anchorEl={anchorFecha}
+                        open={Boolean(anchorFecha)}
+                        onClose={this.handleCloseSol}
+                        transformOrigin={{
+                            vertical: 'bottom',
+                            horizontal: 'left',
+                        }}
+                        elevation={9}
+                    >
+                        <DatePicker
+                            dia={this.state.dia}
+                            mes={this.state.mes}
+                            hora={this.state.hora}
+                            minutos={this.state.minutos}
+                            onDateChange={this.onDateChange}/>
+                    </Menu>
 
                 </Menu>
 

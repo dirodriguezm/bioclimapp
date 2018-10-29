@@ -37,7 +37,7 @@ class Morfologia extends Component {
     componentDidUpdate(prevProps) {
         if (this.props.sunPosition !== prevProps.sunPosition || (this.sunPath == null && this.props.sunPosition != null)) {
             this.onSunpositionChanged();
-            if(this.props.fecha != null) this.getSunPath(new Date(this.props.fecha));
+            if(this.props.fecha != null) this.getSunPath(this.props.fecha);
             else this.getSunPath();
         }
         /*if(this.props.sunPath !== prevProps.sunPath || (this.sunPath == null && this.props.sunPosition != null)){

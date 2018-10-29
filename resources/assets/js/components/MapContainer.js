@@ -24,7 +24,7 @@ export default class MapContainer extends Component {
 
     componentDidUpdate(prevProps){
         if(this.props.fecha != prevProps.fecha){
-            this.setState((state) => ({sunPosition: this.getSunPosition(state.lat,state.lng, new Date(this.props.fecha))}), () => {this.props.onComunaChanged(this.state)});
+            this.setState((state) => ({sunPosition: this.getSunPosition(state.lat,state.lng,this.props.fecha)}), () => {this.props.onComunaChanged(this.state)});
         }
     }
 
