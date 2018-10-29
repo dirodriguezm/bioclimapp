@@ -56,7 +56,7 @@ class ManagerCasas {
             side: THREE.DoubleSide,
         });
 
-        this.materialTechoConstruccion = new THREE.MeshBasicMaterial({
+        this.materialTechoConstruido = new THREE.MeshBasicMaterial({
             color: '#3d8179',
             opacity: 0.7,
             transparent: true,
@@ -97,7 +97,7 @@ class ManagerCasas {
             side: THREE.DoubleSide,
         });
 
-        this.materialTechoConstruido = new THREE.MeshLambertMaterial({
+        this.materialTechoConstruccion = new THREE.MeshLambertMaterial({
             color: '#B3B3B3',
             side: THREE.DoubleSide,
             opacity: 0.7,

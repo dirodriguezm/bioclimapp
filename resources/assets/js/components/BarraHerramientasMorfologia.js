@@ -323,7 +323,6 @@ class BarraHerramientasMorfologia extends Component {
             minutos: new Date().getMinutes(),
         };
 
-
         this.handleCasaPredefinida = this.handleCasaPredefinida.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
         this.handleClose = this.handleClose.bind(this);

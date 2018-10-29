@@ -17,6 +17,7 @@ import FormControl from '@material-ui/core/FormControl'
 import Grid from "@material-ui/core/Grid";
 import * as BalanceEnergetico from '../Utils/BalanceEnergetico';
 import TextField from "@material-ui/core/TextField/TextField";
+import CalendarToday from "@material-ui/icons/CalendarToday";
 
 const ITEM_HEIGHT = 48;
 
@@ -282,7 +283,7 @@ class InformacionVentana extends Component {
                             align={"center"}
                             className={classes.titulo}
                         >
-                            {'Configuracion '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
+                            {'Configuración '+ Morfologia.tipos_texto[seleccionado.userData.tipo] }
                         </Typography>
 
                         <ExpansionPanel>
