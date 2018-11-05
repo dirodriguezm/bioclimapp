@@ -387,6 +387,7 @@ class Context extends Component {
             let obstruccion = this.obstruccionFantasma.clone();
             obstruccion.material = material;
             obstruccion.ventanas = [];
+            obstruccion.userData.altura = obstruccion.geometry.parameters.height;
             this.obstrucciones.push(obstruccion);
             this.escena.add(obstruccion);
             this.crearTextoObstruccion(obstruccion);
@@ -488,7 +489,7 @@ class Context extends Component {
                     if (intersections[i].distance > 50) {
                         intersections[i].object.fuera = true
                     }
-                    let aDistance = intersections[i].object.geometry.parameters.height - pos.y;
+                    let aDistance = intersections[i].object.userData.altura - pos.y;
                     let bDistance = ventana.userData.orientacion.clone().dot(intersections[i].object.position);
                     let far = Math.pow(0.2996, (aDistance / bDistance));
                     let ventanaObstruida = {
@@ -617,7 +618,7 @@ class Context extends Component {
 
     handleParamChange(name, value) {
         if (name === 'altura') {
-            this.selectedObstruction.geometry = new THREE.BoxBufferGeometry(this.selectedObstruction.geometry.parameters.width, value, 0.5);
+            this.selectedObstruction.userData.altura = value;
             let sprite = this.selectedObstruction.getObjectByName("info");
             sprite.text = "alt: " + value + "   long: " + Math.round(this.selectedObstruction.geometry.parameters.width);
         }

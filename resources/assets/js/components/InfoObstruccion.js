@@ -93,7 +93,7 @@ class InfoObstruccion extends Component{
                                 type="number"
                                 label="Altura"
                                 className={classes.textField}
-                                value={this.props.selectedObstruction.geometry.parameters.height}
+                                value={this.props.selectedObstruction.userData.altura}
                                 onChange={this.handleChange}
                             />
                             <Typography className={classes.typography}>Rotar</Typography>
