@@ -357,12 +357,10 @@ function toDegrees(angle) {
 
 function calcularRbParedes(paredes, latitud, longitud) {
     let periodo = paredes[0].parent.parent.parent.parent.userData.periodo;
-    console.log("periodo en calcularrbparedes", periodo);
     let angulos = calcularAngulos( periodo, 90,  latitud);
     for (let [index,pared] of paredes.entries()) {
         if(pared.userData.separacion === Morfologia.separacion.EXTERIOR) {
             let rbPared = [];
-            console.log(pared.userData.gamma);
             let gammas = calcularGammasPared(pared.userData.gamma);
             for (let angulo of angulos) {
                 let omega_mna = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma1, latitud, longitud);

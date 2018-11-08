@@ -542,6 +542,7 @@ class Context extends Component {
                 if (!obstruccionesVentana.includes(current)) {
                     obstruccionesVentana.push(current);
                 }
+
                 //pasamos al siguiente angulo
                 angle.applyAxisAngle(axisY, -Math.PI / 180);
             }
