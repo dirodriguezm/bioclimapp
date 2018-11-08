@@ -263,7 +263,7 @@ function calcularGammasPared(gamma) {
 
 function calcularOmegaPared(date, delta, gamma, latitud, longitud) {
     let dif = 100;
-    let omega_m = -180;
+    let omega_m = -180.07;
     let gamma_sol = 0;
     while (Math.abs(dif) > 0.1 && omega_m < 180) {
         dif = gamma - gamma_sol;
@@ -274,9 +274,9 @@ function calcularOmegaPared(date, delta, gamma, latitud, longitud) {
         // gamma_sol = this.sign(omega_m) * Math.abs( this.toDegrees(Math.acos((Math.cos(this.toRadians(thetaz)) * Math.sin(this.toRadians(phi))
         //               - Math.sin(this.toRadians(delta))) / (Math.sin(this.toRadians(thetaz)) * Math.cos(this.toRadians(phi))))));
         //let sun = SunCalc.getPosition(new Date(solardate),latitud,longitud);
+        omega_m += 0.02;
         let sun = SunCalc.getPosition(hourAngleToDate(date,omega_m,latitud, longitud), latitud, longitud);
         gamma_sol = sun.azimuth * 180 / Math.PI;
-        omega_m += 0.07;
     }
     return omega_m;
 }
@@ -362,6 +362,7 @@ function calcularRbParedes(paredes, latitud, longitud) {
         if(pared.userData.separacion === Morfologia.separacion.EXTERIOR) {
             let rbPared = [];
             let gammas = calcularGammasPared(pared.userData.gamma);
+            pared.userData.gammas = gammas;
             for (let angulo of angulos) {
                 let omega_mna = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma1, latitud, longitud);
                 let omega_tde = calcularOmegaPared(angulo.date, angulo.delta, gammas.gamma2, latitud, longitud);
@@ -389,6 +390,8 @@ function calcularRbParedes(paredes, latitud, longitud) {
                         rb: Rb.toFixed(3)
                     };
                     pared.userData.omegas = omegasDate;
+                    pared.userData.omega_mna = omega_mna;
+                    pared.userData.omega_tde = omega_tde;
                 }
             }
             pared.userData.rb = rbPared;

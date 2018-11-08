@@ -98,7 +98,7 @@ function Grades(props){
     else if(props.balance <= 70 && props.balance > 55) grade = 'B';
     else if(props.balance <= 55 && props.balance > 40) grade = 'C';
     else if(props.balance <= 40 && props.balance > 20) grade = 'D';
-    else if(props.balance <= 20 && props.balance > 10) grade = 'E';
+    else if(props.balance <= 20 && props.balance > -10) grade = 'E';
     else if(props.balance <= -10 && props.balance > -35) grade = 'F';
     else if(props.balance <= -35) grade = 'G';
     return (

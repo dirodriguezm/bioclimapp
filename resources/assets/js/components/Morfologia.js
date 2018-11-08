@@ -894,6 +894,7 @@ class Morfologia extends Component {
             this.changeColorSeleccion(this.objetoSeleccionadoClick);
         }
         this.objetoSeleccionadoClick = this.objetoSeleccionado;
+        console.log("objeto seleccionado", this.objetoSeleccionadoClick);
     }
 
     handleBorrado(){
