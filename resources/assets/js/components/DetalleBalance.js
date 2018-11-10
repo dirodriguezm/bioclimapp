@@ -103,6 +103,7 @@ function Grades(props){
     else if(props.balance <= -35) grade = 'G';
     return (
         <Paper>
+            <Typography align="center" variant="title" style={{color: '#3a3b3d',padding : 16}} >Calificación energética</Typography>
             <Stage width={400} height={240} >
                 {grades.map((grade, index ) => (
                     <Layer key={index}>
@@ -170,7 +171,9 @@ function Grades(props){
                     <Layer></Layer>
                 }
             </Stage>
-            <Typography>
+            <Typography style={{paddingLeft: 10,
+                paddingRight: 10,
+                paddingBottom: 10}}>
                 La letra representa el porcentaje de ahorro de energía de la vivienda que se está evaluando con una vivienda de referencia, la cual posee las mismas
                 dimensiones, pero cumple con los parámetros mínimos de la reglamentación térmica.
             </Typography>
@@ -195,7 +198,7 @@ class DetalleBalance extends Component {
                 ]
             },
             dataPerdidas: {
-                labels: ['Por Conducción', 'Por Ventilación'],
+                labels: ['Conducción', 'Ventilación'],
                 datasets: [
                     {
                         data: [0, 0],

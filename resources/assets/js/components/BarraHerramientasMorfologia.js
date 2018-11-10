@@ -215,11 +215,20 @@ function SunPathIcon() {
         </SvgIcon>
     );
 }
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+    PaperProps: {
+        style: {
+            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        },
+    },
+};
 
 function DatePicker(props){
 
     return(
-        <Grid container spacing={8}>
+        <Grid container spacing={8} style={{margin: 5}}>
             <Grid item xs={4}>
                 <InputLabel htmlFor="dia-simple">Día</InputLabel>
             </Grid>
@@ -231,6 +240,7 @@ function DatePicker(props){
             </Grid>
             <Grid item xs={4}>
                 <Select
+                    MenuProps={MenuProps}
                     value={props.dia}
                     onChange={props.onDateChange}
                     inputProps={{
@@ -247,6 +257,7 @@ function DatePicker(props){
             </Grid>
             <Grid item xs={4}>
                 <Select
+                    MenuProps={MenuProps}
                     value={props.mes}
                     onChange={props.onDateChange}
                     inputProps={{
@@ -263,6 +274,7 @@ function DatePicker(props){
             </Grid>
             <Grid item xs={4}>
                 <Select
+                    MenuProps={MenuProps}
                     value={props.hora}
                     onChange={props.onDateChange}
                     inputProps={{
@@ -278,6 +290,7 @@ function DatePicker(props){
                     ))}
                 </Select>
                 <Select
+                    MenuProps={MenuProps}
                     value={props.minutos}
                     onChange={props.onDateChange}
                     inputProps={{
@@ -432,6 +445,7 @@ class BarraHerramientasMorfologia extends Component {
             dibujando: parseInt(event.currentTarget.value),
             borrando: false,
             seleccionando: false,
+            rotando: false,
             dibujandoStatesButtons: dibujandoStatesButtons,
         });
         this.onActionChanged(parseInt(event.currentTarget.value), false, false);
@@ -851,6 +865,7 @@ class BarraHerramientasMorfologia extends Component {
                             horizontal: 'left',
                         }}
                         elevation={9}
+
                     >
                         <DatePicker
                             dia={this.state.dia}

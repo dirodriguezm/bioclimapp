@@ -178,17 +178,9 @@ class InformacionPuerta extends Component {
         let puerta = this.props.seleccionado;
         let height = puerta.userData.height, width = puerta.userData.width;
         if (event.target.name === 'altura') {
-            if(parseInt(event.target.value) >= height){
-                height += 0.1;
-            }else{
-                height -= 0.1;
-            }
+            height = parseFloat(event.target.value);
         } else {
-            if(parseInt(event.target.value) >= width){
-                width += 0.1;
-            }else{
-                width -= 0.1;
-            }
+            width = parseFloat(event.target.value);
         }
         this.props.onDimensionChanged(puerta, width, height);
     }
@@ -405,6 +397,9 @@ class InformacionPuerta extends Component {
                                                 name="altura"
                                                 value={height}
                                                 type="number"
+                                                inputProps={
+                                                    { step: 0.1}
+                                                }
                                                 onChange={this.handleChangeDimension}
                                                 InputLabelProps={{
                                                     shrink: true,
@@ -419,6 +414,9 @@ class InformacionPuerta extends Component {
                                                 name="ancho"
                                                 value={width}
                                                 type="number"
+                                                inputProps={
+                                                    { step: 0.1}
+                                                }
                                                 onChange={this.handleChangeDimension}
                                                 InputLabelProps={{
                                                     shrink: true,
