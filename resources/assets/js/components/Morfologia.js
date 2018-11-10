@@ -9,6 +9,8 @@ import axios from "axios";
 import ManagerCasas from "../Utils/ManagerCasas";
 import Typography from "@material-ui/core/Typography/Typography";
 
+
+
 class Morfologia extends Component {
     //Aqui se nomban objetos y se asocian a un metodo
     constructor(props) {
@@ -25,11 +27,15 @@ class Morfologia extends Component {
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
         this.temperaturaConfort = props.temperatura;
         this.angleRotatedTemp = 0;
+        this.dragging = false;
         this.coordenadasRotadas = false;
 
         this.state  = {
             height: props.height,
             width: props.width,
+            dragging : false,
+            angleRotatedTemp : 0,
+
         };
 
     };
@@ -609,6 +615,7 @@ class Morfologia extends Component {
 
         if(this.props.rotando && event.button === 0){
             this.dragging = true;
+            this.setState({dragging: this.dragging});
             this.prevX = event.screenX;
         }
     }
@@ -651,6 +658,7 @@ class Morfologia extends Component {
 
         if(this.dragging && this.props.rotando){
             this.dragging = false;
+            this.setState({dragging: this.dragging})
             
             //let ventanas = [];
             for(let pared of this.paredes){
@@ -668,7 +676,7 @@ class Morfologia extends Component {
                     }while(resultAngle < -180);
                 }
                 pared.userData.gamma = resultAngle;
-                console.log(pared.userData.gamma);
+                //console.log(pared.userData.gamma);
                 for(let child of pared.children){
                     if(child.userData.tipo === Morfologia.tipos.VENTANA){
                         child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotatedTemp * Math.PI / 180);
@@ -677,7 +685,8 @@ class Morfologia extends Component {
                 }
             }
             this.angleRotated = this.angleRotatedTemp;
-            this.angleRotatedTemp = 0;
+            //this.angleRotatedTemp = 0;
+            this.setState({angleRotatedTemp: this.angleRotatedTemp});
             if(this.paredes.length > 0) this.props.onParedesChanged(this.paredes);
             if(this.ventanas.length > 0) this.props.onVentanasChanged(this.ventanas);
             this.props.onRotationChanged();
@@ -767,6 +776,7 @@ class Morfologia extends Component {
 
         //Si se está dibujando
         if (this.props.dibujando !== -1 && this.props.dibujando < 4) {
+
             let index = parseInt(this.props.dibujando);
             let intersect;
             //si se dibujan paredes
@@ -790,6 +800,7 @@ class Morfologia extends Component {
             }
             //si se dibuja una ventana o pared, se intersecta con paredes.
             else if (this.props.dibujando === 1 || this.props.dibujando === 2 ) {
+                this.indicador_dibujado.visible = false;
                 let intersects = this.raycaster.intersectObjects(this.paredes);
                 if (intersects.length > 0) {
                     intersect = intersects[0];
@@ -810,13 +821,22 @@ class Morfologia extends Component {
                 }
             }
             else if(this.props.dibujando === 3){
+                this.indicador_dibujado.visible = false;
                 let intersects = this.raycaster.intersectObjects(this.paredes);
                 if( intersects.length > 0){
                     intersect = intersects[0];
-                    let piso = intersect.object;
-                    this.managerCasas.moverTechoConstruccion(piso);
+                    let pared = intersect.object;
+                    this.managerCasas.moverTechoConstruccion(pared);
                 }else{
-                   this.managerCasas.ocultarTechoConstruccion();
+                    intersects = this.raycaster.intersectObjects(this.pisos);
+                    if( intersects.length > 0){
+                        intersect = intersects[0];
+                        let piso = intersect.object;
+                        this.managerCasas.moverTechoConstruccion(piso);
+                    }else{
+                        this.managerCasas.ocultarTechoConstruccion();
+                    }
+
                 }
             }
         }
@@ -834,6 +854,11 @@ class Morfologia extends Component {
             this.prevX = event.screenX;
             let angle = Math.PI * movementX / 180;
             this.angleRotatedTemp += (angle*180/Math.PI);
+            if(this.angleRotatedTemp > 359 ) this.angleRotatedTemp = this.angleRotatedTemp - 360;
+            else if(this.angleRotatedTemp < 0){
+                this.angleRotatedTemp = 360 + this.angleRotatedTemp;
+            }
+            this.setState({angleRotatedTemp: this.angleRotatedTemp});
             this.cardinalPointsCircle.rotateZ(angle);
             this.sunPath.rotateY(angle);
             this.light.target.position.set(0,0,0);
@@ -916,7 +941,10 @@ class Morfologia extends Component {
 
     }
 
+
+
     render() {
+        console.log(this.dragging);
         return (
             <div style={{height: this.props.height}}>
                 <div style={{height: 10}}
@@ -931,16 +959,57 @@ class Morfologia extends Component {
                 />
                 <Typography style={{
                                 fontSize: 'x-small',
+                                zIndex: 0,
+                                position: 'relative',
                             }}
                             align={"center"}
                             variant={"button"}
                             color={"textSecondary"}>
-                    Rotar camara: botón secundario
+                    Rotar camara: Arrastrar click derecho
                 </Typography>
+                <TextoAccion
+                    seleccionando={this.props.seleccionando}
+                    rotando={this.props.rotando}
+                    dragging={this.state.dragging}
+                    angleRotatedTemp={this.state.angleRotatedTemp}
+                    borrando={this.props.borrando}
+                    dibujando={this.props.dibujando}
+
+                />
             </div>
 
         )
     }
+}
+
+function TextoAccion(props){
+    let text = '';
+    if(props.seleccionando) text = Morfologia.texto_accion.seleccionar;
+    else if(props.rotando) {
+        if(props.dragging){
+            text = 'Angulo rotado: '+Math.round(props.angleRotatedTemp)+'° ';
+        }else{
+            text = Morfologia.texto_accion.rotar;
+        }
+
+    }
+    else if(props.borrando) text = Morfologia.texto_accion.borrar;
+    else if(props.dibujando === 0) text = Morfologia.texto_accion.bloque_paredes;
+    else if(props.dibujando === 1) text = Morfologia.texto_accion.ventanas;
+    else if(props.dibujando === 2) text = Morfologia.texto_accion.puertas;
+    else if(props.dibujando === 3) text = Morfologia.texto_accion.techos;
+    return (
+        <Typography style={{
+            fontSize: 'x-small',
+            zIndex: 0,
+            position: 'relative',
+        }}
+                    align={"center"}
+                    variant={"button"}
+                    color={"textSecondary"}>
+            {text}
+        </Typography>
+    )
 }
 
 Morfologia.propTypes = {
@@ -965,6 +1034,16 @@ Morfologia.tipos_texto = {
     2 : 'Puerta',
     3 : 'Techo',
     4 : 'Piso',
+};
+
+Morfologia.texto_accion = {
+    seleccionar: '\nseleccionar: click izquierdo en un elemento',
+    rotar: '\nrotar coordenadas: arrastrar click izquierdo',
+    borrar: '\neliminar: click izquierdo en un elemento',
+    bloque_paredes: '\nAgregar bloque paredes: arrastrar click izquierdo desde punto inicio hasta punto final',
+    ventanas: '\nAgregar ventanas: click izquierdo dentro de una pared',
+    puertas: '\nAgregar puertas: click izquierdo dentro de una pared ',
+    techos: '\nAgregar techos: Click izquierdo dentro de un bloque de paredes',
 };
 
 export default Morfologia
