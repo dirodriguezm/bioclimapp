@@ -270,7 +270,7 @@ function DatePicker(props){
                         id: 'hora-simple',
                     }}
                 >
-                    {Array.from(Array(24), (x,index) => index+1).map(hora => (
+                    {Array.from(Array(24), (x,index) => index).map(hora => (
                         <MenuItem value={hora} key={hora}>
                             {hora >= 10 ? hora : '0'+hora}
                         </MenuItem>
@@ -285,7 +285,7 @@ function DatePicker(props){
                         id: 'minutos-simple',
                     }}
                 >
-                    {Array.from(Array(60), (x,index) => index+1).map(minutos => (
+                    {Array.from(Array(60), (x,index) => index).map(minutos => (
                         <MenuItem value={minutos} key={minutos}>
                             {minutos >= 10 ? minutos : '0'+minutos}
                         </MenuItem>
