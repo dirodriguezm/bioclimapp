@@ -277,7 +277,7 @@ class DetalleBalance extends Component {
                     labels: ['Solares', 'Internos'],
                     datasets: [
                         {
-                            data: [Math.round(this.props.aporte_solar * 1000), Math.round(this.aporte_interno_objetivo)], //el objetivo es el mismo
+                            data: [Math.round(this.props.aporte_solar * 1000 / this.props.area), Math.round(this.aporte_interno_objetivo / this.props.area)], //el objetivo es el mismo
                             backgroundColor: ['#F19C00', '#F16600'],
                             borderColor: ['#F19C00', '#F16600'],
                             label: 'Aportes'
@@ -285,7 +285,7 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
-            this.aporte_solar = this.props.aporte_solar;
+            this.aporte_solar = this.props.aporte_solar / this.props.area;
         }
         if (this.props.aporte_interno !== prevProps.aporte_interno) {
             this.setState({
@@ -293,7 +293,7 @@ class DetalleBalance extends Component {
                     labels: ['Solares', 'Internos'],
                     datasets: [
                         {
-                            data: [Math.round(this.aporte_solar * 1000), Math.round(this.props.aporte_interno)],
+                            data: [Math.round(this.aporte_solar * 1000 / this.props.area), Math.round(this.props.aporte_interno / this.props.area)],
                             backgroundColor: ['#F19C00', '#F16600'],
                             borderColor: ['#F19C00', '#F16600'],
                             label: 'Aportes'
@@ -301,7 +301,7 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
-            this.aporte_interno_objetivo = this.props.aporte_interno;
+            this.aporte_interno_objetivo = this.props.aporte_interno / this.props.area;
         }
         if (this.props.perdida_conduccion !== prevProps.perdida_conduccion) {
             this.setState({
@@ -309,7 +309,7 @@ class DetalleBalance extends Component {
                     labels: ['Por Conducción', 'Por Ventilación'],
                     datasets: [
                         {
-                            data: [Math.round(this.props.perdida_conduccion), Math.round(this.perdida_ventilacion)],
+                            data: [Math.round(this.props.perdida_conduccion / this.props.area), Math.round(this.perdida_ventilacion / this.props.area)],
                             backgroundColor: ['#009688', '#1043A0'],
                             borderColor: ['#009688', '#1043A0'],
                             label: 'Perdidas'
@@ -317,7 +317,7 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
-            this.perdida_conduccion = this.props.perdida_conduccion;
+            this.perdida_conduccion = this.props.perdida_conduccion / this.props.area;
         }
         if (this.props.perdida_ventilacion !== prevProps.perdida_ventilacion) {
             this.setState({
@@ -325,7 +325,7 @@ class DetalleBalance extends Component {
                     labels: ['Por Conducción', 'Por Ventilación'],
                     datasets: [
                         {
-                            data: [Math.round(this.perdida_conduccion), Math.round(this.props.perdida_ventilacion)],
+                            data: [Math.round(this.perdida_conduccion / this.props.area), Math.round(this.props.perdida_ventilacion / this.props.area)],
                             backgroundColor: ['#009688', '#1043A0'],
                             borderColor: ['#009688', '#1043A0'],
                             label: 'Perdidas'
@@ -333,7 +333,7 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
-            this.perdida_ventilacion = this.props.perdida_ventilacion;
+            this.perdida_ventilacion = this.props.perdida_ventilacion / this.props.area;
         }
         if(this.props.perdida_conduccion_objetivo !== prevProps.perdida_conduccion_objetivo){
             this.perdida_conduccion_objetivo = this.props.perdida_conduccion_objetivo;

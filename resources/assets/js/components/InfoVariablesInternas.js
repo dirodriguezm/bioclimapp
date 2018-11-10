@@ -51,14 +51,9 @@ class InfoVariablesInternas extends React.Component {
 
 
     render(){
-        let tzoffset = (new Date()).getTimezoneOffset() * 60000; //offset in milliseconds
-        let localISOTime = (new Date(Date.now() - tzoffset)).toISOString().slice(0, -1).substring(0,16);
         return(
             <div style={{marginLeft:'30%',marginRight:'30%',padding:20}}>
                 <Paper>
-                    {/*<IconButton onClick={this.handleClick}>*/}
-                        {/*<Clear/>*/}
-                    {/*</IconButton>*/}
                     <Grid container spacing={32} alignItems="center" style={{margin: 0,
                         width: '100%',
                         padding: 32}}>
@@ -119,7 +114,7 @@ class InfoVariablesInternas extends React.Component {
                         <Grid item xs={8}>
                             <TextField
                                 type="number"
-                                label="Volumen de aire ventilado"
+                                label="Renovacion de aire diaria"
                                 value={this.state.aire}
                                 onChange={this.handleChange('aire')}
                                 InputProps={{
