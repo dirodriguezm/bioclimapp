@@ -216,32 +216,18 @@ class InformacionVentana extends Component {
     handleChangeDimension(event) {
         let ventana = this.props.seleccionado;
         let height = ventana.userData.height, width = ventana.userData.width;
-        if (event.target.name === 'altura') {
-            if(parseInt(event.target.value) >= height){
-                height += 0.1;
-            }else{
-                height -= 0.1;
-            }
 
-            //this.props.onDimensionChanged(puerta, width, height);
+        if (event.target.name === 'altura') {
+            height = parseFloat(event.target.value);
         } else {
-            if(parseInt(event.target.value) >= width){
-                width += 0.1;
-            }else{
-                width -= 0.1;
-            }
+            width = parseFloat(event.target.value);
         }
         this.props.onDimensionChanged(ventana, width, height);
     }
 
     handleChangeAlturaPiso(event){
         let ventana = this.props.seleccionado;
-        let altura = ventana.position.y;
-        if(parseInt(event.target.value) >= altura){
-            altura += 0.1;
-        }else{
-            altura -= 0.1;
-        }
+        let altura = parseFloat(event.target.value);
         this.props.onAlturaVentanaChanged(ventana, altura);
     }
 
@@ -270,7 +256,7 @@ class InformacionVentana extends Component {
             fm = info_material_marco.fs;
         }
 
-        seleccionado != null ? console.log("seleccionado",seleccionado.uuid, seleccionado.userData) : seleccionado;
+        //seleccionado != null ? console.log("seleccionado",seleccionado.uuid, seleccionado.userData) : seleccionado;
 
 
         return (
@@ -576,6 +562,9 @@ class InformacionVentana extends Component {
                                                 name="altura"
                                                 value={height}
                                                 type="number"
+                                                inputProps={
+                                                    { step: 0.1}
+                                                }
                                                 onChange={this.handleChangeDimension}
                                                 InputLabelProps={{
                                                     shrink: true,
@@ -590,6 +579,9 @@ class InformacionVentana extends Component {
                                                 name="ancho"
                                                 value={width}
                                                 type="number"
+                                                inputProps={
+                                                    { step: 0.1}
+                                                }
                                                 onChange={this.handleChangeDimension}
                                                 InputLabelProps={{
                                                     shrink: true,
@@ -603,6 +595,9 @@ class InformacionVentana extends Component {
                                                 label="Altura al Piso (m)"
                                                 value={alturaPiso}
                                                 type="number"
+                                                inputProps={
+                                                    { step: 0.1}
+                                                }
                                                 onChange={this.handleChangeAlturaPiso}
                                                 InputLabelProps={{
                                                     shrink: true,

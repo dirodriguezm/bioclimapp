@@ -811,8 +811,8 @@ class ManagerCasas {
             perdidaVentilacion = 0
             perdidaVentilacionObjetivo = 0;
         }
-        console.log("calculando aporte interno", this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo, aporteInterno)
-        console.log("calculando perdida ventilacion",habitacion.userData.volumen, this.aireRenovado, this.gradoDias, perdidaVentilacion)
+        //console.log("calculando aporte interno", this.ocupantes, piso.userData.superficie, this.horasIluminacion, this.periodo, aporteInterno)
+        //console.log("calculando perdida ventilacion",habitacion.userData.volumen, this.aireRenovado, this.gradoDias, perdidaVentilacion)
 
         habitacion.userData.aporteInterno = aporteInterno;
         habitacion.userData.perdidaVentilacion = perdidaVentilacion;
@@ -1055,15 +1055,17 @@ class ManagerCasas {
 
         habitacion = this.crearCasaSimple();
 
-        let pared = habitacion.getObjectByName("Paredes").children[2];
-        for(let objeto of pared.children){
-            if(objeto.userData.tipo === Morfologia.tipos.PUERTA){
+        for(let pared of habitacion.getObjectByName("Paredes").children){
+            for(let objeto of pared.children){
+                if(objeto.userData.tipo === Morfologia.tipos.PUERTA){
 
-                this.quitarTransmitanciaSuperficie(objeto,habitacion);
-                this.quitarObjetoPuerta(objeto);
+                    this.quitarTransmitanciaSuperficie(objeto,habitacion);
+                    this.quitarObjetoPuerta(objeto);
+                }
             }
+            this.actualizarTransmitanciaSuperficie(pared);
         }
-        this.actualizarTransmitanciaSuperficie(pared);
+
         this.aumentarNivelHabitacion(habitacion);
 
     }
@@ -1520,8 +1522,8 @@ class ManagerCasas {
         }
     }
 
-    moverTechoConstruccion(pared){
-        let habitacion = pared.parent.parent;
+    moverTechoConstruccion(elemento){
+        let habitacion = elemento.userData.tipo === Morfologia.tipos.PARED ? elemento.parent.parent : elemento.parent;
         let {height, depth, width, nivel} = habitacion.userData;
 
         this.techoConstruccion.visible = true;
@@ -1603,7 +1605,7 @@ class ManagerCasas {
                     }
                 }
 
-                ventana.position.y = altura;
+                ventana.position.y = ( Math.round( altura * 10) / 10);
 
                 let bound = ventana.geometry.boundingBox;
 
@@ -1639,7 +1641,7 @@ class ManagerCasas {
         let habitacion = pared.parent.parent;
 
         if(oldHeight !== height || oldWidth !== width){
-            if((height + ventana.position.y) <= pared.userData.height && width <= 1){
+            if((height + ventana.position.y) <= pared.userData.height && width <= 1 && height >= 0 && width >= 0){
 
                 var shape = pared.geometry.userData.shape.clone();
                 let currentPointVentana = ventana.userData.hole.currentPoint;
@@ -1697,7 +1699,7 @@ class ManagerCasas {
         let habitacion = pared.parent.parent;
 
         if(oldHeight !== height || oldWidth !== width){
-            if(height <= pared.userData.height && width <= 1){
+            if(height <= pared.userData.height && width <= 1 && height >= 0 && width >= 0){
 
                 var shape = pared.geometry.userData.shape.clone();
                 let currentPointPuerta = puerta.userData.hole.currentPoint;
@@ -2068,7 +2070,7 @@ class ManagerCasas {
 
         habitacion.userData.error = this.casasChocan(habitacion);
         if(habitacion.userData.error){
-            console.log('yes');
+            //console.log('yes');
             let prevEnd = new THREE.Vector3(
                 prevHabitacion.userData.end.x,
                 prevHabitacion.userData.end.y,

@@ -348,19 +348,9 @@ class InformacionPared extends Component {
         let pared = this.props.seleccionado;
         let height= pared.userData.height, width = pared.userData.width;
         if (event.target.name === 'altura') {
-            if(parseInt(event.target.value) >= height){
-                height += 0.1;
-                height= Math.round(height * 10)/10;
-            }else{
-                height -= 0.1;
-                height= Math.round(height * 10)/10;
-            }
-        } else {
-            if(parseInt(event.target.value) >= width){
-                width += 1;
-            }else{
-                width -= 1;
-            }
+            height = parseFloat(event.target.value);
+        }else{
+            width = parseFloat(event.target.value);
         }
         this.props.onDimensionChanged(pared, width, height);
     }
@@ -783,6 +773,9 @@ class InformacionPared extends Component {
                                                 name="altura"
                                                 value={height}
                                                 type="number"
+                                                inputProps={
+                                                    { step: 0.1}
+                                                }
                                                 onChange={this.handleChangeDimension}
                                                 InputLabelProps={{
                                                     shrink: true,
@@ -797,6 +790,9 @@ class InformacionPared extends Component {
                                                 name="ancho"
                                                 value={width}
                                                 type="number"
+                                                inputProps={
+                                                    { step: 1}
+                                                }
                                                 onChange={this.handleChangeDimension}
                                                 InputLabelProps={{
                                                     shrink: true,

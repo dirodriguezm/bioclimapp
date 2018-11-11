@@ -357,10 +357,12 @@ function toDegrees(angle) {
 
 function calcularRbParedes(paredes, latitud, longitud) {
     let periodo = paredes[0].parent.parent.parent.parent.userData.periodo;
+    //console.log("periodo en calcularrbparedes", periodo);
     let angulos = calcularAngulos( periodo, 90,  latitud);
     for (let [index,pared] of paredes.entries()) {
         if(pared.userData.separacion === Morfologia.separacion.EXTERIOR) {
             let rbPared = [];
+            //console.log(pared.userData.gamma);
             let gammas = calcularGammasPared(pared.userData.gamma);
             pared.userData.gammas = gammas;
             for (let angulo of angulos) {
@@ -408,13 +410,13 @@ function calcularAporteSolar(periodo, ventanas, difusa, directa){
         let pared = ventana.parent;
         let Igb = 0;
         for(let i = 0; i < (periodo[1]-periodo[0])+1; i++){
-            console.log("Igb", difusa[i].valor,directa[i].valor, pared.userData.rb[i], pared.userData.rb.length, (periodo[1]-periodo[0])+1);
+            //console.log("Igb", difusa[i].valor,directa[i].valor, pared.userData.rb[i], pared.userData.rb.length, (periodo[1]-periodo[0])+1);
             Igb += calcularIgb(difusa[i].valor,directa[i].valor,pared.userData.rb[i]);
         }
         let area_ventana = Math.abs( (ventana.geometry.boundingBox.max.x - ventana.geometry.boundingBox.min.x) *
             (ventana.geometry.boundingBox.max.y - ventana.geometry.boundingBox.min.y) );
         aporte_solar += Igb * area_ventana * f.normal;
-        console.log("aporte_solar", Igb, area_ventana, f.normal);
+        //console.log("aporte_solar", Igb, area_ventana, f.normal);
         aporte_solar_objetivo += Igb * area_ventana * f.objetivo;
     }
     return {normal: aporte_solar, objetivo: aporte_solar_objetivo}
