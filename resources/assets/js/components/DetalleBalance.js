@@ -250,7 +250,7 @@ class DetalleBalance extends Component {
                         return data['labels'][tooltipItem[0]['index']];
                     },
                     label: function (tooltipItem, data) {
-                        return data['datasets'][0]['data'][tooltipItem['index']] + " Wh";
+                        return data['datasets'][0]['data'][tooltipItem['index']] + " Wh/m2";
                     },
                     // afterLabel: function (tooltipItem, data) {
                     //     var dataset = data['datasets'][0];
@@ -277,7 +277,7 @@ class DetalleBalance extends Component {
                     labels: ['Solares', 'Internos'],
                     datasets: [
                         {
-                            data: [Math.round(this.props.aporte_solar * 1000 / this.props.area), Math.round(this.aporte_interno_objetivo / this.props.area)], //el objetivo es el mismo
+                            data: [Math.round((this.props.aporte_solar * 1000) / this.props.area), Math.round(this.aporte_interno_objetivo)], //el objetivo es el mismo
                             backgroundColor: ['#F19C00', '#F16600'],
                             borderColor: ['#F19C00', '#F16600'],
                             label: 'Aportes'
@@ -285,7 +285,7 @@ class DetalleBalance extends Component {
                     ]
                 }
             });
-            this.aporte_solar = this.props.aporte_solar / this.props.area;
+            this.aporte_solar = (this.props.aporte_solar * 1000) / this.props.area;
         }
         if (this.props.aporte_interno !== prevProps.aporte_interno) {
             this.setState({
@@ -293,7 +293,7 @@ class DetalleBalance extends Component {
                     labels: ['Solares', 'Internos'],
                     datasets: [
                         {
-                            data: [Math.round(this.aporte_solar * 1000 / this.props.area), Math.round(this.props.aporte_interno / this.props.area)],
+                            data: [Math.round(this.aporte_solar), Math.round(this.props.aporte_interno / this.props.area)],
                             backgroundColor: ['#F19C00', '#F16600'],
                             borderColor: ['#F19C00', '#F16600'],
                             label: 'Aportes'
@@ -309,7 +309,7 @@ class DetalleBalance extends Component {
                     labels: ['Por Conducción', 'Por Ventilación'],
                     datasets: [
                         {
-                            data: [Math.round(this.props.perdida_conduccion / this.props.area), Math.round(this.perdida_ventilacion / this.props.area)],
+                            data: [Math.round(this.props.perdida_conduccion / this.props.area), Math.round(this.perdida_ventilacion)],
                             backgroundColor: ['#009688', '#1043A0'],
                             borderColor: ['#009688', '#1043A0'],
                             label: 'Perdidas'
@@ -325,7 +325,7 @@ class DetalleBalance extends Component {
                     labels: ['Por Conducción', 'Por Ventilación'],
                     datasets: [
                         {
-                            data: [Math.round(this.perdida_conduccion / this.props.area), Math.round(this.props.perdida_ventilacion / this.props.area)],
+                            data: [Math.round(this.perdida_conduccion), Math.round(this.props.perdida_ventilacion / this.props.area)],
                             backgroundColor: ['#009688', '#1043A0'],
                             borderColor: ['#009688', '#1043A0'],
                             label: 'Perdidas'
@@ -338,19 +338,19 @@ class DetalleBalance extends Component {
         if(this.props.perdida_conduccion_objetivo !== prevProps.perdida_conduccion_objetivo){
             this.perdida_conduccion_objetivo = this.props.perdida_conduccion_objetivo;
             let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
-            -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/(1000*this.props.area);
+            -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/1000;
             this.setState({balanceObjetivo: balanceObjetivo});
         }
         if(this.props.perdida_ventilacion_objetivo !== prevProps.perdida_ventilacion_objetivo){
             this.perdida_ventilacion_objetivo = this.props.perdida_ventilacion_objetivo;
             let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
-                -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/(1000*this.props.area);
+                -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/1000;
             this.setState({balanceObjetivo: balanceObjetivo});
         }
         if(this.props.aporte_solar_objetivo !== prevProps.aporte_solar_objetivo){
             this.aporte_solar_objetivo = this.props.aporte_solar_objetivo * 1000;
             let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
-                -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/(1000*this.props.area);
+                -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/1000;
             this.setState({balanceObjetivo: balanceObjetivo});
         }
     }
@@ -358,7 +358,7 @@ class DetalleBalance extends Component {
     render() {
         const {classes} = this.props;
         let balance = Math.round( ((this.state.dataPerdidas.datasets[0].data[0] + this.state.dataPerdidas.datasets[0].data[1]) -
-            (this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) ) / (1000*this.props.area) )
+            (this.state.dataAportes.datasets[0].data[0] + this.state.dataAportes.datasets[0].data[1]) ) / 1000 );
         let ahorro = balance * 100 / this.state.balanceObjetivo;
         //console.log("balance", balance, "ahorro", ahorro, "perdidaConduccion", this.state.dataPerdidas.datasets[0].data[0], "perdidaVentilacion", this.state.dataPerdidas.datasets[0].data[1],
          //   "aporteSolar", this.state.dataAportes.datasets[0].data[0], "aporteInterno", this.state.dataAportes.datasets[0].data[1]);
