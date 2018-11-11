@@ -171,6 +171,17 @@ function Grades(props){
                     <Layer></Layer>
                 }
             </Stage>
+            <Grid container spacing={8}>
+                <Grid item xs={6}>
+                    {props.balance > 0 ? <Typography align="center">Ahorro : {Math.round(props.balance)} %</Typography>
+                        :  <Typography align="center">Ahorro:</Typography>}
+
+                </Grid>
+                <Grid item xs={6}>
+                    {props.objetivo > 0 ? <Typography align="center">Balance Objetivo : {Math.round(props.objetivo)} KWh/m<sup>2</sup></Typography>
+                        :  <Typography align="center">Balance Objetivo:</Typography>}
+                </Grid>
+            </Grid>
             <Typography style={{paddingLeft: 10,
                 paddingRight: 10,
                 paddingBottom: 10}}>
@@ -339,19 +350,19 @@ class DetalleBalance extends Component {
             this.perdida_ventilacion = this.props.perdida_ventilacion / this.props.area;
         }
         if(this.props.perdida_conduccion_objetivo !== prevProps.perdida_conduccion_objetivo){
-            this.perdida_conduccion_objetivo = this.props.perdida_conduccion_objetivo;
-            let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
+            this.perdida_conduccion_objetivo = this.props.perdida_conduccion_objetivo / this.props.area;
+            let balanceObjetivo =  ((this.perdida_conduccion_objetivo/ + this.perdida_ventilacion_objetivo)
             -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/1000;
             this.setState({balanceObjetivo: balanceObjetivo});
         }
         if(this.props.perdida_ventilacion_objetivo !== prevProps.perdida_ventilacion_objetivo){
-            this.perdida_ventilacion_objetivo = this.props.perdida_ventilacion_objetivo;
+            this.perdida_ventilacion_objetivo = this.props.perdida_ventilacion_objetivo / this.props.area;
             let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
                 -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/1000;
             this.setState({balanceObjetivo: balanceObjetivo});
         }
         if(this.props.aporte_solar_objetivo !== prevProps.aporte_solar_objetivo){
-            this.aporte_solar_objetivo = this.props.aporte_solar_objetivo * 1000;
+            this.aporte_solar_objetivo = (this.props.aporte_solar_objetivo * 1000) / this.props.area;
             let balanceObjetivo =  ((this.perdida_conduccion_objetivo + this.perdida_ventilacion_objetivo)
                 -(this.aporte_solar_objetivo + this.aporte_interno_objetivo))/1000;
             this.setState({balanceObjetivo: balanceObjetivo});
@@ -409,7 +420,8 @@ class DetalleBalance extends Component {
                     />
                 </Grid>
                 <Grid item xs={12}>
-                    <Grades balance = {ahorro}/>
+                    <Grades balance = {ahorro}
+                    objetivo = {this.state.balanceObjetivo}/>
                 </Grid>
             </Grid>
         );
