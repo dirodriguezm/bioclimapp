@@ -854,8 +854,8 @@ class Morfologia extends Component {
             this.prevX = event.screenX;
             let angle = Math.PI * movementX / 180;
             this.angleRotatedTemp += (angle*180/Math.PI);
-            if(this.angleRotatedTemp > 359 ) this.angleRotatedTemp = this.angleRotatedTemp - 360;
-            else if(this.angleRotatedTemp < 0){
+            if(this.angleRotatedTemp > 180 ) this.angleRotatedTemp = this.angleRotatedTemp - 360;
+            else if(this.angleRotatedTemp < -180){
                 this.angleRotatedTemp = 360 + this.angleRotatedTemp;
             }
             this.setState({angleRotatedTemp: this.angleRotatedTemp});
