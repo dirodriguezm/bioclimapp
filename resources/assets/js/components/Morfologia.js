@@ -27,6 +27,7 @@ class Morfologia extends Component {
         this.temperaturasMes = [0,0,0,0,0,0,0,0,0,0,0,0];
         this.temperaturaConfort = props.temperatura;
         this.angleRotatedTemp = 0;
+        this.angleRotated = 0;
         this.dragging = false;
         this.coordenadasRotadas = false;
 
@@ -35,6 +36,7 @@ class Morfologia extends Component {
             width: props.width,
             dragging : false,
             angleRotatedTemp : 0,
+            angleRotated: 0,
 
         };
 
@@ -658,35 +660,27 @@ class Morfologia extends Component {
 
         if(this.dragging && this.props.rotando){
             this.dragging = false;
-            this.setState({dragging: this.dragging})
-            
-            //let ventanas = [];
             for(let pared of this.paredes){
                 let resultAngle = pared.userData.gamma + this.angleRotatedTemp;
-
                 if(resultAngle > 180){
                     do{
                         resultAngle = resultAngle - 360;
                     }while(resultAngle > 180);
 
                 }
-                else if(resultAngle < -180){
+                else if(resultAngle <= -180){
                     do{
                         resultAngle = resultAngle + 360;
-                    }while(resultAngle < -180);
+                    }while(resultAngle <= -180);
                 }
                 pared.userData.gamma = resultAngle;
-                //console.log(pared.userData.gamma);
                 for(let child of pared.children){
                     if(child.userData.tipo === Morfologia.tipos.VENTANA){
                         child.userData.orientacion.applyAxisAngle(new THREE.Vector3(0,1,0), -this.angleRotatedTemp * Math.PI / 180);
-                        //ventanas.push(child);
                     }
                 }
             }
-            this.angleRotated = this.angleRotatedTemp;
-            //this.angleRotatedTemp = 0;
-            this.setState({angleRotatedTemp: this.angleRotatedTemp});
+            this.angleRotatedTemp = 0;
             if(this.paredes.length > 0) this.props.onParedesChanged(this.paredes);
             if(this.ventanas.length > 0) this.props.onVentanasChanged(this.ventanas);
             this.props.onRotationChanged();
@@ -849,22 +843,20 @@ class Morfologia extends Component {
         }
         //si se está rotando
         if(this.dragging){
-            // 
-            // this.angleRotatedTemp += (angle*180/Math.PI);
             let movementX = event.screenX - this.prevX;
             this.prevX = event.screenX;
             let angle = Math.PI * movementX / 180;
             this.angleRotatedTemp += (angle*180/Math.PI);
-            if(this.angleRotatedTemp > 359 ) this.angleRotatedTemp = this.angleRotatedTemp - 359;
-            else if(this.angleRotatedTemp < 0){
-                this.angleRotatedTemp = 360 + this.angleRotatedTemp;
+            this.angleRotated += (angle*180/Math.PI);
+            if(this.angleRotated > 359 ) this.angleRotated = this.angleRotated - 359;
+            if(this.angleRotated < 0){
+                this.angleRotated = 360 + this.angleRotated;
             }
-            this.setState({angleRotatedTemp: this.angleRotatedTemp});
+            this.managerCasas.setAngleRotated(this.angleRotated);
+            this.setState({angleRotated: this.angleRotated});
             this.cardinalPointsCircle.rotateZ(angle);
             this.sunPath.rotateY(angle);
             this.light.target.position.set(0,0,0);
-            //this.light.position.set(this.sol.position.x, this.sol.position.y, this.sol.position.z);
-
         }
     }
 
@@ -972,7 +964,7 @@ class Morfologia extends Component {
                     seleccionando={this.props.seleccionando}
                     rotando={this.props.rotando}
                     dragging={this.state.dragging}
-                    angleRotatedTemp={this.state.angleRotatedTemp}
+                    angleRotated={this.state.angleRotated}
                     borrando={this.props.borrando}
                     dibujando={this.props.dibujando}
 
@@ -985,10 +977,12 @@ class Morfologia extends Component {
 
 function TextoAccion(props){
     let text = '';
+    let angulo = props.angleRotated;
+
     if(props.seleccionando) text = Morfologia.texto_accion.seleccionar;
     else if(props.rotando) {
         if(props.dragging){
-            text = 'Angulo rotado: '+Math.round(props.angleRotatedTemp)+'° ';
+            text = 'Angulo rotado: '+Math.round(angulo)+'° ';
         }else{
             text = Morfologia.texto_accion.rotar;
         }

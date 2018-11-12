@@ -13,6 +13,7 @@ class ManagerCasas {
         this.puertas = puertas;
         this.pisos = pisos;
         this.allObjects = allObjects;
+        this.angleRotated = 0;
 
         this.ocupantes = ocupantes;
         this.horasIluminacion = horasIluminacion;
@@ -255,6 +256,10 @@ class ManagerCasas {
         }
         //this.casa.userData.perdidaVentilacion = perdidaVentilacionTotal;
         //this.casa.userData.perdidaPorConduccion = perdidaPorConduccionTotal;
+    }
+
+    setAngleRotated(angle){
+        this.angleRotated = angle;
     }
 
     setStartHabitacion(start, raycaster) {
@@ -2225,7 +2230,7 @@ class ManagerCasas {
 
         var pared1 = this.crearMeshPared(width, height);
         pared1.position.z = pared1.position.z + halfDepth;
-        pared1.userData.gamma = 0;
+        0 + this.angleRotated > -180 && 0 + this.angleRotated <= 180 ? pared1.userData.gamma = 0 + this.angleRotated : pared1.userData.gamma = 0+this.angleRotated -360;
         pared1.userData.orientacion = new THREE.Vector3(0,0,-1);
         pared1.userData.width = width;
         pared1.userData.height = height;
@@ -2237,7 +2242,7 @@ class ManagerCasas {
         var pared2 = this.crearMeshPared(depth, height);
         pared2.rotation.y = Math.PI / 2;
         pared2.position.x = pared2.position.x + halfWidth;
-        pared2.userData.gamma = -90;
+        -90 + this.angleRotated > -180 && -90 + this.angleRotated <= 180 ? pared2.userData.gamma = -90 + this.angleRotated : pared2.userData.gamma = -90+this.angleRotated -360;
         pared2.userData.orientacion = new THREE.Vector3(-1,0,0);
         pared2.userData.width = depth;
         pared2.userData.height = height;
@@ -2249,7 +2254,7 @@ class ManagerCasas {
         var pared3 = this.crearMeshPared(width, height);
         pared3.rotation.y = Math.PI;
         pared3.position.z = pared3.position.z - halfDepth;
-        pared3.userData.gamma = 180;
+        180 + this.angleRotated > -180 && 180 + this.angleRotated <= 180 ? pared3.userData.gamma = 180 + this.angleRotated : pared3.userData.gamma = 180+this.angleRotated -360;
         pared3.userData.orientacion = new THREE.Vector3(0,0,1);
         pared3.userData.width = width;
         pared3.userData.height = height;
@@ -2261,7 +2266,7 @@ class ManagerCasas {
         var pared4 = this.crearMeshPared(depth, height);
         pared4.rotation.y = -Math.PI / 2;
         pared4.position.x = pared4.position.x - halfWidth;
-        pared4.userData.gamma = 90;
+        90 + this.angleRotated > -180 && 90 + this.angleRotated <= 180 ? pared4.userData.gamma = 90 + this.angleRotated : pared4.userData.gamma = 90+this.angleRotated -360;
         pared4.userData.orientacion = new THREE.Vector3(1,0,0);
         pared4.userData.width = depth;
         pared4.userData.height = height;
