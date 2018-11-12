@@ -738,6 +738,7 @@ class Morfologia extends Component {
 
             if(this.objetoSeleccionadoClick !== null){
                 this.changeColorSeleccion(this.objetoSeleccionadoClick);
+                this.objetoSeleccionadoClick = null;
 
             }
             if(intersects.length > 0){
@@ -749,7 +750,7 @@ class Morfologia extends Component {
                 this.objetoSeleccionado.material = this.materialSeleccionado.clone();
 
             }else{
-                if(this.objetoSeleccionado != null){
+                if(this.objetoSeleccionado !== null){
                     this.changeColorSeleccion(this.objetoSeleccionado);
                     this.objetoSeleccionado = null;
                 }
@@ -854,8 +855,8 @@ class Morfologia extends Component {
             this.prevX = event.screenX;
             let angle = Math.PI * movementX / 180;
             this.angleRotatedTemp += (angle*180/Math.PI);
-            if(this.angleRotatedTemp > 180 ) this.angleRotatedTemp = this.angleRotatedTemp - 360;
-            else if(this.angleRotatedTemp < -180){
+            if(this.angleRotatedTemp > 359 ) this.angleRotatedTemp = this.angleRotatedTemp - 359;
+            else if(this.angleRotatedTemp < 0){
                 this.angleRotatedTemp = 360 + this.angleRotatedTemp;
             }
             this.setState({angleRotatedTemp: this.angleRotatedTemp});
@@ -911,7 +912,7 @@ class Morfologia extends Component {
     }
 
     handleSeleccionado(){
-        if (this.objetoSeleccionado != null){
+        if (this.objetoSeleccionado !== null){
             this.props.onSeleccionadoChanged(this.objetoSeleccionado);
 
         }
