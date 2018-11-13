@@ -264,7 +264,7 @@ class DetalleBalance extends Component {
                         return data['labels'][tooltipItem[0]['index']];
                     },
                     label: function (tooltipItem, data) {
-                        return data['datasets'][0]['data'][tooltipItem['index']] + " Wh/m2";
+                        return data['datasets'][0]['data'][tooltipItem['index']] + " KWh/m2";
                     },
                     // afterLabel: function (tooltipItem, data) {
                     //     var dataset = data['datasets'][0];
