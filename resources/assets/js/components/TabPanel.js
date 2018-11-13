@@ -530,16 +530,13 @@ class TabPanel extends Component {
                         <div style={{
                             marginLeft: 'auto',}}>
                             <Typography variant="button" color="inherit"  >
-                                Diseño bioclimático de viviendas
+                                Proyecto FIPI,
                             </Typography>
                             <Typography style={{
                                 fontSize: 'x-small',}}align={'center'} variant="button" color="inherit"  >
-                                Por
+                                Facultad de Ingeniería - UdeC
                             </Typography>
-                            <Typography style={{
-                                fontSize: 'x-small',}}align={'center'} variant="button" color="inherit"  >
-                                Matias Medina y Diego Rodriguez
-                            </Typography>
+
                         </div>
                     </Toolbar>
                 </AppBar>
