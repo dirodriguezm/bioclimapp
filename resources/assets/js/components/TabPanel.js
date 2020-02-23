@@ -491,11 +491,11 @@ class TabPanel extends Component {
             <div className={classes.appFrame} ref={(tab) => {
                 this.tab = tab
             }} style={{margin:0, padding:0}}>
-                <Sound
-                    url="https://bioclimapp.host/music/jazz.mp3"
+                {/* <Sound
+                    url="http://localhost/music/jazz.mp3"
                     playStatus={Sound.status.PLAYING}
                     loop={true}
-                />
+                /> */}
                 <AlertDialog
                             open={!loaded}
                             classes={{

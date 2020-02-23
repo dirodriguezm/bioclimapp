@@ -135,7 +135,7 @@ class Morfologia extends Component {
     }
 
     onComunaChanged() {
-        axios.get("https://bioclimapp.host/api/temperaturas/"+this.props.comuna.id)
+        axios.get("http://localhost/api/temperaturas/"+this.props.comuna.id)
             .then(response => this.getJson(response));
 
     }

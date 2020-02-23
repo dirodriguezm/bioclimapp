@@ -99,19 +99,19 @@ class GeoInfoPanel extends Component {
     }
 
     getTemperaturesById(id) {
-        return axios.get('https://bioclimapp.host/api/temperaturas/' + id);
+        return axios.get('http://localhost/api/temperaturas/' + id);
     }
 
     getGlobalRadiationById(id) {
-        return axios.get('https://bioclimapp.host/api/radiaciones/' + id);
+        return axios.get('http://localhost/api/radiaciones/' + id);
     }
 
     getDirectRadiationById(id) {
-        return axios.get('https://bioclimapp.host/api/radiaciones_directa/' + id);
+        return axios.get('http://localhost/api/radiaciones_directa/' + id);
     }
 
     getDifuseRadiationById(id) {
-        return axios.get('https://bioclimapp.host/api/radiaciones_difusa/' + id);
+        return axios.get('http://localhost/api/radiaciones_difusa/' + id);
     }
 
 

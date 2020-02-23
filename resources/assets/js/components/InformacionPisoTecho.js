@@ -103,7 +103,7 @@ class InformacionPisoTecho extends Component {
         this.vaciosArrayTecho = [];
         this.info_material = [];
         this.themes = [];
-        axios.get("https://bioclimapp.host/api/info_materiales")
+        axios.get("http://localhost/api/info_materiales")
             .then(response => this.getJson(response));
         this.handleChange = this.handleChange.bind(this);
         this.handleClickAgregarPiso = this.handleClickAgregarPiso.bind(this);
