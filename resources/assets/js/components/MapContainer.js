@@ -30,7 +30,7 @@ export default class MapContainer extends Component {
 
     componentWillMount(){
         let comuna, sunPosition, sunPath;
-        axios.get("http://bioclimatic.inf.udec.cl:8000/api/comuna/" + this.state.lat + "/" + this.state.lng)
+        axios.get("http://bioclimatic.inf.udec.cl/api/comuna/" + this.state.lat + "/" + this.state.lng)
             .then(response => {
                 comuna = response.data[0];
                 sunPosition = this.getSunPosition(this.state.lat,this.state.lng);
@@ -108,7 +108,7 @@ export default class MapContainer extends Component {
 
     mapClicked(e) {
         this.props.setLoading(false);
-        axios.get("http://bioclimatic.inf.udec.cl:8000/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
+        axios.get("http://bioclimatic.inf.udec.cl/api/comuna/" + e.latlng.lat + "/" + e.latlng.lng)
             .then(response => {
                     if(response.data.length > 0) {
                         this.createMarker(e.latlng.lat, e.latlng.lng);
@@ -136,7 +136,7 @@ export default class MapContainer extends Component {
         let lat = parseFloat(e.location.y);
         //
         this.createMarker(lat, lng);
-        axios.get("http://bioclimatic.inf.udec.cl:8000/api/comuna/" + lat + "/" + lng)
+        axios.get("http://bioclimatic.inf.udec.cl/api/comuna/" + lat + "/" + lng)
             .then(response => {
                     this.setState({
                         lat: lat,

@@ -114,7 +114,7 @@ class InformacionPared extends Component {
         this.vaciosArray = [];
         this.info_material = [];
         this.themes = [];
-        axios.get("http://bioclimatic.inf.udec.cl:8000/api/info_materiales")
+        axios.get("http://bioclimatic.inf.udec.cl/api/info_materiales")
             .then(response => this.getJson(response));
         this.handleChange = this.handleChange.bind(this);
         this.handleClickAgregar = this.handleClickAgregar.bind(this);
