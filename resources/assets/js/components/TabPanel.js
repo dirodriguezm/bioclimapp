@@ -492,7 +492,7 @@ class TabPanel extends Component {
                 this.tab = tab
             }} style={{margin:0, padding:0}}>
                 {/* <Sound
-                    url="http://localhost/music/jazz.mp3"
+                    url="http://bioclimatic.inf.udec.cl/music/jazz.mp3"
                     playStatus={Sound.status.PLAYING}
                     loop={true}
                 /> */}

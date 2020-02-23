@@ -43,7 +43,7 @@ return [
 
         'beanstalkd' => [
             'driver' => 'beanstalkd',
-            'host' => 'localhost',
+            'host' => 'bioclimatic.inf.udec.cl',
             'queue' => 'default',
             'retry_after' => 90,
         ],

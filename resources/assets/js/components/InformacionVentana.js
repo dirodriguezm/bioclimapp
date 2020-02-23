@@ -70,9 +70,9 @@ class InformacionVentana extends Component {
         };
         this.info_material = [];
         this.info_marco = [];
-        axios.get("http://bioclimatic.inf.udec.cl:8000/info_ventanas")
+        axios.get("http://bioclimatic.inf.udec.cl:8000/api/info_ventanas")
             .then(response => this.getJson(response));
-        axios.get("http://bioclimatic.inf.udec.cl:8000/info_marcos")
+        axios.get("http://bioclimatic.inf.udec.cl:8000/api/info_marcos")
             .then(response => this.getJsonMarcos(response));
         this.difusa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,2,new Date().getMonth() + 1) : null;
         this.directa = this.props.comuna ? this.getFilteredRadiation(this.props.comuna.id,3,new Date().getMonth() + 1) : null;
@@ -137,7 +137,7 @@ class InformacionVentana extends Component {
     }
 
     getFilteredRadiation(comuna,tipo,mes){
-        axios.get("http://bioclimatic.inf.udec.cl:8000/radiaciones/"+comuna+"/"+tipo+"/"+mes)
+        axios.get("http://bioclimatic.inf.udec.cl:8000/api/radiaciones/"+comuna+"/"+tipo+"/"+mes)
             .then(response => {
                 tipo === 2 ? this.difusa = response.data.valor : null;
                 tipo === 3 ? this.directa = response.data.valor : null;
