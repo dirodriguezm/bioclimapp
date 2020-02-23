@@ -88,7 +88,7 @@ class InformacionPuerta extends Component {
 
         };
         this.info_material = [];
-        axios.get("http://localhost/api/info_materiales")
+        axios.get("http://bioclimatic.inf.udec.cl:8000/info_materiales")
             .then(response => this.getJson(response));
         this.handleChangeDimension = this.handleChangeDimension.bind(this);
         this.handleChangeMaterial = this.handleChangeMaterial.bind(this);
